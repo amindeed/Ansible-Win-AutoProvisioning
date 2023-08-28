@@ -1,5 +1,5 @@
 ---
-- name: "{{ label }} Create Temp directory"
+- name: "{{ label }} Init."
   win_file:
     path: "{% raw %}{{ temp_dir_path_ansible }}{% endraw %}"
     state: directory

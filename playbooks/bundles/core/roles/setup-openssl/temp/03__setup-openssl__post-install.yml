@@ -1,15 +1,20 @@
 ---
-- name: 'Generate "POST-INSTALL" tasks'
-  template:
-    src: "{{ role_path }}/tasks/templates/configuration.yml.j2"
-    dest: "{{ role_path }}/temp/03__{{ role_name }}__post-install.yml"
-  vars:
-    label: "[POST-INSTALL]"
-    configs: "{{ postinstall.configurations | default([]) }}"
-  delegate_to: localhost
+- name: "[POST-INSTALL] Started post-install actions..."
+  debug:
+    msg: "helooooo"
 
 
-- name: "[POST-INSTALL] Check if OpenSSL bin directory is added to %PATH%"
+
+
+
+
+
+
+
+
+
+
+- name: "[POST-INSTALL] (1/1) Check environment variable"
   win_shell: |
     $locationToAdd = "C:\Program Files\OpenSSL-Win64\bin"
     $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
@@ -23,10 +28,19 @@
   no_log: true
 
 
-- name: "[POST-INSTALL] Append OpenSSL bin directory to PATH"
+- name: "[POST-INSTALL] (1/1) Modify environment variable"
   win_shell: |
     $existingPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
     $existingPath += ';C:\Program Files\OpenSSL-Win64\bin'
     [Environment]::SetEnvironmentVariable("PATH", $existingPath, "Machine")
   when: "'is not' in path_exists.stdout"
+
+
+# 
+
+
+
+
+
+
 

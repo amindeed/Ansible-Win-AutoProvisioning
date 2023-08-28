@@ -50,10 +50,12 @@
               installer_relative_path: openssl/Win64OpenSSL_Light-3_1_2.msi
               type: msi
               arguments: "" # for 'msi' type, 'arguments' string should always be empty
-        #postinstall:
-        #  configurations:
-        #    - xxxxxxx:
-        #      yyyyyyy:
+        postinstall:
+          configurations:
+            - resource_type: envvar # [reg, 
+              resource_name: PATH
+              value: 'C:\Program Files\OpenSSL-Win64\bin' # /!\ use single quotes ('value_for_resource')
+              action_type: append # [create, modify, delete, check]
 
 
 - name: Setup KeePass
