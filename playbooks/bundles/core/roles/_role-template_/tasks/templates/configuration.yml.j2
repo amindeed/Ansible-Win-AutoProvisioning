@@ -1,14 +1,48 @@
 ---
-- name: "{{ label }} Create Temp directory"
-  win_file:
-    path: "{% raw %}{{ temp_dir_path_ansible }}{% endraw %}"
-    state: directory
-
+- name: "Started post-install actions..."
+  meta: noop
 
 {% for item in configs %}
 
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) This is a post-install task"
-  debug:
-    msg: "This is a message from a post-install task."
+{% if item.resource_type == 'path_envvar' %}
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check PATH environment variable"
+  win_shell: |
+    $locationToAdd = "{{ item.value }}"
+    $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+    $pathDirectories = $currentPath -split ";"
+    $locationInPath = $pathDirectories -contains $locationToAdd
+    if (-not $locationInPath) {
+        Write-Host "Location is not in path PATH."
+    } else { Write-Host "Location is already in PATH." }
+  register: path_exists
+  changed_when: false
+  no_log: true
+
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Update PATH environment variable"
+  win_shell: |
+    $existingPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+    $existingPath += ';{{ item.value }}'
+    [Environment]::SetEnvironmentVariable("PATH", $existingPath, "Machine")
+  when: "'is not' in path_exists.stdout"
+
+
+# {% elif item.resource_type == 'registry' %}
+# ...
+
+{% else %}
+
+# Default Action
+# ...
+
+{% endif %}
+
+
+
+
+
+
+
 
 {% endfor %}

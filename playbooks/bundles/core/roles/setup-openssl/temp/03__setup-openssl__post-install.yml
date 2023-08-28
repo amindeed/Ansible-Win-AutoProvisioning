@@ -1,7 +1,6 @@
 ---
 - name: "[POST-INSTALL] Started post-install actions..."
-  debug:
-    msg: "helooooo"
+  meta: noop
 
 
 
@@ -14,7 +13,7 @@
 
 
 
-- name: "[POST-INSTALL] (1/1) Check environment variable"
+- name: "[POST-INSTALL] (1/1) Check PATH environment variable"
   win_shell: |
     $locationToAdd = "C:\Program Files\OpenSSL-Win64\bin"
     $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
@@ -28,7 +27,7 @@
   no_log: true
 
 
-- name: "[POST-INSTALL] (1/1) Modify environment variable"
+- name: "[POST-INSTALL] (1/1) Update PATH environment variable"
   win_shell: |
     $existingPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
     $existingPath += ';C:\Program Files\OpenSSL-Win64\bin'

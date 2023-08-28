@@ -1,40 +1,30 @@
 ---
-- name: "{{ label }} Started post-install actions..."
-  debug:
-    msg: "helooooo"
-
+- name: "Started post-install actions..."
+  meta: noop
 
 {% for item in configs %}
 
+{% if item.resource_type == 'path_envvar' %}
 
-
-
-
-
-
-
-
-{% if item.resource_type == 'envvar' %}
-
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check environment variable"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check PATH environment variable"
   win_shell: |
     $locationToAdd = "{{ item.value }}"
-    $currentPath = [Environment]::GetEnvironmentVariable("{{ item.resource_name }}", "Machine")
+    $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
     $pathDirectories = $currentPath -split ";"
     $locationInPath = $pathDirectories -contains $locationToAdd
     if (-not $locationInPath) {
-        Write-Host "Location is not in path {{ item.resource_name }}."
-    } else { Write-Host "Location is already in {{ item.resource_name }}." }
+        Write-Host "Location is not in path PATH."
+    } else { Write-Host "Location is already in PATH." }
   register: path_exists
   changed_when: false
   no_log: true
 
 
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Modify environment variable"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Update PATH environment variable"
   win_shell: |
-    $existingPath = [Environment]::GetEnvironmentVariable("{{ item.resource_name }}", "Machine")
+    $existingPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
     $existingPath += ';{{ item.value }}'
-    [Environment]::SetEnvironmentVariable("{{ item.resource_name }}", $existingPath, "Machine")
+    [Environment]::SetEnvironmentVariable("PATH", $existingPath, "Machine")
   when: "'is not' in path_exists.stdout"
 
 

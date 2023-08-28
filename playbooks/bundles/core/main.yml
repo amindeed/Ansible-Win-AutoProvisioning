@@ -49,11 +49,11 @@
             - software_fullname: "OpenSSL"
               installer_relative_path: openssl/Win64OpenSSL_Light-3_1_2.msi
               type: msi
-              arguments: "" # for 'msi' type, 'arguments' string should always be empty
+              arguments: "" # for 'msi' type, 'arguments' string should always be empty / or better: ignore it
         postinstall:
           configurations:
-            - resource_type: envvar # [reg, 
-              resource_name: PATH
+            - resource_type: path_envvar # [reg, envvar] 
+              resource_name: PATH # should be ignored in case of 'path_envvar'
               value: 'C:\Program Files\OpenSSL-Win64\bin' # /!\ use single quotes ('value_for_resource')
               action_type: append # [create, modify, delete, check]
 

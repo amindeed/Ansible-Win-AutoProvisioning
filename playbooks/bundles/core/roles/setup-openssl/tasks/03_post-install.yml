@@ -8,25 +8,3 @@
     configs: "{{ postinstall.configurations | default([]) }}"
   delegate_to: localhost
 
-
-- name: "[POST-INSTALL] Check if OpenSSL bin directory is added to %PATH%"
-  win_shell: |
-    $locationToAdd = "C:\Program Files\OpenSSL-Win64\bin"
-    $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-    $pathDirectories = $currentPath -split ";"
-    $locationInPath = $pathDirectories -contains $locationToAdd
-    if (-not $locationInPath) {
-        Write-Host "Location is not in path PATH."
-    } else { Write-Host "Location is already in PATH." }
-  register: path_exists
-  changed_when: false
-  no_log: true
-
-
-- name: "[POST-INSTALL] Append OpenSSL bin directory to PATH"
-  win_shell: |
-    $existingPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-    $existingPath += ';C:\Program Files\OpenSSL-Win64\bin'
-    [Environment]::SetEnvironmentVariable("PATH", $existingPath, "Machine")
-  when: "'is not' in path_exists.stdout"
-
