@@ -15,6 +15,7 @@
               type: exe
               arguments: "/S"
 
+
 - name: Setup 7-Zip
   hosts: all
   gather_facts: no
@@ -49,6 +50,10 @@
               installer_relative_path: openssl/Win64OpenSSL_Light-3_1_2.msi
               type: msi
               arguments: "" # for 'msi' type, 'arguments' string should always be empty
+        #postinstall:
+        #  configurations:
+        #    - xxxxxxx:
+        #      yyyyyyy:
 
 
 - name: Setup KeePass
