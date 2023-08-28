@@ -1,5 +1,5 @@
 ---
-# Playbook: Setup Core Software Bundle
+# Playbook: Setup Core Software Bundle.
 
 - name: Setup Notepad++
   hosts: all
