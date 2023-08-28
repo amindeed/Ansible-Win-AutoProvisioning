@@ -1,0 +1,18 @@
+---
+- name: Create Temp directory if it does not exist
+  win_file:
+    path: C:/Temp/
+    state: directory
+
+- name: Copy Firefox installer from Ansible Controller
+  win_copy:
+    src: "{{ product_filename }}"
+    dest: "C:/Temp/"
+
+- name: Install Firefox using the installer file
+  win_package:
+    path: "C:/Temp/{{ product_filename }}"
+    arguments: '/S'
+    product_id: 'Firefox'
+  register: result
+

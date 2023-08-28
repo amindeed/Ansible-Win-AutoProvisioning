@@ -1,0 +1,33 @@
+---
+- name: Create Temp directory if it does not exist
+  win_file:
+    path: C:/Temp/
+    state: directory
+
+- name: Copy KeePass installer from Ansible Controller
+  win_copy:
+    src: "{{ product_filename }}"
+    dest: "C:/Temp/"
+
+- name: Check KeePass installation status
+  win_shell: |
+    $app = Get-WmiObject -Class Win32_Product | 
+    Where-Object {$_.Name -match "KeePass"} |
+    Sort-Object -Property Name |
+    Select-Object Name
+
+    if($app) { $status = "Installed" } else { $status = "Not Installed" }
+
+    Write-Host "KeePass is $status"
+
+  register: keepass_status
+
+- name: Display KeePass installation status
+  debug:
+    var: keepass_status.stdout_lines
+
+- name: Install KeePass (quietly and unattended) if not installed
+  win_shell: |
+    cd C:/Temp/
+    msiexec /i {{ product_filename }} /quiet /qn
+  when: "'Not Installed' in keepass_status.stdout"

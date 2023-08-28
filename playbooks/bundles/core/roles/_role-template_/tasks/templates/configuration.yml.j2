@@ -1,0 +1,14 @@
+---
+- name: "{{ label }} Create Temp directory"
+  win_file:
+    path: "{% raw %}{{ temp_dir_path_ansible }}{% endraw %}"
+    state: directory
+
+
+{% for item in configs %}
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) This is a post-install task"
+  debug:
+    msg: "This is a message from a post-install task."
+
+{% endfor %}

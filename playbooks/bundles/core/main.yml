@@ -1,0 +1,67 @@
+---
+# Playbook: Setup Core Software Bundle
+
+- name: Setup Notepad++
+  hosts: all
+  gather_facts: no
+  tags: notepadpp
+  roles:
+    - role: setup-notepadpp
+      vars:
+        install:
+          components:
+            - software_fullname: "Notepad++"
+              installer_relative_path: notepadpp/npp.8.5.4.Installer.x64.exe
+              type: exe
+              arguments: "/S"
+
+- name: Setup 7-Zip
+  hosts: all
+  gather_facts: no
+  tags: 7zip
+  roles:
+    - role: setup-7zip
+      vars:
+        install:
+          components:
+            - software_fullname: "7-Zip"
+              installer_relative_path: 7zip/7z2301-x64.msi
+              type: msi
+              arguments: ""
+
+
+- name: Setup OpenSSL
+  hosts: all
+  gather_facts: no
+  tags: openssl
+  roles:
+    - role: setup-openssl
+      vars:
+        preinstall:
+          components:
+            - software_fullname: "Microsoft Visual C++ 2022 X64"
+              installer_relative_path: ms-vc-redist/VC_redist.x64_15-17-19-22.exe
+              type: exe
+              arguments: "/q /norestart" 
+        install:
+          components:
+            - software_fullname: "OpenSSL"
+              installer_relative_path: openssl/Win64OpenSSL_Light-3_1_2.msi
+              type: msi
+              arguments: "" # for 'msi' type, 'arguments' string should always be empty
+
+
+- name: Setup KeePass
+  hosts: all
+  gather_facts: no
+  tags: keepass
+  roles:
+    - role: setup-keepass
+      vars:
+        install:
+          components:
+            - software_fullname: "KeePass"
+              installer_relative_path: keepass/KeePass-2.54.msi
+              type: msi
+              arguments: ""
+

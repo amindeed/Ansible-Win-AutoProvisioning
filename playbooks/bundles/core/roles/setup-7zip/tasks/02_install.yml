@@ -1,0 +1,9 @@
+---
+- name: 'Generate "INSTALL" tasks'
+  template:
+    src: "{{ role_path }}/tasks/templates/installation.yml.j2"
+    dest: "{{ role_path }}/temp/02__{{ role_name }}__install.yml"
+  vars:
+    label: "[INSTALL]"
+    components: "{{ install.components | default([]) }}"
+  delegate_to: localhost

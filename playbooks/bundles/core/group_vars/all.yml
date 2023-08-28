@@ -1,0 +1,6 @@
+---
+#generic_repo_url: "http://artifactory.lab:8080/win_packages/"
+generic_repo_url: "http://192.168.66.24:8080/win_packages/"
+generic_repo_auth_user: "amine"
+generic_repo_auth_pass: "pwdRepoUsr23"
+

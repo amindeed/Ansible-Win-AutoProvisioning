@@ -1,0 +1,10 @@
+---
+- name: 'Generate "POST-INSTALL" tasks'
+  template:
+    src: "{{ role_path }}/tasks/templates/configuration.yml.j2"
+    dest: "{{ role_path }}/temp/03__{{ role_name }}__post-install.yml"
+  vars:
+    label: "[POST-INSTALL]"
+    configs: "{{ postinstall.configurations | default([]) }}"
+  delegate_to: localhost
+
