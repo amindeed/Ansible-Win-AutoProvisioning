@@ -2,11 +2,13 @@
 - name: "Started post-install actions..."
   meta: noop
 
+{% for item in configs %}
 
+{% if item.resource_type == 'path_envvar' %}
 
-- name: "[POST-INSTALL] (1/1) Check PATH environment variable"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check PATH environment variable"
   win_shell: |
-    $locationToAdd = "C:\Program Files\OpenSSL-Win64\bin"
+    $locationToAdd = "{{ item.value }}"
     $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
     $pathDirectories = $currentPath -split ";"
     $locationInPath = $pathDirectories -contains $locationToAdd
@@ -18,15 +20,23 @@
   no_log: true
 
 
-- name: "[POST-INSTALL] (1/1) Update PATH environment variable"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Update PATH environment variable"
   win_shell: |
     $existingPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-    $existingPath += ';C:\Program Files\OpenSSL-Win64\bin'
+    $existingPath += ';{{ item.value }}'
     [Environment]::SetEnvironmentVariable("PATH", $existingPath, "Machine")
   when: "'is not' in path_exists.stdout"
 
 
-# 
+# {% elif item.resource_type == 'registry' %}
+# ...
+
+{% else %}
+
+# Default Action
+# ...
+
+{% endif %}
 
 
 
@@ -34,3 +44,5 @@
 
 
 
+
+{% endfor %}

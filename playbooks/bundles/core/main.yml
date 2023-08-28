@@ -72,3 +72,17 @@
               type: msi
               arguments: ""
 
+
+- name: Setup Firefox
+  hosts: all
+  gather_facts: no
+  tags: firefox
+  roles:
+    - role: setup-firefox
+      vars:
+        install:
+          components:
+            - software_fullname: "Firefox"
+              installer_relative_path: firefox/FirefoxSetup114.0.2.msi
+              type: msi
+              arguments: ""
