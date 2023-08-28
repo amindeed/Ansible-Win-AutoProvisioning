@@ -1,7 +1,4 @@
 ---
-- name: "[POST-INSTALL] Create Temp directory"
-  win_file:
-    path: "{{ temp_dir_path_ansible }}"
-    state: directory
-
+- name: "Started post-install actions..."
+  meta: noop
 

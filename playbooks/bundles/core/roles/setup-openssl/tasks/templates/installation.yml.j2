@@ -9,12 +9,12 @@
 
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check {{ item.software_fullname }} installation status"
   win_shell: |
-    $app = Get-WmiObject -Class Win32_Product |
-    Where-Object {$_.Name -like "{{ item.software_fullname }}*"} |
-    Sort-Object -Property Name |
-    Select-Object Name
-    if($app) { $status = "Installed" } else { $status = "Not Installed" }
-    Write-Host "{{ item.software_fullname }} is $status"
+    $appName = "{{ item.software_fullname }}"
+    $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
+    $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regCheck = Get-ChildItem -Path $regPath | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    if ($wmiQuery -or $regCheck) { $status = "Installed" } else { $status = "Not Installed" }
+    Write-Host "$appName is $status"
   register: software_status
   changed_when: false
   no_log: true

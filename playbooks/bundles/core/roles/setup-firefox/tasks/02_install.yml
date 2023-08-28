@@ -7,3 +7,4 @@
     label: "[INSTALL]"
     components: "{{ install.components | default([]) }}"
   delegate_to: localhost
+  changed_when: false

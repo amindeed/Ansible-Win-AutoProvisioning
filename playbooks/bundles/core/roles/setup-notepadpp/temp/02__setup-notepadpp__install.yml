@@ -1,5 +1,5 @@
 ---
-- name: "[INSTALL] Create Temp directory"
+- name: "[INSTALL] Init."
   win_file:
     path: "{{ temp_dir_path_ansible }}"
     state: directory
@@ -8,12 +8,12 @@
 
 - name: "[INSTALL] (1/1) Check Notepad++ installation status"
   win_shell: |
-    $app = Get-WmiObject -Class Win32_Product |
-    Where-Object {$_.Name -like "Notepad++*"} |
-    Sort-Object -Property Name |
-    Select-Object Name
-    if($app) { $status = "Installed" } else { $status = "Not Installed" }
-    Write-Host "Notepad++ is $status"
+    $appName = "Notepad++"
+    $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
+    $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regCheck = Get-ChildItem -Path $regPath | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    if ($wmiQuery -or $regCheck) { $status = "Installed" } else { $status = "Not Installed" }
+    Write-Host "$appName is $status"
   register: software_status
   changed_when: false
   no_log: true

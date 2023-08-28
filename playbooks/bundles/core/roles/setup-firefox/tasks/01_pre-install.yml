@@ -7,4 +7,5 @@
     label: "[PRE-INSTALL]"
     components: "{{ preinstall.components | default([]) }}"
   delegate_to: localhost
+  changed_when: false
 

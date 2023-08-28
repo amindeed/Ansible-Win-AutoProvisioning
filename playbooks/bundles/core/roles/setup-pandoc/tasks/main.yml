@@ -1,0 +1,11 @@
+---
+- name: "Include role's tasks"
+  block:
+    - include_tasks: 01_pre-install.yml
+    - include_tasks: "{{ role_path }}/temp/01__{{ role_name }}__pre-install.yml"
+    - include_tasks: 02_install.yml
+    - include_tasks: "{{ role_path }}/temp/02__{{ role_name }}__install.yml"
+    - include_tasks: 03_post-install.yml
+    - include_tasks: "{{ role_path }}/temp/03__{{ role_name }}__post-install.yml"
+  ignore_errors: yes
+

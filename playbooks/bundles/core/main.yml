@@ -102,3 +102,62 @@
               type: exe
               arguments: "/allusers /S"
 
+
+- name: Setup Pandoc
+  hosts: all
+  gather_facts: no
+  tags: pandoc
+  roles:
+    - role: setup-pandoc
+      vars:
+        install:
+          components:
+            - software_fullname: "Pandoc"
+              installer_relative_path: pandoc/pandoc-3.1.3-windows-x86_64.msi
+              type: msi
+              arguments: ""
+
+
+- name: Setup BeyondCompare
+  hosts: all
+  gather_facts: no
+  tags: beyondcompare
+  roles:
+    - role: setup-beyondcompare
+      vars:
+        install:
+          components:
+            - software_fullname: "Beyond Compare"
+              installer_relative_path: beyond-compare/BCompare-4.4.6.27483_x64.msi
+              type: msi
+              arguments: ""
+
+
+- name: Setup Adobe PDF Reader
+  hosts: all
+  gather_facts: no
+  tags: adobereader
+  roles:
+    - role: setup-adobereader
+      vars:
+        install:
+          components:
+            - software_fullname: "Adobe Acrobat Reader"
+              installer_relative_path: adobe-reader/AcroRdrDC2300320201_en_US.exe
+              type: exe
+              arguments: "/sAll /rs /msi /norestart EULA_ACCEPT=YES"
+
+
+- name: Setup Greenshot
+  hosts: all
+  gather_facts: no
+  tags: greenshot
+  roles:
+    - role: setup-greenshot
+      vars:
+        install:
+          components:
+            - software_fullname: "Greenshot"
+              installer_relative_path: greenshot/Greenshot-INSTALLER-1.2.10.6-RELEASE.exe
+              type: exe
+              arguments: "/VERYSILENT /NORESTART"

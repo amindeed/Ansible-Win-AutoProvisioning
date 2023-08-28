@@ -1,14 +1,14 @@
 ---
-- name: "[PRE-INSTALL] Init."
+- name: "[INSTALL] Init."
   win_file:
     path: "{{ temp_dir_path_ansible }}"
     state: directory
 
 
 
-- name: "[PRE-INSTALL] (1/1) Check Microsoft Visual C++ 2022 X64 installation status"
+- name: "[INSTALL] (1/1) Check Greenshot installation status"
   win_shell: |
-    $appName = "Microsoft Visual C++ 2022 X64"
+    $appName = "Greenshot"
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
     $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
     $regCheck = Get-ChildItem -Path $regPath | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
@@ -19,27 +19,27 @@
   no_log: true
 
 
-- name: "[PRE-INSTALL] (1/1) Download Microsoft Visual C++ 2022 X64 installer"
+- name: "[INSTALL] (1/1) Download Greenshot installer"
   win_get_url:
-    url: "{{ artifact_base_url }}/ms-vc-redist/VC_redist.x64_15-17-19-22.exe"
-    dest: "{{ temp_dir_path_ansible }}\\VC_redist.x64_15-17-19-22.exe"
+    url: "{{ artifact_base_url }}/greenshot/Greenshot-INSTALLER-1.2.10.6-RELEASE.exe"
+    dest: "{{ temp_dir_path_ansible }}\\Greenshot-INSTALLER-1.2.10.6-RELEASE.exe"
     username: "{{ http_auth_username }}"
     password: "{{ http_auth_password }}"
   when: "'Not Installed' in software_status.stdout"
 
 
-- name: "[PRE-INSTALL] (1/1) Install Microsoft Visual C++ 2022 X64"
+- name: "[INSTALL] (1/1) Install Greenshot"
   win_shell: |
     $installResult = $null
     $installerType = "exe"
     if ($installerType -eq "msi") {
-      $installResult = (Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"{{ temp_dir_path_win }}\VC_redist.x64_15-17-19-22.exe`" /qn" -Wait -PassThru).ExitCode
+      $installResult = (Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"{{ temp_dir_path_win }}\Greenshot-INSTALLER-1.2.10.6-RELEASE.exe`" /qn" -Wait -PassThru).ExitCode
     }
     elseif ($installerType -eq "exe") {
-      $installResult = (Start-Process -FilePath "{{ temp_dir_path_win }}\VC_redist.x64_15-17-19-22.exe" -ArgumentList "/q /norestart" -Wait -PassThru).ExitCode
+      $installResult = (Start-Process -FilePath "{{ temp_dir_path_win }}\Greenshot-INSTALLER-1.2.10.6-RELEASE.exe" -ArgumentList "/VERYSILENT /NORESTART" -Wait -PassThru).ExitCode
     }
     if ($installResult -ne 0) {
-        Write-Output "Microsoft Visual C++ 2022 X64 installation failed. Exit Code: $installResult"
+        Write-Output "Greenshot installation failed. Exit Code: $installResult"
         exit 1 }
   register: install_output
   failed_when: "'installation failed' in install_output.stdout"

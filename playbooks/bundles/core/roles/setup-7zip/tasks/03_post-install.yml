@@ -7,4 +7,5 @@
     label: "[POST-INSTALL]"
     configs: "{{ postinstall.configurations | default([]) }}"
   delegate_to: localhost
+  changed_when: false
 
