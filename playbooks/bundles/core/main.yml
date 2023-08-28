@@ -86,3 +86,19 @@
               installer_relative_path: firefox/FirefoxSetup114.0.2.msi
               type: msi
               arguments: ""
+
+
+- name: Setup Draw.io
+  hosts: all
+  gather_facts: no
+  tags: drawio
+  roles:
+    - role: setup-drawio
+      vars:
+        install:
+          components:
+            - software_fullname: "draw.io"
+              installer_relative_path: draw-io/draw.io-21.6.8-windows-installer.exe
+              type: exe
+              arguments: "/allusers /S"
+

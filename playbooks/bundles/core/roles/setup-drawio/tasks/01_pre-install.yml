@@ -1,0 +1,10 @@
+---
+- name: 'Generate "PRE-INSTALL" tasks'
+  template:
+    src: "{{ role_path }}/tasks/templates/installation.yml.j2"
+    dest: "{{ role_path }}/temp/01__{{ role_name }}__pre-install.yml"
+  vars:
+    label: "[PRE-INSTALL]"
+    components: "{{ preinstall.components | default([]) }}"
+  delegate_to: localhost
+
