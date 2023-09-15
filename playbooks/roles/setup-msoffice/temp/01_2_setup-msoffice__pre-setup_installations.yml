@@ -1,0 +1,7 @@
+---
+- name: "[PRE-SETUP] Init."
+  win_file:
+    path: "{{ temp_dir_path_ansible }}"
+    state: directory
+
+

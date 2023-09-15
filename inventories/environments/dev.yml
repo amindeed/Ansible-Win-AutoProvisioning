@@ -8,10 +8,9 @@ all:
     ansible_winrm_transport: ntlm
     ansible_winrm_server_cert_validation: ignore
     ansible_port: 5985
-    artifact_base_url: "https://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts"
-    http_auth_username: "amine"
+    artifactsrepo_base_url: "https://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts"
+    http_auth_username: "artifactuser"
     http_auth_password: "pwdUsr23"
     temp_dir_path_ansible: "C:\\AWAP_Temp"
     temp_dir_path_win: 'C:\AWAP_Temp'
-    software_fullname: 'TEST_TEST_TEST'
 

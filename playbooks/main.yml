@@ -1,0 +1,275 @@
+---
+# ansible-playbook main.yml -i ../inventories/environments/dev.yml
+
+#- name: ">>>> Gather and display all facts
+#  hosts: all
+#  tags: gatherfacts
+#  tasks:
+#    - name: ">>>> Gather all facts
+#      setup:
+#    - name: ">>>> Display all gathered facts
+#      debug:
+#        var: ansible_facts
+
+- name: ">>>> Setup Notepad++ <<<<"
+  hosts: all
+  gather_facts: no
+  tags: notepadpp
+  roles:
+    - role: setup-notepadpp
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Notepad++"
+                file_relative_url: notepadpp/npp.8.5.4.Installer.x64.exe
+                type: exe
+                arguments: "/S"
+
+- name: ">>>> Setup 7-Zip <<<<"
+  hosts: all
+  gather_facts: no
+  tags: 7zip
+  roles:
+    - role: setup-7zip
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "7-Zip"
+                file_relative_url: 7zip/7z2301-x64.msi
+                type: msi
+
+- name: ">>>> Setup OpenSSL <<<<"
+  hosts: all
+  gather_facts: no
+  tags: openssl
+  roles:
+    - role: setup-openssl
+      vars:
+        pre_setup:
+          installations:
+            software_components:
+              - software_fullname: "Microsoft Visual C++ 2022 X64"
+                file_relative_url: ms-vc-redist/VC_redist.x64_15-17-19-22.exe
+                type: exe
+                arguments: "/q /norestart" 
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "OpenSSL"
+                file_relative_url: openssl/Win64OpenSSL_Light-3_1_2.msi
+                type: msi
+        post_setup:
+          configurations:
+            update_resources:
+              - resource_type: path_env_var # [reg, env_var] 
+                resource_name: PATH
+                value: 'C:\Program Files\OpenSSL-Win64\bin' # /!\ use single quotes ('value_for_resource')
+                action_type: append # [create, modify, delete, check]
+
+- name: ">>>> Setup KeePass <<<<"
+  hosts: all
+  gather_facts: no
+  tags: keepass
+  roles:
+    - role: setup-keepass
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "KeePass"
+                file_relative_url: keepass/KeePass-2.54.msi
+                type: msi
+
+- name: ">>>> Setup Firefox <<<<"
+  hosts: all
+  gather_facts: no
+  tags: firefox
+  roles:
+    - role: setup-firefox
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Firefox"
+                file_relative_url: firefox/FirefoxSetup114.0.2.msi
+                type: msi
+
+- name: ">>>> Setup Draw.io <<<<"
+  hosts: all
+  gather_facts: no
+  tags: drawio
+  roles:
+    - role: setup-drawio
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "draw.io"
+                file_relative_url: draw-io/draw.io-21.6.8-windows-installer.exe
+                type: exe
+                arguments: "/allusers /S"
+
+- name: ">>>> Setup Pandoc <<<<"
+  hosts: all
+  gather_facts: no
+  tags: pandoc
+  roles:
+    - role: setup-pandoc
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Pandoc"
+                file_relative_url: pandoc/pandoc-3.1.3-windows-x86_64.msi
+                type: msi
+
+- name: ">>>> Setup BeyondCompare <<<<"
+  hosts: all
+  gather_facts: no
+  tags: beyondcompare
+  roles:
+    - role: setup-beyondcompare
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Beyond Compare"
+                file_relative_url: beyond-compare/BCompare-4.4.6.27483_x64.msi
+                type: msi
+
+- name: ">>>> Setup Adobe PDF Reader <<<<"
+  hosts: all
+  gather_facts: no
+  tags: adobereader
+  roles:
+    - role: setup-adobereader
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Adobe Acrobat Reader"
+                file_relative_url: adobe-reader/AcroRdrDC2300320201_en_US.exe
+                type: exe
+                arguments: "/sAll /rs /msi /norestart EULA_ACCEPT=YES"
+          #post-setup:
+            #jobs:
+              #- disable "Acrobat Update Service"
+
+- name: ">>>> Setup Greenshot <<<<"
+  hosts: all
+  gather_facts: no
+  tags: greenshot
+  roles:
+    - role: setup-greenshot
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Greenshot"
+                file_relative_url: greenshot/Greenshot-INSTALLER-1.2.10.6-RELEASE.exe
+                type: exe
+                arguments: "/VERYSILENT /NORESTART"
+        #post-setup:
+          #- disable first time run screen
+          #- Configure?
+
+#- name: ">>>> Setup KDiff3
+#  hosts: all
+#  gather_facts: no
+#  tags: kdiff3
+#  roles:
+#    - role: setup-kdiff3
+#      vars:
+#        setup:
+#          software_components:
+#            - software_fullname: "kdiff3"
+#              file_relative_url: kdiff3/kdiff3-1.10.5-windows-x86_64.exe
+#              type: exe
+#              arguments: "/S"
+
+- name: ">>>> Setup Keystore Explorer <<<<"
+  hosts: all
+  gather_facts: no
+  tags: keystoreexplorer
+  roles:
+    - role: setup-keystoreexplorer
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Keystore Explorer"
+                file_relative_url: keystore-explorer/kse-552-setup.exe
+                type: exe
+                arguments: "/VERYSILENT /NORESTART /ALLUSERS"
+
+- name: ">>>> Setup MarkText <<<<"
+  hosts: all
+  gather_facts: no
+  tags: marktext
+  roles:
+    - role: setup-marktext
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "MarkText"
+                file_relative_url: marktext/marktext-setup.exe
+                type: exe
+                arguments: "/allusers /S"
+        #post-setup:
+        #  configurations:
+        #    update_resources:
+        #      # Make Marktext default program for md files.
+
+- name: ">>>> Setup VSCode <<<<"
+  hosts: all
+  gather_facts: no
+  tags: vscode
+  roles:
+    - role: setup-vscode
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Microsoft Visual Studio Code" # A name that will be recognizable by the system
+                file_relative_url: vscode/VSCodeSetup-x64-1.80.2.exe
+                type: exe
+                arguments: "/VERYSILENT /NORESTART /MERGETASKS=!runcode,desktopicon,addcontextmenufiles,addcontextmenufolders"
+        #post-setup:
+          #- disable auto-update / update check
+
+
+- name: ">>>> Setup Microsoft Office Standard 2016 <<<<"
+  hosts: all
+  gather_facts: no
+  tags: msoffice
+  roles:
+    - role: setup-msoffice
+      vars:
+        pre_setup:
+          checks:
+            check_net_flows:
+              - target_host: kms.server.local
+                target_port: 1688
+                #abort_on_failure: yes
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Microsoft Office Standard 2016"
+                file_relative_url: ms-office-16/MS_Office_2016_32Bit_En_VL.zip
+                type: bundle
+                installer_file_path: setup.exe
+                arguments: '/config .\Config.xml' # /!\ Consider escaping special characters with "`" (for PowerShell)
+                success_exit_codes: # Default is "[0]", when none provided
+                  - 0
+                  - 3010
+        #post_setup:
+        #  executions:
+        #    - run_ps1_script: |
+        #        $currentDateTime = Get-Date
+        #        $formattedDateTime = $currentDateTime.ToString("yyyy-MM-dd HH-mm-ss")
+        #        Write-Host "TEST $formattedDateTime" >> C:\TEST_ANSIBLE.txt
+
+

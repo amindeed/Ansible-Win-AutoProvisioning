@@ -1,0 +1,37 @@
+---
+- name: "Start Checks (if any)..."
+  meta: noop
+
+{# Checking prerequisites that can not be set by the playbook if missing #}
+{% for item in checks %}
+
+{# Check network flows #}
+{% if item == 'check_net_flows' %}
+{% for check in checks['check_net_flows'] %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check Required TCP Network flows"
+  win_shell: |
+    $net_test = Test-NetConnection -ComputerName {{ check.target_host }} -Port {{ check.target_port }}
+    if($net_test.TcpTestSucceeded) {
+      Write-Host "success"
+    } else {
+      Write-Host "failure"
+    }
+  register: netflow_check_result
+  changed_when: false
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Results of TCP Network flow check"
+  assert:
+    that:
+      - "'success' in netflow_check_result.stdout"
+      - "'failure' not in netflow_check_result.stdout"
+    fail_msg: "Failed to establish TCP connection to '{{ check.target_host }}:{{ check.target_port }}'"
+    success_msg: "TCP connection to '{{ check.target_host }}:{{ check.target_port }}' succeeded!"
+  ignore_errors: {% if check.abort_on_failure is defined and check.abort_on_failure %}no{% else %}yes{% endif %}
+{% endfor %}
+{% endif %}
+
+{# 
+... 
+#}
+
+{% endfor %}

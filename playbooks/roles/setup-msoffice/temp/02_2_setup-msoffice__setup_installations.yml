@@ -1,0 +1,82 @@
+---
+- name: "[SETUP] Init."
+  win_file:
+    path: "{{ temp_dir_path_ansible }}"
+    state: directory
+
+
+
+- name: "[SETUP] (1/1) Check 'Microsoft Office Standard 2016' installation status"
+  win_shell: |
+    $appName = "Microsoft Office Standard 2016"
+    $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
+    $regPath1 = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regPath2 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regCheck1 = Get-ChildItem -Path $regPath1 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    $regCheck2 = Get-ChildItem -Path $regPath2 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    if ($wmiQuery -or $regCheck1 -or $regCheck2) { $status = "Installed" } else { $status = "Not Installed" }
+    Write-Host "$appName is $status"
+  register: software_status
+  changed_when: false
+  no_log: true
+
+
+- name: "[SETUP] (1/1) Check if authentication is required for file download"
+  win_shell: |
+    $url = "{{ artifactsrepo_base_url }}/ms-office-16/MS_Office_2016_32Bit_En_VL.zip"
+    $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
+
+    if ($responseStatusCode -eq 401) { 
+        Write-Host "Auth required" 
+    } else { 
+        Write-Host "Auth not required" 
+    }
+  register: auth_check
+  changed_when: false
+  no_log: true
+  when: "'Not Installed' in software_status.stdout"
+
+
+- name: "[SETUP] (1/1) Download 'Microsoft Office Standard 2016' files (with authentication)"
+  win_get_url:
+    url: "{{ artifactsrepo_base_url }}/ms-office-16/MS_Office_2016_32Bit_En_VL.zip"
+    dest: "{{ temp_dir_path_ansible }}\\MS_Office_2016_32Bit_En_VL.zip"
+    username: "{{ http_auth_username }}"
+    password: "{{ http_auth_password }}"
+  when: "'Not Installed' in software_status.stdout and 'Auth required' in auth_check.stdout"
+
+
+- name: "[SETUP] (1/1) Download 'Microsoft Office Standard 2016' files (without authentication)"
+  win_get_url:
+    url: "{{ artifactsrepo_base_url }}/ms-office-16/MS_Office_2016_32Bit_En_VL.zip"
+    dest: "{{ temp_dir_path_ansible }}\\MS_Office_2016_32Bit_En_VL.zip"
+  when: "'Not Installed' in software_status.stdout and 'Auth not required' in auth_check.stdout"
+
+
+- name: "[SETUP] (1/1) Unzip 'MS_Office_2016_32Bit_En_VL.zip'"
+  win_unzip:
+    src: "{{ temp_dir_path_ansible }}\\MS_Office_2016_32Bit_En_VL.zip"
+    dest: "{{ temp_dir_path_ansible }}\\MS_Office_2016_32Bit_En_VL"
+    creates: "{{ temp_dir_path_ansible }}\\MS_Office_2016_32Bit_En_VL"
+
+- name: "[SETUP] (1/1) Install 'Microsoft Office Standard 2016'"
+  win_shell: |
+    $installResult = $null
+    $installSuccess = $false
+    Set-Location "{{ temp_dir_path_win }}\MS_Office_2016_32Bit_En_VL"
+    $InstallerFile = "setup.exe"
+    $InstArgList = "/config .\Config.xml"
+    $successExitCodes = @()
+    $successExitCodes += 0
+    $successExitCodes += 3010
+    $installResult = (Start-Process $InstallerFile -ArgumentList $InstArgList -Wait -PassThru -WindowStyle Hidden).ExitCode
+    if ($successExitCodes -contains $installResult) {$installSuccess = $true}
+    if (-not $installSuccess) {
+        Write-Output "Microsoft Office Standard 2016 installation failed. Exit Code: $installResult"
+        exit 1 }
+  register: component_install_result
+  failed_when: 
+    - "'installation failed' in component_install_result.stdout"
+    - component_install_result.rc != 0
+  when: "'Not Installed' in software_status.stdout"
+
