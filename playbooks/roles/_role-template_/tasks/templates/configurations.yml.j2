@@ -3,37 +3,241 @@
   meta: noop
 
 {% for item in configs %}
-
 {% if item == 'update_resource' %}
 {% for config in configs['update_resource'] %}
 
-{% if item.resource_type == 'path_env_var' %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check PATH environment variable"
+
+{# ︵‿︵‿︵‿︵‿ Handle System Environment Variables ︵‿︵‿︵‿︵‿ #}
+{% if config.resource_type == 'env_var' %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Update '{{ config.resource_name }}' system environment variable"
   win_shell: |
-    $locationToAdd = "{{ item.value }}"
-    $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-    $pathDirectories = $currentPath -split ";"
-    $locationInPath = $pathDirectories -contains $locationToAdd
-    if (-not $locationInPath) {
-        Write-Host "Location is not in path PATH."
-    } else { Write-Host "Location is already in PATH." }
-  register: path_exists
+    function IsVar($var) {
+      if ($null -eq $var) {return $false}
+      if ($var -is [string]) {return -not [string]::IsNullOrEmpty($var)}
+      if ($var -is [array] -or $var -is [System.Collections.IEnumerable]) {return $var.Count -ne 0}
+      return $true
+    }
+    try {
+      $newEnvVarValue = '{{ config.value | default("") }}'
+      $currentEnvVarValue = [Environment]::GetEnvironmentVariable("{{ config.resource_name }}", [System.EnvironmentVariableTarget]::Machine)
+      $action = '{{ config.action | default("append") }}'
+
+      if (IsVar $currentEnvVarValue) {
+        if ($action -eq 'append') {
+          $envvarItemsList = $currentEnvVarValue -split ";"
+          $envvarContainsNewVal = $envvarItemsList -contains $newEnvVarValue
+          if (-not $envvarContainsNewVal) {
+            $currentEnvVarValue += ';{{ config.value | default("") }}'
+            [Environment]::SetEnvironmentVariable("{{ config.resource_name }}", $currentEnvVarValue, [System.EnvironmentVariableTarget]::Machine)
+            Write-Host "[OK_CHANGE] New value appended to system environment variable '{{ config.resource_name }}'."
+            exit 0
+          } else {
+              Write-Host "[OK_NO_CHANGE] Value already in system environment variable '{{ config.resource_name }}'."
+              exit 0
+            }
+        } elseif ('{{ config.resource_name }}' -eq 'PATH') {
+            Write-Host "[KO_FAILURE] Only 'append' action is allowed for 'PATH' environment variable."
+            exit 1
+        } elseif ($action -eq 'modify') {
+          if ($currentEnvVarValue -eq '{{ config.value | default("") }}') {
+            Write-Host "[OK_NO_CHANGE] '{{ config.resource_name }}' variable value already equals to '{{ config.value | default("") }}'."
+            exit 0
+          } else {
+            [Environment]::SetEnvironmentVariable("{{ config.resource_name }}", $newEnvVarValue, [System.EnvironmentVariableTarget]::Machine)
+            Write-Host "[OK_CHANGE] System environment variable '{{ config.resource_name }}' modified."
+            exit 0
+          }
+        } elseif ($action -eq 'delete') {
+          [Environment]::SetEnvironmentVariable("{{ config.resource_name }}", $null, [System.EnvironmentVariableTarget]::Machine)
+          Write-Host "[OK_CHANGE] System environment variable '{{ config.resource_name }}' deleted."
+          exit 0
+        } elseif ($action -eq 'create')  {
+          if ($currentEnvVarValue -eq '{{ config.value | default("") }}') {
+            Write-Host "[OK_NO_CHANGE] '{{ config.resource_name }}' variable already exists with the value '{{ config.value | default("") }}'."
+            exit 0
+          } else {
+            [Environment]::SetEnvironmentVariable("{{ config.resource_name }}", $newEnvVarValue, [System.EnvironmentVariableTarget]::Machine)
+            Write-Host "[OK_CHANGE] '{{ config.resource_name }}' variable already exists, and so has been modified."
+            exit 0
+          }
+        } else {
+          Write-Host "[KO_FAILURE] unknown action '{{ config.action | default("") }}'."
+          exit 1
+        }
+      } else {
+        if (@('create', 'modify', 'append') -contains $action) {
+          [Environment]::SetEnvironmentVariable("{{ config.resource_name }}", $newEnvVarValue, [System.EnvironmentVariableTarget]::Machine)
+          Write-Host "[OK_CHANGE] System environment variable '{{ config.resource_name }}' created."
+          exit 0
+        } else {
+          Write-Host "[OK_NO_CHANGE] '{{ config.resource_name }}' system environment variable does not exist."
+          exit 0
+        }
+      }
+    } catch {
+      $errorMessage = $_.Exception.Message
+      Write-Host "Unexpected exception/error: $errorMessage"
+      exit 1
+    }
+  register: envvar_handling_result
+  changed_when: envvar_handling_result.rc == 0 and 'OK_CHANGE' in envvar_handling_result.stdout
+  failed_when: envvar_handling_result.rc != 0 or 'KO_FAILURE' in envvar_handling_result.stdout
+  ignore_errors: {% if config.abort_on_failure is defined and config.abort_on_failure %}no{% else %}yes{% endif %}
+
+{# ︵‿︵‿︵‿︵‿ Handle Registry Keys & Properties ︵‿︵‿︵‿︵‿ #}
+{% elif config.resource_type == 'registry' %}
+{#
+.... 
+#}
+
+{# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations ︵‿︵‿︵‿︵‿ #}
+
+{% elif config.resource_type == 'file_system' %}
+{% if config.operation_type == 'shortcut' %}
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Create shortcut "{{ config.source }}"'
+  win_shortcut:
+    src: '{{ config.source }}'
+    dest: '{{ config.destination }}'
+
+{% elif config.operation_type == 'transfer' %}
+
+{% if config.source.upload_file is defined %}
+  {% set file_name = config.source.upload_file.split('/')[-1] | default(config.source.upload_file) %}
+{% elif config.source.file_full_url is defined %}
+  {% set file_name = config.source.file_full_url.split('/')[-1] %}
+{% elif config.source.file_relative_url is defined %}
+  {% set file_name = config.source.file_relative_url.split('/')[-1] %}
+{% endif %}
+
+{# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
+{% if config.source.upload_file is not defined and (config.source.file_full_url is defined or config.source.file_relative_url is defined) %}
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Check if HTTP auth. is required to download "{{ file_name }}"'
+  win_shell: |
+{% if config.source.file_full_url is defined and config.source.file_full_url is not none %}
+    $url = "{{ config.source.file_full_url }}"
+{% elif config.source.file_relative_url is defined and config.source.file_relative_url is not none %}
+    $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ config.source.file_relative_url }}"
+{% endif %}
+    $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
+
+    if ($responseStatusCode -eq 401) { 
+        Write-Host "Auth required" 
+    } else { 
+        Write-Host "Auth not required" 
+    }
+  register: auth_check
   changed_when: false
   no_log: true
 
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Update PATH environment variable"
-  win_shell: |
-    $existingPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
-    $existingPath += ';{{ item.value }}'
-    [Environment]::SetEnvironmentVariable("PATH", $existingPath, "Machine")
-  when: "'is not' in path_exists.stdout"
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure destination "{{ config.destination }}" exists'
+  win_file: 
+    path: '{{ config.destination }}'
+    state: directory
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}' (with authentication)"
+  win_get_url:
+{% if config.source.file_full_url is defined and config.source.file_full_url is not none %}
+    url: "{{ config.source.file_full_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+{% elif config.source.file_relative_url is defined and config.source.file_relative_url is not none %}
+    url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ config.source.file_relative_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
 {% endif %}
+    username: "{{ config.source.http_auth_username | default('{{ http_auth_username }}') }}"
+    password: "{{ config.source.http_auth_password | default('{{ http_auth_password }}') }}"
+  register: auth_dl_result
+  when: "'Auth required' in auth_check.stdout"
+
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}' (without authentication)"
+  win_get_url:
+{% if config.source.file_full_url is defined and config.source.file_full_url is not none %}
+    url: "{{ config.source.file_full_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+{% elif config.source.file_relative_url is defined and config.source.file_relative_url is not none %}
+    url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ config.source.file_relative_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+{% endif %}
+  register: no_auth_dl_result
+  when: "'Auth not required' in auth_check.stdout"
+
+{% endif %} {# end process 'Download' #}
+
+{# ︵‿︵‿ Upload files from Ansible Controller machine ︵‿︵‿ #}
+{% if config.source.upload_file is defined and config.source.upload_file is not none %}
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' to target host"
+  win_copy:
+    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ config.source.upload_file }}'
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+    #backup: yes
+{% endif %}
+
+{# Down/Upload: Unzip file if 'unzip: yes' #}
+{% if config.unzip is defined and config.unzip %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination"
+  assert:
+    that: my_variable is defined
+    msg: "The variable 'my_variable' is not defined."
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination"
+  win_unzip:
+    src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+    dest: '{{ config.destination }}'
+    #creates: '{{ config.destination }}'
+  #when: "'XXXXXXXXX' in YYYYYYYYstdout"
+{% endif %}
+
+
+
+
+{# ....
+- Create/modify/move/rename/delete files
+  - Modify: overwrite content, append content, find [text matching pattern] and replace
+  - Create: download, or create from content (plain text or base64-encoded binary files)
+
+- transfer
+  - source
+    - download/upload
+  - destination
+    - file path (include resource name)
+      > w / w/o trailing slash
+    - if none provided, it'll be put in 'win_temp_dir_path'
+
+- create
+  - source
+    - file_content
+    - template
+  - destination
+    - file path (include resource name)
+      > w / w/o trailing slash
+
+- modify
+  - type
+    - empty
+    - insert
+    - find_replace
+    - append
+    - prepend
+
+- move
+  - source
+  - destination
+
+- delete
+  - destionation/source
+
+- shortcut
+  - source
+  - destination
+.... #}
+
+{% endif %}
+{% endif %}
+
 
 {% endfor %}
 {% endif %}
-
-{# 
-... 
-#}
-
 {% endfor %}

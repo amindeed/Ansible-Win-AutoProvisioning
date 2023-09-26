@@ -5,7 +5,7 @@
 {# Checking prerequisites that can not be set by the playbook if missing #}
 {% for item in checks %}
 
-{# Check network flows #}
+{# ︵‿︵‿︵‿︵‿ Check TCP Network Flows ︵‿︵‿︵‿︵‿ #}
 {% if item == 'check_net_flows' %}
 {% for check in checks['check_net_flows'] %}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check Required TCP Network flows"
@@ -30,8 +30,24 @@
 {% endfor %}
 {% endif %}
 
+
+{# ︵‿︵‿︵‿︵‿ Check HTTP Server Status ︵‿︵‿︵‿︵‿ #}
+{% if item == 'check_http_status' %}
+{% for check in checks['check_http_status'] %}
 {# 
 ... 
 #}
+{% endfor %}
+{% endif %}
+
+
+{# ︵‿︵‿︵‿︵‿ Check Windows Service Status ︵‿︵‿︵‿︵‿ #}
+{% if item == 'check_service_status' %}
+{% for check in checks['check_service_status'] %}
+{# 
+... 
+#}
+{% endfor %}
+{% endif %}
 
 {% endfor %}
