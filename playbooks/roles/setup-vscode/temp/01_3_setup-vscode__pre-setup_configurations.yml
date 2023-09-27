@@ -1,0 +1,96 @@
+---
+- name: "Start configurations (if any)..."
+  meta: noop
+
+
+
+
+  
+
+- name: '[PRE-SETUP] (1/2) Check if HTTP auth. is required to download "esbenp.prettier-vscode-9.16.0.vsix"'
+  win_shell: |
+    $url = "{{ pkgs_repo_base_url }}/vscode/extensions/esbenp.prettier-vscode-9.16.0.vsix"
+    $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
+
+    if ($responseStatusCode -eq 401) { 
+        Write-Host "Auth required" 
+    } else { 
+        Write-Host "Auth not required" 
+    }
+  register: auth_check
+  changed_when: false
+  no_log: true
+
+
+- name: "[PRE-SETUP] (1/2) Download 'esbenp.prettier-vscode-9.16.0.vsix' (with authentication)"
+  win_get_url:
+    url: "{{ pkgs_repo_base_url }}/vscode/extensions/esbenp.prettier-vscode-9.16.0.vsix"
+    dest: '{{ win_temp_dir_path }}\esbenp.prettier-vscode-9.16.0.vsix'
+    username: "{{ http_auth_username }}"
+    password: "{{ http_auth_password }}"
+  register: auth_dl_result
+  when: "'Auth required' in auth_check.stdout"
+
+
+- name: "[PRE-SETUP] (1/2) Download 'esbenp.prettier-vscode-9.16.0.vsix' (without authentication)"
+  win_get_url:
+    url: "{{ pkgs_repo_base_url }}/vscode/extensions/esbenp.prettier-vscode-9.16.0.vsix"
+    dest: '{{ win_temp_dir_path }}\esbenp.prettier-vscode-9.16.0.vsix'
+  register: no_auth_dl_result
+  when: "'Auth not required' in auth_check.stdout"
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+  
+
+- name: '[PRE-SETUP] (2/2) Check if HTTP auth. is required to download "PKief.material-icon-theme-4.28.0.vsix"'
+  win_shell: |
+    $url = "{{ pkgs_repo_base_url }}/vscode/extensions/PKief.material-icon-theme-4.28.0.vsix"
+    $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
+
+    if ($responseStatusCode -eq 401) { 
+        Write-Host "Auth required" 
+    } else { 
+        Write-Host "Auth not required" 
+    }
+  register: auth_check
+  changed_when: false
+  no_log: true
+
+
+- name: "[PRE-SETUP] (2/2) Download 'PKief.material-icon-theme-4.28.0.vsix' (with authentication)"
+  win_get_url:
+    url: "{{ pkgs_repo_base_url }}/vscode/extensions/PKief.material-icon-theme-4.28.0.vsix"
+    dest: '{{ win_temp_dir_path }}\PKief.material-icon-theme-4.28.0.vsix'
+    username: "{{ http_auth_username }}"
+    password: "{{ http_auth_password }}"
+  register: auth_dl_result
+  when: "'Auth required' in auth_check.stdout"
+
+
+- name: "[PRE-SETUP] (2/2) Download 'PKief.material-icon-theme-4.28.0.vsix' (without authentication)"
+  win_get_url:
+    url: "{{ pkgs_repo_base_url }}/vscode/extensions/PKief.material-icon-theme-4.28.0.vsix"
+    dest: '{{ win_temp_dir_path }}\PKief.material-icon-theme-4.28.0.vsix'
+  register: no_auth_dl_result
+  when: "'Auth not required' in auth_check.stdout"
+
+ 
+
+
+
+
+
+
+
+

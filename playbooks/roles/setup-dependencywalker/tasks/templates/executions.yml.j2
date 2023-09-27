@@ -67,7 +67,7 @@
 {% endif %}
 
 {% if job.file_text_content is defined %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run user-provided script ({{ job.description | default('') }})"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run user-provided script ('{{ job.description | default('') }}')"
   win_shell: |
 {{ job.file_text_content | indent(width=4, indentfirst=True) }}
 {% else %}

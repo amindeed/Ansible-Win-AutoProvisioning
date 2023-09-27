@@ -1,7 +1,7 @@
 ---
 # ansible-playbook main.yml -i ../inventories/environments/dev.yml
 
-#- name: "Gather and display all facts
+#- name: "Gather and display all facts"
 #  hosts: all
 #  tags: gatherfacts
 #  tasks:
@@ -10,6 +10,13 @@
 #    - name: "Display all gathered facts
 #      debug:
 #        var: ansible_facts
+
+#- name: "Show all variables"
+#  hosts: all
+#  tags: gatherfacts
+#  tasks:
+#    - name: Show all variables
+#      ansible.builtin.debug: msg="{{ lookup('ansible.builtin.varnames', '.+')}}"
 
 
 - name: "Setup Notepad++"
@@ -22,7 +29,7 @@
         setup:
           installations:
             software_components:
-              - software_fullname: Notepad++
+              - software_fullname: Notepad++ # Provide a relevant name that is both human-readable and recognizable by the system (check: tools/check_software_installed.ps1)
                 file_relative_url: notepadpp/npp.8.5.4.Installer.x64.exe
                 type: exe
                 arguments: /S /D=D:\AppServ\Notepad++ 
@@ -109,8 +116,6 @@
             software_components:
               - software_fullname: "7-Zip"
                 file_relative_url: 7zip/7z2301-x64.msi
-                #file_full_url: https://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts/7zip/7z2301-x64.msi
-                #upload_file: 7z2301-x64.msi
                 type: msi
                 root_install_dir: D:\AppServ
 
@@ -139,9 +144,9 @@
         post_setup:
           configurations:
             update_resource:
-              - resource_type: env_var # [reg, env_var] 
+              - resource_type: env_var
                 resource_name: PATH
-                value: D:\AppServ\OpenSSL-Win64\bin # /!\ use single quotes ('value_for_resource')
+                value: D:\AppServ\OpenSSL-Win64\bin
                 action: append # [create, modify, delete] # Default behaviour: attempts 'create' action
                 #abort_on_failure: yes # Default: 'no'
 
@@ -175,7 +180,6 @@
               - software_fullname: "Firefox"
                 file_relative_url: firefox/FirefoxSetup114.0.2.exe
                 type: exe
-                #root_install_dir: D:\AppServ
                 arguments: -ms /MaintenanceService=false /InstallDirectoryPath=D:\AppServ\Firefox
 
 
@@ -241,9 +245,6 @@
                 file_relative_url: adobe-reader/AcroRdrDC2300320201_en_US.exe
                 type: exe
                 arguments: /sAll /rs /msi /norestart EULA_ACCEPT=YES INSTALLDIR=D:\AppServ\Adobe DISABLEDESKTOPSHORTCUT=1
-          #post-setup:
-            #jobs:
-              #- disable "Acrobat Update Service"
 
 
 - name: "Setup Greenshot"
@@ -262,9 +263,6 @@
                 #http_auth_password: p@ssw0rd      # any globally-defined HTTP auth. credentials
                 type: exe
                 arguments: /DIR=D:\AppServ\Greenshot /VERYSILENT /NORESTART
-        #post-setup:
-          #- disable first time run screen
-          #- Configure?
 
 
 - name: "Setup Keystore Explorer"
@@ -297,10 +295,6 @@
                 file_relative_url: marktext/marktext-setup.exe
                 type: exe
                 arguments: /allusers /S /D=D:\AppServ\MarkText
-        #post-setup:
-        #  configurations:
-        #    update_resources:
-        #      # Make Marktext default program for md files.
 
 
 - name: "Setup VSCode"
@@ -324,15 +318,25 @@
         setup:
           installations:
             software_components:
-              - software_fullname: "Microsoft Visual Studio Code" # Provide a relevant name that is both human-readable and recognizable by the system
+              - software_fullname: "Microsoft Visual Studio Code"
                 file_relative_url: vscode/VSCodeSetup-x64-1.80.2.exe
                 type: exe
                 arguments: /DIR=D:\AppServ\VSCode /VERYSILENT /NORESTART /MERGETASKS=!runcode,desktopicon,addcontextmenufiles,addcontextmenufolders
-        #post-setup:
-          #- disable auto-update / update check
-          # `code --extensions-dir "D:\AppServ\VSCode\resources\app\extensions" --install-extension C:\AWAP_Temp\myextension.vsix --force`
+        post_setup:
+          executions:
+            run_ps1_script:
+              - file_text_content: |
+                  try {
+                    code --extensions-dir "D:\AppServ\VSCode\resources\app\extensions" --install-extension "C:\AWAP_Temp\PKief.material-icon-theme-4.28.0.vsix" --force
+                    code --extensions-dir "D:\AppServ\VSCode\resources\app\extensions" --install-extension "C:\AWAP_Temp\esbenp.prettier-vscode-9.16.0.vsix" --force
+                  } catch {
+                      $errorMessage = $_.Exception.Message
+                      Write-Host "Unexpected exception/error: $errorMessage"
+                      exit 1
+                  }
+                description: Install 'Prettier' and 'Material Icons' extensions
 
-
+# According to MS doc, it is not possible to install MS Office to a custom directory:
 # https://support.microsoft.com/en-us/office/can-i-custom-install-office-apps-1eede13d-3426-40cc-b30b-9aa40226bb9e
 - name: "Setup Microsoft Office Standard 2016"
   hosts: all
@@ -366,7 +370,7 @@
                 #    </Configuration>
                 #  #file_relative_url: ms-office-16/files/Config.xml
                 #  #file_full_url: https://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts/ms-office-16/files/Config.xml
-                #  #upload:
+                #  #upload: 
                 #  #  upload_src:
                 #  #  upload_dest:
                 installer_file_path: setup.exe
