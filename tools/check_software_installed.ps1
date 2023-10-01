@@ -18,4 +18,5 @@ Write-Host "`n`n$appName is $status`n`n"
 
 Write-Host "`$wmiQuery = `n$wmiQuery`n`n"
 Write-Host "`$regCheck1 = `n$regCheck1`n`n"
-Write-Host "`$regCheck1 = `n$regCheck1`n`n"
+Write-Host "`$regCheck2 = `n$regCheck2`n`n"
+Write-Host "`$regCheck3 = `n$regCheck3`n`n"

@@ -1,0 +1,446 @@
+---
+# ansible-playbook main.yml -i ../inventories/environments/dev.yml
+
+#- name: "Gather and display all facts"
+#  hosts: all
+#  tags: gatherfacts
+#  tasks:
+#    - name: "Gather all facts
+#      setup:
+#    - name: "Display all gathered facts
+#      debug:
+#        var: ansible_facts
+
+#- name: "Show all variables"
+#  hosts: all
+#  tags: gatherfacts
+#  tasks:
+#    - name: Show all variables
+#      ansible.builtin.debug: msg="{{ lookup('ansible.builtin.varnames', '.+')}}"
+
+
+- name: "Setup Notepad++"
+  hosts: all
+  gather_facts: no
+  tags: notepadpp
+  roles:
+    - role: setup-notepadpp
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: Notepad++ # Provide a relevant name that is both human-readable and recognizable by the system (check: tools/check_software_installed.ps1)
+                file_relative_url: notepadpp/npp.8.5.4.Installer.x64.exe
+                type: exe
+                arguments: /S /D=D:\AppServ\Notepad++ 
+        post_setup:
+          configurations:
+            update_resource:
+              - resource_type: file_system
+                operation_type: shortcut
+                source: 'D:\AppServ\Notepad++\notepad++.exe'
+                destination: '%PUBLIC%\Desktop\Notepad++.lnk'
+                
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/AutoSave_dll_2v00_x64.zip
+                  # OR:
+                  #file_full_url:
+                  #upload_file:
+                  #file_content: |
+                    #1st line of content
+                    #2nd line of content
+                destination: D:\AppServ\Notepad++\plugins\AutoSave\
+                unzip: yes # Default: 'no'
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/DSpellCheck_x64.zip
+                destination: D:\AppServ\Notepad++\plugins\DSpellCheck\
+                unzip: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/LanguageHelp_dll_1v75_x64.zip
+                destination: D:\AppServ\Notepad++\plugins\LanguageHelp\
+                unzip: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/MenuIcons_dll_2v03_x64.zip
+                destination: D:\AppServ\Notepad++\plugins\MenuIcons\
+                unzip: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/OpenSelection_dll_1v13_x64.zip
+                destination: D:\AppServ\Notepad++\plugins\OpenSelection\
+                unzip: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/RunMe_dll_1v61_x64.zip
+                destination: D:\AppServ\Notepad++\plugins\RunMe\
+                unzip: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/TakeNotes_dll_1v26_x64.zip
+                destination: D:\AppServ\Notepad++\plugins\TakeNotes\
+                unzip: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/TopMost_dll_1v42_x64.zip
+                destination: D:\AppServ\Notepad++\plugins\TopMost\
+                unzip: yes
+              
+
+- name: "Setup 7-Zip"
+  hosts: all
+  gather_facts: no
+  tags: 7zip
+  roles:
+    - role: setup-7zip
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "7-Zip"
+                file_relative_url: 7zip/7z2301-x64.msi
+                type: msi
+                root_install_dir: D:\AppServ
+
+
+- name: "Setup OpenSSL"
+  hosts: all
+  gather_facts: no
+  tags: openssl
+  roles:
+    - role: setup-openssl
+      vars:
+        pre_setup:
+          installations:
+            software_components:
+              - software_fullname: "Microsoft Visual C++ 2022 X64"
+                file_relative_url: ms-vc-redist/VC_redist.x64_15-17-19-22.exe
+                type: exe
+                arguments: "/q /norestart" 
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "OpenSSL"
+                file_relative_url: openssl/Win64OpenSSL_Light-3_1_2.exe
+                type: exe
+                arguments: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=D:\AppServ\OpenSSL-Win64
+        post_setup:
+          configurations:
+            update_resource:
+              - resource_type: env_var
+                resource_name: PATH
+                value: D:\AppServ\OpenSSL-Win64\bin
+                action: append # [create, modify, delete] # Default behaviour: attempts 'create' action
+                #abort_on_failure: yes # Default: 'no'
+
+
+- name: "Setup KeePass"
+  hosts: all
+  gather_facts: no
+  tags: keepass
+  roles:
+    - role: setup-keepass
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "KeePass"
+                file_relative_url: keepass/KeePass-2.54.msi
+                type: msi
+                root_install_dir: D:\AppServ
+
+
+- name: "Setup Firefox"
+  hosts: all
+  gather_facts: no
+  tags: firefox
+  roles:
+    - role: setup-firefox
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Firefox"
+                file_relative_url: firefox/FirefoxSetup114.0.2.exe
+                type: exe
+                arguments: -ms /MaintenanceService=false /InstallDirectoryPath=D:\AppServ\Firefox
+
+
+- name: "Setup Draw.io"
+  hosts: all
+  gather_facts: no
+  tags: drawio
+  roles:
+    - role: setup-drawio
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "draw.io"
+                file_relative_url: draw-io/draw.io-21.6.8-windows-installer.exe
+                type: exe
+                arguments: /allusers /S /D=D:\AppServ\Draw.io
+
+
+- name: "Setup Pandoc"
+  hosts: all
+  gather_facts: no
+  tags: pandoc
+  roles:
+    - role: setup-pandoc
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Pandoc"
+                file_relative_url: pandoc/pandoc-3.1.3-windows-x86_64.msi
+                type: msi
+                root_install_dir: D:\AppServ
+
+
+- name: "Setup BeyondCompare"
+  hosts: all
+  gather_facts: no
+  tags: beyondcompare
+  roles:
+    - role: setup-beyondcompare
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Beyond Compare"
+                file_relative_url: beyond-compare/BCompare-4.4.6.27483_x64.msi
+                type: msi
+                root_install_dir: D:\AppServ
+
+
+- name: "Setup Adobe PDF Reader"
+  hosts: all
+  gather_facts: no
+  tags: adobereader
+  roles:
+    - role: setup-adobereader
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Adobe Acrobat Reader"
+                file_relative_url: adobe-reader/AcroRdrDC2300320201_en_US.exe
+                type: exe
+                arguments: /sAll /rs /msi /norestart EULA_ACCEPT=YES INSTALLDIR=D:\AppServ\Adobe DISABLEDESKTOPSHORTCUT=1
+
+
+- name: "Setup Greenshot"
+  hosts: all
+  gather_facts: no
+  tags: greenshot
+  roles:
+    - role: setup-greenshot
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Greenshot"
+                file_relative_url: greenshot/Greenshot-INSTALLER-1.2.10.6-RELEASE.exe
+                #http_auth_username: john          # These override (only for this 'software_components' item) 
+                #http_auth_password: p@ssw0rd      # any globally-defined HTTP auth. credentials
+                type: exe
+                arguments: /DIR=D:\AppServ\Greenshot /VERYSILENT /NORESTART
+
+
+- name: "Setup Keystore Explorer"
+  hosts: all
+  gather_facts: no
+  tags: keystoreexplorer
+  roles:
+    - role: setup-keystoreexplorer
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Keystore Explorer"
+                file_relative_url: keystore-explorer/kse-552-setup.exe
+                type: exe
+                arguments: /DIR=D:\AppServ\KeystoreExplorer /VERYSILENT /NORESTART /ALLUSERS /MERGETASKS=desktopicon
+
+
+- name: "Setup MarkText"
+  hosts: all
+  gather_facts: no
+  tags: marktext
+  roles:
+    - role: setup-marktext
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "MarkText"
+                file_relative_url: marktext/marktext-setup.exe
+                type: exe
+                arguments: /allusers /S /D=D:\AppServ\MarkText
+
+
+- name: "Setup VSCode"
+  hosts: all
+  gather_facts: no
+  tags: vscode
+  roles:
+    - role: setup-vscode
+      vars:
+        pre_setup:
+          configurations:
+            update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: vscode/extensions/esbenp.prettier-vscode-9.16.0.vsix
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: vscode/extensions/PKief.material-icon-theme-4.28.0.vsix
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Microsoft Visual Studio Code"
+                file_relative_url: vscode/VSCodeSetup-x64-1.80.2.exe
+                type: exe
+                arguments: /DIR=D:\AppServ\VSCode /VERYSILENT /NORESTART /MERGETASKS=!runcode,desktopicon,addcontextmenufiles,addcontextmenufolders
+        post_setup:
+          executions:
+            run_ps1_script:
+              - file_text_content: |
+                  try {
+                    code --extensions-dir "D:\AppServ\VSCode\resources\app\extensions" --install-extension "C:\AWAP_Temp\PKief.material-icon-theme-4.28.0.vsix" --force
+                    code --extensions-dir "D:\AppServ\VSCode\resources\app\extensions" --install-extension "C:\AWAP_Temp\esbenp.prettier-vscode-9.16.0.vsix" --force
+                  } catch {
+                      $errorMessage = $_.Exception.Message
+                      Write-Host "Unexpected exception/error: $errorMessage"
+                      exit 1
+                  }
+                description: Install 'Prettier' and 'Material Icons' extensions
+
+# According to MS doc, it is not possible to install MS Office to a custom directory:
+# https://support.microsoft.com/en-us/office/can-i-custom-install-office-apps-1eede13d-3426-40cc-b30b-9aa40226bb9e
+- name: "Setup Microsoft Office Standard 2016"
+  hosts: all
+  gather_facts: no
+  tags: msoffice
+  roles:
+    - role: setup-msoffice
+      vars:
+        pre_setup:
+          checks:
+            check_net_flows:
+              - target_host: kms.server.local
+                target_port: 1688
+                #abort_on_failure: yes # Default: 'no'
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Microsoft Office Standard 2016"
+                file_relative_url: ms-office-16/MS_Office_2016_32Bit_En_VL.zip
+                type: bundle
+                installer_file_path: setup.exe
+                arguments: '/config .\Config.xml' # /!\ Consider escaping special characters with "`" (for PowerShell)
+                success_exit_codes: # Default: "[0]"
+                  - 0
+                  - 3010
+        post_setup:
+          executions:
+            run_ps1_script:
+              - file_relative_url: ms-office-16/scripts/ms-office-kms-activate.ps1
+                #http_auth_username: john          # These override (only for this 'executionsrun_ps1_script' job) 
+                #http_auth_password: p@ssw0rd      # any globally-defined HTTP auth. credentials
+                arguments: "kms.server.local"
+                #working_directory: C:\temp\my office stuff\misc
+                abort_on_failure: yes # Default: 'no'
+
+
+- name: "Setup Sysinternals Suite"
+  hosts: all
+  gather_facts: no
+  tags: sysinternals
+  roles:
+    - role: setup-sysinternals
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Sysinternals Suite" 
+                #file_relative_url: sysinternals/SysinternalsSuite.zip
+                file_relative_url: sysinternals/SysinternalsSuite.zip
+                type: zip
+                root_install_dir: D:\AppServ
+                desktop_shortcut: yes # Default: no
+                #startmenu_shortcut: no # Default: yes
+
+
+- name: "Setup RegShot"
+  hosts: all
+  gather_facts: no
+  tags: regshot
+  roles:
+    - role: setup-regshot
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "RegShot" 
+                file_relative_url: regshot/Regshot-1.9.1-beta_r321.zip
+                type: zip
+                root_install_dir: D:\AppServ
+                main_app_launcher: Regshot-x64-Unicode.exe
+                #desktop_shortcut: no # Default: no
+                #startmenu_shortcut: yes # Default: yes
+
+
+- name: "Setup Dependency Walker"
+  hosts: all
+  gather_facts: no
+  tags: dependencywalker
+  roles:
+    - role: setup-dependencywalker
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "Dependency Walker" 
+                file_relative_url: dependency-walker/depends22_x64.zip
+                type: zip
+                root_install_dir: D:\AppServ
+                main_app_launcher: 'depends.exe'
+                #desktop_shortcut: no # Default: no
+                #startmenu_shortcut: yes # Default: yes
+
+
+- name: "Setup TreeSize"
+  hosts: all
+  gather_facts: no
+  tags: treesize
+  roles:
+    - role: setup-treesize
+      vars:
+        setup:
+          installations:
+            software_components:
+              - software_fullname: "TreeSize"
+                file_relative_url: treesize/TreeSizeFreeSetup.exe
+                type: exe
+                arguments: /DIR=D:\AppServ\TreeSize /VERYSILENT /NORESTART
