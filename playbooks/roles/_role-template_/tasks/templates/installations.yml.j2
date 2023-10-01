@@ -6,7 +6,7 @@
 
 {% for item in components %}
 
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check '{{ item.software_fullname }}' status *BEFORE* installation"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check '{{ item.software_fullname }}' status *BEFORE* installation"
   win_shell: |
     $appName = "{{ item.software_fullname }}"
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
@@ -22,7 +22,7 @@
 
 {# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
 {% if item.upload_file is not defined and (item.file_full_url is defined or item.file_relative_url is defined) %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check if HTTP authentication is required for file download"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check if HTTP authentication is required for file download"
   win_shell: |
 {% if item.file_full_url is defined and item.file_full_url is not none %}
     $url = "{{ item.file_full_url }}"
@@ -42,7 +42,7 @@
   when: "'Not Installed' in initial_software_status.stdout"
 
 
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ item.software_fullname }}' files (with authentication)"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ item.software_fullname }}' files (with authentication)"
   win_get_url:
 {% if item.file_full_url is defined and item.file_full_url is not none %}
     url: "{{ item.file_full_url }}"
@@ -56,7 +56,7 @@
   when: "'Not Installed' in initial_software_status.stdout and 'Auth required' in auth_check.stdout"
 
 
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ item.software_fullname }}' files (without authentication)"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ item.software_fullname }}' files (without authentication)"
   win_get_url:
 {% if item.file_full_url is defined and item.file_full_url is not none %}
     url: "{{ item.file_full_url }}"
@@ -72,7 +72,7 @@
 
 {# ︵‿︵‿ Upload packages from Ansible Controller machine ︵‿︵‿ #}
 {% if item.upload_file is defined and item.upload_file is not none %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ item.software_fullname }}' files to target host"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Upload '{{ item.software_fullname }}' files to target host"
   win_copy:
     src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ item.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ item.upload_file }}'
@@ -89,7 +89,7 @@
 {% endif %}
 
 {% if item.type == 'bundle' %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}'"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}'"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name.split(".")[0] }}'
@@ -99,7 +99,7 @@
 
 
 {% if item.root_install_dir is defined or root_install_dir is defined %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check custom target installation directory"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check custom target installation directory"
   win_file:
     path: '{{ item.root_install_dir | default(root_install_dir) }}'
     state: directory
@@ -108,7 +108,7 @@
 
 
 {% if item.type == 'zip' %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}'"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}'"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ item.root_install_dir | default("C:\\Program Files") }}\{{ item.software_fullname }}'
@@ -117,7 +117,7 @@
 {% endif %}
 
 
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Install '{{ item.software_fullname }}'"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Install '{{ item.software_fullname }}'"
   win_shell: |
     $installResult = $null
     $installSuccess = $false
@@ -251,7 +251,7 @@
   when: "'Not Installed' in initial_software_status.stdout"
 
 
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check '{{ item.software_fullname }}' status *AFTER* installation"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check '{{ item.software_fullname }}' status *AFTER* installation"
   win_shell: |
     $appName = "{{ item.software_fullname }}"
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }

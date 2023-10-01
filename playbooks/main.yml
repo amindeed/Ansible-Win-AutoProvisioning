@@ -62,10 +62,42 @@
     - role: setup-nodejs
       vars:
         pre_setup:
-          installations:
-            software_components:
+          - executions:
+            - run_ps1_script:
+              - file_relative_url: ms-office-16/scripts/ms-office-kms-activate.ps1
+                #http_auth_username: john          # These override (only for this 'executionsrun_ps1_script' job) 
+                #http_auth_password: p@ssw0rd      # any globally-defined HTTP auth. credentials
+                arguments: "kms.server.local"
+                #working_directory: C:\temp\my office stuff\misc
+                abort_on_failure: yes # Default: 'no'
+          - installations:
+            - software_components:
               - software_fullname: "nvm-windows" 
                 file_relative_url: nodejs/nvm-noinstall.zip
                 type: zip
                 root_install_dir: D:\AppServ
+          - checks:
+            - check_net_flows:
+              - target_host: kms.server.local
+                target_port: 1688
+                #abort_on_failure: yes # Default: 'no'
+        setup:
+          - installations:
+            - software_components:
+              - software_fullname: "Sysinternals Suite" 
+                #file_relative_url: sysinternals/SysinternalsSuite.zip
+                file_relative_url: sysinternals/SysinternalsSuite.zip
+                type: zip
+                root_install_dir: D:\AppServ
+                desktop_shortcut: yes # Default: no
+                #startmenu_shortcut: no # Default: yes
+        post_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: env_var
+                resource_name: PATH
+                value: D:\AppServ\OpenSSL-Win64\bin
+                action: append # [create, modify, delete] # Default behaviour: attempts 'create' action
+                #abort_on_failure: yes # Default: 'no'
+
 

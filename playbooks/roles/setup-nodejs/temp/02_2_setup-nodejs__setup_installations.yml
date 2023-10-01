@@ -1,6 +1,0 @@
----
-- name: "[SETUP] Init."
-  win_file:
-    path: '{{ win_temp_dir_path }}'
-    state: directory
-

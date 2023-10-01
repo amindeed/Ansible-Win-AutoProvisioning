@@ -2,19 +2,10 @@
 - name: "Include role's tasks"
   block:
     - include_tasks: 01_pre-setup.yml
-    - include_tasks: "{{ role_path }}/temp/01_1_{{ role_name }}__pre-setup_checks.yml"
-    - include_tasks: "{{ role_path }}/temp/01_2_{{ role_name }}__pre-setup_installations.yml"
-    - include_tasks: "{{ role_path }}/temp/01_3_{{ role_name }}__pre-setup_configurations.yml"
-    - include_tasks: "{{ role_path }}/temp/01_4_{{ role_name }}__pre-setup_executions.yml"
+    - include_tasks: "{{ role_path }}/temp/01_{{ role_name }}__pre-setup.yml"
     - include_tasks: 02_setup.yml
-    - include_tasks: "{{ role_path }}/temp/02_1_{{ role_name }}__setup_checks.yml"
-    - include_tasks: "{{ role_path }}/temp/02_2_{{ role_name }}__setup_installations.yml"
-    - include_tasks: "{{ role_path }}/temp/02_3_{{ role_name }}__setup_configurations.yml"
-    - include_tasks: "{{ role_path }}/temp/02_4_{{ role_name }}__setup_executions.yml"
+    - include_tasks: "{{ role_path }}/temp/02_{{ role_name }}__setup.yml"
     - include_tasks: 03_post-setup.yml
-    - include_tasks: "{{ role_path }}/temp/03_1_{{ role_name }}__post-setup_checks.yml"
-    - include_tasks: "{{ role_path }}/temp/03_2_{{ role_name }}__post-setup_installations.yml"
-    - include_tasks: "{{ role_path }}/temp/03_3_{{ role_name }}__post-setup_configurations.yml"
-    - include_tasks: "{{ role_path }}/temp/03_4_{{ role_name }}__post-setup_executions.yml"
+    - include_tasks: "{{ role_path }}/temp/03_{{ role_name }}__post-setup.yml"
   #ignore_errors: yes
 

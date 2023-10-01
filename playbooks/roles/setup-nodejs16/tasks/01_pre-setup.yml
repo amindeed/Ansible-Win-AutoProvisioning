@@ -1,41 +1,10 @@
 ---
-- name: 'Generate "PRE-SETUP" tasks file from template (1/4): >> Checks'
+- name: 'Generate "PRE-SETUP" tasks file from template(s)'
   template:
-    src: "{{ role_path }}/tasks/templates/checks.yml.j2"
-    dest: "{{ role_path }}/temp/01_1_{{ role_name }}__pre-setup_checks.yml"
+    src: "{{ role_path }}/tasks/templates/operations.yml.j2"
+    dest: "{{ role_path }}/temp/01_{{ role_name }}__pre-setup.yml"
   vars:
     label: "[PRE-SETUP]"
-    checks: "{{ pre_setup.checks | default([]) }}"
-  delegate_to: localhost
-  changed_when: false
-
-- name: 'Generate "PRE-SETUP" tasks file from template (2/4): >> Installations'
-  template:
-    src: "{{ role_path }}/tasks/templates/installations.yml.j2"
-    dest: "{{ role_path }}/temp/01_2_{{ role_name }}__pre-setup_installations.yml"
-  vars:
-    label: "[PRE-SETUP]"
-    components: "{{ pre_setup.installations.software_components | default([]) }}"
-    #install_items: "{{ pre_setup.installations | default([]) }}"
-  delegate_to: localhost
-  changed_when: false
-
-- name: 'Generate "PRE-SETUP" tasks file from template (3/4): >> Configurations'
-  template:
-    src: "{{ role_path }}/tasks/templates/configurations.yml.j2"
-    dest: "{{ role_path }}/temp/01_3_{{ role_name }}__pre-setup_configurations.yml"
-  vars:
-    label: "[PRE-SETUP]"
-    configs: "{{ pre_setup.configurations | default([]) }}"
-  delegate_to: localhost
-  changed_when: false
-
-- name: 'Generate "PRE-SETUP" tasks file from template (4/4): >> Executions'
-  template:
-    src: "{{ role_path }}/tasks/templates/executions.yml.j2"
-    dest: "{{ role_path }}/temp/01_4_{{ role_name }}__pre-setup_executions.yml"
-  vars:
-    label: "[PRE-SETUP]"
-    execs: "{{ pre_setup.executions | default([]) }}"
+    setup_phase_operations: "{{ pre_setup | default([]) }}"
   delegate_to: localhost
   changed_when: false

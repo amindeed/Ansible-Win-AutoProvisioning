@@ -1,13 +1,16 @@
 ---
-- name: "[PRE-SETUP] Init."
+- name: "Initialization.."
   win_file:
     path: '{{ win_temp_dir_path }}'
     state: directory
 
 
-- name: "[PRE-SETUP] (1/1) Check 'nvm-windows' status *BEFORE* installation"
+
+                    
+
+- name: "[SETUP] (1/1) Check 'Sysinternals Suite' status *BEFORE* installation"
   win_shell: |
-    $appName = "nvm-windows"
+    $appName = "Sysinternals Suite"
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
     $regPath1 = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
     $regPath2 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
@@ -19,9 +22,9 @@
   changed_when: false
   no_log: true
 
-- name: "[PRE-SETUP] (1/1) Check if HTTP authentication is required for file download"
+- name: "[SETUP] (1/1) Check if HTTP authentication is required for file download"
   win_shell: |
-    $url = "{{ pkgs_repo_base_url }}/nodejs/nvm-noinstall.zip"
+    $url = "{{ pkgs_repo_base_url }}/sysinternals/SysinternalsSuite.zip"
     $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
 
     if ($responseStatusCode -eq 401) { 
@@ -35,19 +38,19 @@
   when: "'Not Installed' in initial_software_status.stdout"
 
 
-- name: "[PRE-SETUP] (1/1) Download 'nvm-windows' files (with authentication)"
+- name: "[SETUP] (1/1) Download 'Sysinternals Suite' files (with authentication)"
   win_get_url:
-    url: "{{ pkgs_repo_base_url }}/nodejs/nvm-noinstall.zip"
-    dest: '{{ win_temp_dir_path }}\nvm-noinstall.zip'
+    url: "{{ pkgs_repo_base_url }}/sysinternals/SysinternalsSuite.zip"
+    dest: '{{ win_temp_dir_path }}\SysinternalsSuite.zip'
     username: "{{ http_auth_username }}"
     password: "{{ http_auth_password }}"
   when: "'Not Installed' in initial_software_status.stdout and 'Auth required' in auth_check.stdout"
 
 
-- name: "[PRE-SETUP] (1/1) Download 'nvm-windows' files (without authentication)"
+- name: "[SETUP] (1/1) Download 'Sysinternals Suite' files (without authentication)"
   win_get_url:
-    url: "{{ pkgs_repo_base_url }}/nodejs/nvm-noinstall.zip"
-    dest: '{{ win_temp_dir_path }}\nvm-noinstall.zip'
+    url: "{{ pkgs_repo_base_url }}/sysinternals/SysinternalsSuite.zip"
+    dest: '{{ win_temp_dir_path }}\SysinternalsSuite.zip'
   when: "'Not Installed' in initial_software_status.stdout and 'Auth not required' in auth_check.stdout"
 
  
@@ -56,22 +59,22 @@
   
 
 
-- name: "[PRE-SETUP] (1/1) Check custom target installation directory"
+- name: "[SETUP] (1/1) Check custom target installation directory"
   win_file:
     path: 'D:\AppServ'
     state: directory
   when: "'Not Installed' in initial_software_status.stdout"
 
 
-- name: "[PRE-SETUP] (1/1) Unzip 'nvm-noinstall.zip'"
+- name: "[SETUP] (1/1) Unzip 'SysinternalsSuite.zip'"
   win_unzip:
-    src: '{{ win_temp_dir_path }}\nvm-noinstall.zip'
-    dest: 'D:\AppServ\nvm-windows'
-    creates: 'D:\AppServ\nvm-windows'
+    src: '{{ win_temp_dir_path }}\SysinternalsSuite.zip'
+    dest: 'D:\AppServ\Sysinternals Suite'
+    creates: 'D:\AppServ\Sysinternals Suite'
   when: "'Not Installed' in initial_software_status.stdout"
 
 
-- name: "[PRE-SETUP] (1/1) Install 'nvm-windows'"
+- name: "[SETUP] (1/1) Install 'Sysinternals Suite'"
   win_shell: |
     $installResult = $null
     $installSuccess = $false
@@ -79,12 +82,12 @@
     try {
       $mainAppLauncher = 'D:\AppServ'
       $mainAppLauncher += '\'
-      $mainAppLauncher += 'nvm-windows'
+      $mainAppLauncher += 'Sysinternals Suite'
       $mainAppLauncher += '\'
       $mainAppLauncher += ''
       $softwareVersion = $((Get-Item $mainAppLauncher).VersionInfo.ProductVersion)
       
-      $registryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\nvm-windows$(if($softwareVersion){' '+$softwareVersion})"
+      $registryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Sysinternals Suite$(if($softwareVersion){' '+$softwareVersion})"
 
       # Generate uninstaller file content
       $uninstallerScriptContent = @"
@@ -99,8 +102,8 @@
     # Delete the folder and its contents
     Remove-Item -Path `$folderPath -Force -Recurse
 
-    `$publicDesktopShortcut = [System.Environment]::ExpandEnvironmentVariables(`"%PUBLIC%\Desktop\nvm-windows.lnk`")
-    `$commonStartMenuShortcut = [System.Environment]::ExpandEnvironmentVariables(`"%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\nvm-windows.lnk`")
+    `$publicDesktopShortcut = [System.Environment]::ExpandEnvironmentVariables(`"%PUBLIC%\Desktop\Sysinternals Suite.lnk`")
+    `$commonStartMenuShortcut = [System.Environment]::ExpandEnvironmentVariables(`"%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Sysinternals Suite.lnk`")
 
     # Check if shared shortcuts exist and remove them
     if (Test-Path -Path `$publicDesktopShortcut) {
@@ -112,27 +115,37 @@
     Remove-Item -Path `"$registryPath`" -Recurse -Force
     "@
 
-      Add-Content "D:\AppServ\nvm-windows\uninstall.ps1" $uninstallerScriptContent
+      Add-Content "D:\AppServ\Sysinternals Suite\uninstall.ps1" $uninstallerScriptContent
 
       $WshShell = New-Object -ComObject WScript.Shell
-      $Shortcut = $WshShell.CreateShortcut([System.Environment]::ExpandEnvironmentVariables("%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\nvm-windows.lnk"))
+      $Shortcut = $WshShell.CreateShortcut([System.Environment]::ExpandEnvironmentVariables("%PUBLIC%\Desktop\Sysinternals Suite.lnk"))
+      $desktopTargetPath = 'D:\AppServ'
+      $desktopTargetPath += '\'
+      $desktopTargetPath += 'Sysinternals Suite'
+      $desktopTargetPath += '\'
+      $desktopTargetPath += ''
+      $Shortcut.TargetPath = $desktopTargetPath
+      $Shortcut.Save()
+
+      $WshShell = New-Object -ComObject WScript.Shell
+      $Shortcut = $WshShell.CreateShortcut([System.Environment]::ExpandEnvironmentVariables("%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Sysinternals Suite.lnk"))
       $startmenuTargetPath = 'D:\AppServ'
       $startmenuTargetPath += '\'
-      $startmenuTargetPath += 'nvm-windows'
+      $startmenuTargetPath += 'Sysinternals Suite'
       $startmenuTargetPath += '\'
       $startmenuTargetPath += ''
       $Shortcut.TargetPath = $startmenuTargetPath
       $Shortcut.Save()
 
-      $directoryPath = "D:\AppServ\nvm-windows"
+      $directoryPath = "D:\AppServ\Sysinternals Suite"
       $directoryInfo = Get-Item -Path $directoryPath
       $directorySize = Get-ChildItem -Path $directoryPath -Recurse | Measure-Object -Property Length -Sum
       $sizeInBytes = $directorySize.Sum
       $sizeInKB = [math]::Round($sizeInBytes / 1KB)
 
       $registryREGSZValues = @{
-          "DisplayName" = "nvm-windows  __Manual Install__"
-          "UninstallString" = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File `"D:\AppServ\nvm-windows\uninstall.ps1`" -Verb RunAs"
+          "DisplayName" = "Sysinternals Suite  __Manual Install__"
+          "UninstallString" = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File `"D:\AppServ\Sysinternals Suite\uninstall.ps1`" -Verb RunAs"
           "DisplayVersion" = "$softwareVersion"
       }
 
@@ -153,16 +166,16 @@
 
 
     if (-not $installSuccess) {
-        Write-Output "nvm-windows installation failed. Exit Code: $installResult"
+        Write-Output "Sysinternals Suite installation failed. Exit Code: $installResult"
         exit 1 }
   register: component_install_result
   failed_when: component_install_result.rc != 0 or 'installation failed' in component_install_result.stdout
   when: "'Not Installed' in initial_software_status.stdout"
 
 
-- name: "[PRE-SETUP] (1/1) Check 'nvm-windows' status *AFTER* installation"
+- name: "[SETUP] (1/1) Check 'Sysinternals Suite' status *AFTER* installation"
   win_shell: |
-    $appName = "nvm-windows"
+    $appName = "Sysinternals Suite"
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
     $regPath1 = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
     $regPath2 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
@@ -178,3 +191,12 @@
   ignore_errors: no  
   when: "'Not Installed' in initial_software_status.stdout"
 
+                  
+
+
+
+
+
+
+
+  
