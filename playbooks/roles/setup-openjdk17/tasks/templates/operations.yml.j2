@@ -181,7 +181,7 @@
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}'"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
-    dest: '{{ software_item.root_install_dir | default("C:\\Program Files") }}\{% if software_item.create_directory is not defined or software_item.create_directory %}{{ software_item.software_fullname }}{% endif %}'
+    dest: '{{ software_item.root_install_dir | default("C:\\Program Files") }}\{{ software_item.software_fullname }}'
     creates: '{{ software_item.root_install_dir | default("C:\\Program Files") }}\{{ software_item.software_fullname }}'
   when: "'Not Installed' in initial_software_status.stdout"
 {% endif %}
@@ -194,7 +194,7 @@
 
 {# ︵‿︵‿ Install 'msi' ︵‿︵‿ #}
 {% if software_item.type == 'msi' %}
-    $installResult = (Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}`" {% if software_item.root_install_dir is defined %}INSTALLDIR=`"{{ software_item.root_install_dir }}\{{ software_item.install_directory_name | default(software_item.software_fullname) }}`" TARGETDIR=`"{{ software_item.root_install_dir }}\{{ software_item.install_directory_name | default(software_item.software_fullname) }}`" INSTALLLOCATION=`"{{ software_item.root_install_dir }}\{{ software_item.install_directory_name | default(software_item.software_fullname) }}`" INSTALLFOLDER=`"{{ software_item.root_install_dir }}\{{ software_item.install_directory_name | default(software_item.software_fullname) }}`" INSTALLPATH=`"{{ software_item.root_install_dir }}\{{ software_item.install_directory_name | default(software_item.software_fullname) }}`" APPLICATIONFOLDER=`"{{ software_item.root_install_dir }}\{{ software_item.install_directory_name | default(software_item.software_fullname) }}`" APPDIR=`"{{ software_item.root_install_dir }}\{{ software_item.install_directory_name | default(software_item.software_fullname) }}`" ARPINSTALLLOCATION=`"{{ software_item.root_install_dir }}\{{ software_item.install_directory_name | default(software_item.software_fullname) }}`"{% endif %} /qn {{ software_item.additional_arguments | default("") }}" -Wait -PassThru).ExitCode
+    $installResult = (Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}`" {% if software_item.root_install_dir is defined %}INSTALLDIR=`"{{ software_item.root_install_dir }}\{{ software_item.software_fullname }}`" TARGETDIR=`"{{ software_item.root_install_dir }}\{{ software_item.software_fullname }}`" INSTALLLOCATION=`"{{ software_item.root_install_dir }}\{{ software_item.software_fullname }}`" INSTALLFOLDER=`"{{ software_item.root_install_dir }}\{{ software_item.software_fullname }}`" INSTALLPATH=`"{{ software_item.root_install_dir }}\{{ software_item.software_fullname }}`" APPLICATIONFOLDER=`"{{ software_item.root_install_dir }}\{{ software_item.software_fullname }}`" APPDIR=`"{{ software_item.root_install_dir }}\{{ software_item.software_fullname }}`" ARPINSTALLLOCATION=`"{{ software_item.root_install_dir }}\{{ software_item.software_fullname }}`"{% endif %} /qn" -Wait -PassThru).ExitCode
     if ($installResult -eq 0) {$installSuccess = $true}
 
 {# ︵‿︵‿ Install 'exe' ︵‿︵‿ #}
