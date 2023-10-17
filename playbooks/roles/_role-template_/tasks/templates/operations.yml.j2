@@ -99,18 +99,6 @@
 {% elif software_item.file_relative_url is defined and software_item.file_relative_url is not none %}
     $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ software_item.file_relative_url }}"
 {% endif %}
-    add-type @"
-        using System.Net;
-        using System.Security.Cryptography.X509Certificates;
-        public class TrustAllCertsPolicy : ICertificatePolicy {
-            public bool CheckValidationResult(
-                ServicePoint srvPoint, X509Certificate certificate,
-                WebRequest request, int certificateProblem) {
-                return true;
-            }
-        }
-    "@
-    [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
     $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
 
     if ($responseStatusCode -eq 401) { 
@@ -126,7 +114,6 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files (with authentication)"
   win_get_url:
-    validate_certs: false
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
     url: "{{ software_item.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.file_full_url.split("/")[-1] }}'
@@ -142,7 +129,6 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files (without authentication)"
   win_get_url:
-    validate_certs: false
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
     url: "{{ software_item.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.file_full_url.split("/")[-1] }}'
@@ -610,18 +596,6 @@
 {% elif update_item.source.file_relative_url is defined and update_item.source.file_relative_url is not none %}
     $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ update_item.source.file_relative_url }}"
 {% endif %}
-    add-type @"
-        using System.Net;
-        using System.Security.Cryptography.X509Certificates;
-        public class TrustAllCertsPolicy : ICertificatePolicy {
-            public bool CheckValidationResult(
-                ServicePoint srvPoint, X509Certificate certificate,
-                WebRequest request, int certificateProblem) {
-                return true;
-            }
-        }
-    "@
-    [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
     $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
 
     if ($responseStatusCode -eq 401) { 
@@ -643,7 +617,6 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ file_name }}' (with authentication)"
   win_get_url:
-    validate_certs: false
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
     url: "{{ update_item.source.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
@@ -660,7 +633,6 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ file_name }}' (without authentication)"
   win_get_url:
-    validate_certs: false
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
     url: "{{ update_item.source.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
@@ -800,18 +772,6 @@
 {% elif job_item.file_relative_url is defined and job_item.file_relative_url is not none %}
     $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ job_item.file_relative_url }}"
 {% endif %}
-    add-type @"
-        using System.Net;
-        using System.Security.Cryptography.X509Certificates;
-        public class TrustAllCertsPolicy : ICertificatePolicy {
-            public bool CheckValidationResult(
-                ServicePoint srvPoint, X509Certificate certificate,
-                WebRequest request, int certificateProblem) {
-                return true;
-            }
-        }
-    "@
-    [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
     $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
 
     if ($responseStatusCode -eq 401) { 
@@ -827,7 +787,6 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\" (with authentication)"
   win_get_url:
-    validate_certs: false
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
     url: "{{ job_item.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ job_item.file_full_url.split("/")[-1] }}'
@@ -842,7 +801,6 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\" (without authentication)"
   win_get_url:
-    validate_certs: false
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
     url: "{{ job_item.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ job_item.file_full_url.split("/")[-1] }}'
