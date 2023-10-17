@@ -396,7 +396,7 @@
                 file_relative_url: sysinternals/SysinternalsSuite.zip
                 type: zip
                 root_install_dir: D:\AppServ
-                desktop_shortcut: yes # Default: no
+                #desktop_shortcut: yes # Default: no
                 #startmenu_shortcut: no # Default: yes
 
 

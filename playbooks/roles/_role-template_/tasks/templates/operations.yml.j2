@@ -99,6 +99,18 @@
 {% elif software_item.file_relative_url is defined and software_item.file_relative_url is not none %}
     $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ software_item.file_relative_url }}"
 {% endif %}
+    add-type @"
+        using System.Net;
+        using System.Security.Cryptography.X509Certificates;
+        public class TrustAllCertsPolicy : ICertificatePolicy {
+            public bool CheckValidationResult(
+                ServicePoint srvPoint, X509Certificate certificate,
+                WebRequest request, int certificateProblem) {
+                return true;
+            }
+        }
+    "@
+    [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
     $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
 
     if ($responseStatusCode -eq 401) { 
@@ -114,6 +126,7 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files (with authentication)"
   win_get_url:
+    validate_certs: false
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
     url: "{{ software_item.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.file_full_url.split("/")[-1] }}'
@@ -123,11 +136,13 @@
 {% endif %}
     username: "{{ software_item.http_auth_username | default('{{ http_auth_username }}') }}"
     password: "{{ software_item.http_auth_password | default('{{ http_auth_password }}') }}"
+    timeout: 60
   when: "'Not Installed' in initial_software_status.stdout and 'Auth required' in auth_check.stdout"
 
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files (without authentication)"
   win_get_url:
+    validate_certs: false
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
     url: "{{ software_item.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.file_full_url.split("/")[-1] }}'
@@ -135,6 +150,7 @@
     url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ software_item.file_relative_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.file_relative_url.split("/")[-1] }}'
 {% endif %}
+    timeout: 60
   when: "'Not Installed' in initial_software_status.stdout and 'Auth not required' in auth_check.stdout"
 
 {% endif %} {# end process 'Download' #}
@@ -594,6 +610,18 @@
 {% elif update_item.source.file_relative_url is defined and update_item.source.file_relative_url is not none %}
     $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ update_item.source.file_relative_url }}"
 {% endif %}
+    add-type @"
+        using System.Net;
+        using System.Security.Cryptography.X509Certificates;
+        public class TrustAllCertsPolicy : ICertificatePolicy {
+            public bool CheckValidationResult(
+                ServicePoint srvPoint, X509Certificate certificate,
+                WebRequest request, int certificateProblem) {
+                return true;
+            }
+        }
+    "@
+    [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
     $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
 
     if ($responseStatusCode -eq 401) { 
@@ -615,6 +643,7 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ file_name }}' (with authentication)"
   win_get_url:
+    validate_certs: false
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
     url: "{{ update_item.source.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
@@ -624,12 +653,14 @@
 {% endif %}
     username: "{{ update_item.source.http_auth_username | default('{{ http_auth_username }}') }}"
     password: "{{ update_item.source.http_auth_password | default('{{ http_auth_password }}') }}"
+    timeout: 60
   register: auth_dl_result
   when: "'Auth required' in auth_check.stdout"
 
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ file_name }}' (without authentication)"
   win_get_url:
+    validate_certs: false
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
     url: "{{ update_item.source.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
@@ -637,6 +668,7 @@
     url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ update_item.source.file_relative_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
 {% endif %}
+    timeout: 60
   register: no_auth_dl_result
   when: "'Auth not required' in auth_check.stdout"
 
@@ -681,11 +713,21 @@
 - name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Move/Rename "{{ update_item.source }}"'
   win_shell: |
     try {
-        Move-Item -Path "{{ update_item.source }}" -Destination "{{ update_item.destination }}"
+        if (Test-Path -Path "{{ update_item.source }}") {
+            Move-Item -Path "{{ update_item.source }}" -Destination "{{ update_item.destination }}"
+            Write-Output "[OK_CHANGE] Item moved/renamed."
+            exit 0
+        } else {
+            Write-Output "[OK_NO_CHANGE] Item does not exist."
+            exit 0
+        }
     } catch {
-        Write-Output "ERROR: $_"
+        Write-Output "[KO_FAILURE] $_"
         exit 1
     }
+  register: move_op_result
+  changed_when: move_op_result.rc == 0 and 'OK_CHANGE' in move_op_result.stdout
+  failed_when: move_op_result.rc != 0 or 'KO_FAILURE' in move_op_result.stdout
   ignore_errors: {% if update_item.abort_on_failure is not defined or update_item.abort_on_failure %}no{% else %}yes{% endif %}
   
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Create ︵‿︵‿︵‿︵‿ #}
@@ -758,6 +800,18 @@
 {% elif job_item.file_relative_url is defined and job_item.file_relative_url is not none %}
     $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ job_item.file_relative_url }}"
 {% endif %}
+    add-type @"
+        using System.Net;
+        using System.Security.Cryptography.X509Certificates;
+        public class TrustAllCertsPolicy : ICertificatePolicy {
+            public bool CheckValidationResult(
+                ServicePoint srvPoint, X509Certificate certificate,
+                WebRequest request, int certificateProblem) {
+                return true;
+            }
+        }
+    "@
+    [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
     $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
 
     if ($responseStatusCode -eq 401) { 
@@ -773,6 +827,7 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\" (with authentication)"
   win_get_url:
+    validate_certs: false
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
     url: "{{ job_item.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ job_item.file_full_url.split("/")[-1] }}'
@@ -787,6 +842,7 @@
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\" (without authentication)"
   win_get_url:
+    validate_certs: false
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
     url: "{{ job_item.file_full_url }}"
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ job_item.file_full_url.split("/")[-1] }}'

@@ -1,0 +1,8 @@
+Core:
+	marktext (debug code)
+	msoffice (debug code ???)
+	
+Basic:
+	python3, Eclipses (code)
+	openjdk8,openjdk11 (debug code)
+	GitExtensions,openjdk17 (debug code ???)
