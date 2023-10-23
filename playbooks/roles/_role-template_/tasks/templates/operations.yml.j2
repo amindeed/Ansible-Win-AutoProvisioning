@@ -91,7 +91,9 @@
   no_log: true
 
 {# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
+
 {% if software_item.upload_file is not defined and (software_item.file_full_url is defined or software_item.file_relative_url is defined) %}
+{# -------------
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check if HTTP authentication is required for file download"
   win_shell: |
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
@@ -110,9 +112,9 @@
   changed_when: false
   no_log: true
   when: "'Not Installed' in initial_software_status.stdout"
+-------------- #}
 
-
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files (with authentication)"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files"
   win_get_url:
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
     url: "{{ software_item.file_full_url }}"
@@ -124,9 +126,10 @@
     username: "{{ software_item.http_auth_username | default('{{ http_auth_username }}') }}"
     password: "{{ software_item.http_auth_password | default('{{ http_auth_password }}') }}"
     timeout: 60
-  when: "'Not Installed' in initial_software_status.stdout and 'Auth required' in auth_check.stdout"
+{#  when: "'Not Installed' in initial_software_status.stdout and 'Auth required' in auth_check.stdout" #}
+  when: "'Not Installed' in initial_software_status.stdout"
 
-
+{# -------------
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files (without authentication)"
   win_get_url:
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
@@ -138,7 +141,7 @@
 {% endif %}
     timeout: 60
   when: "'Not Installed' in initial_software_status.stdout and 'Auth not required' in auth_check.stdout"
-
+-------------- #}
 {% endif %} {# end process 'Download' #}
 
 
@@ -589,6 +592,7 @@
 {# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
 {% if update_item.source.upload_file is not defined and (update_item.source.file_full_url is defined or update_item.source.file_relative_url is defined) %}
 
+{# --------------
 - name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check if HTTP auth. is required to download "{{ file_name }}"'
   win_shell: |
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
@@ -606,6 +610,7 @@
   register: auth_check
   changed_when: false
   no_log: true
+-------------- #}
 
 {% if update_item.destination is defined %}
 - name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
@@ -615,7 +620,7 @@
   register: win_file_dest_check
 {% endif %}
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ file_name }}' (with authentication)"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ file_name }}'"
   win_get_url:
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
     url: "{{ update_item.source.file_full_url }}"
@@ -628,9 +633,9 @@
     password: "{{ update_item.source.http_auth_password | default('{{ http_auth_password }}') }}"
     timeout: 60
   register: auth_dl_result
-  when: "'Auth required' in auth_check.stdout"
+{#  when: "'Auth required' in auth_check.stdout" #}
 
-
+{# --------------
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ file_name }}' (without authentication)"
   win_get_url:
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
@@ -643,7 +648,7 @@
     timeout: 60
   register: no_auth_dl_result
   when: "'Auth not required' in auth_check.stdout"
-
+-------------- #}
 {% endif %} {# end process 'Download' #}
 
 {# ︵‿︵‿ Upload files from Ansible Controller machine ︵‿︵‿ #}
@@ -765,6 +770,7 @@
 {% if job_item.script_content | default("") == "" %} {# X #}
 {% if job_item.file_full_url is defined or job_item.file_relative_url is defined %} {# XX #}
 
+{# --------------
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check if authentication is required for script file download"
   win_shell: |
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
@@ -782,10 +788,11 @@
   register: auth_check
   changed_when: false
   no_log: true
+-------------- #}
 
 {% set file_url = job_item.file_full_url | default(job_item.file_relative_url) %}
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\" (with authentication)"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\""
   win_get_url:
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
     url: "{{ job_item.file_full_url }}"
@@ -796,9 +803,9 @@
 {% endif %}
     username: "{{ job_item.http_auth_username | default('{{ http_auth_username }}') }}"
     password: "{{ job_item.http_auth_password | default('{{ http_auth_password }}') }}"
-  when: "'Auth required' in auth_check.stdout"
+{#  when: "'Auth required' in auth_check.stdout" #}
 
-
+{# --------------
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\" (without authentication)"
   win_get_url:
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
@@ -809,6 +816,7 @@
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ job_item.file_relative_url.split("/")[-1] }}'
 {% endif %}
   when: "'Auth not required' in auth_check.stdout"
+-------------- #}
 
 {% endif %} {# XX #}
 {% endif %} {# X #}

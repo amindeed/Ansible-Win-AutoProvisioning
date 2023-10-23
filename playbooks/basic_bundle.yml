@@ -15,28 +15,30 @@
                 operation_type: transfer
                 source:
                   file_relative_url: nodejs/node-v14.17.3-win-x64.zip
-                destination: D:\AppServ\nodejs\
+                destination: D:\AppServ\NodeJS\
                 unzip: yes
+                #overwrite_dest: no # Default: yes
+                skip_if_path_exists: D:\AppServ\NodeJS\node-v14.17.3-win-x64
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
                   file_relative_url: nodejs/node-v16.16.0-win-x64.zip
-                destination: D:\AppServ\nodejs\
+                destination: D:\AppServ\NodeJS\
                 unzip: yes
+                #overwrite_dest: no # Default: yes
+                skip_if_path_exists: D:\AppServ\NodeJS\node-v16.16.0-win-x64
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
                   file_relative_url: nodejs/node-v18.18.0-win-x64.zip
-                destination: D:\AppServ\nodejs\
+                destination: D:\AppServ\NodeJS\
                 unzip: yes
+                #overwrite_dest: no # Default: yes
+                skip_if_path_exists: D:\AppServ\NodeJS\node-v18.18.0-win-x64
 
-          #- executions:
-          #  - run_ps1_script:
-          #    - script_content: |
-          #        nvm use 14.17.3
-          #      description: Set to use Node.JS version 14.17.3
+              # "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe " -WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\nodejs\set_NODEJS_HOME_form.ps1"
 
 
 - name: Setup Cygwin x64

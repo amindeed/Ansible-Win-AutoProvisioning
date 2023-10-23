@@ -8,40 +8,11 @@ $actionDescription = "Select Node.JS version :"
 $postMsgBoxTitle = "Selected Node.JS directory"
 $postMsgText = "Relaunch any running console app (e.g. CMD, Git Bash). `n`nSelected:"
 
+
 function execAction($arg1, $arg2) {
-#function execAction($arg2) {
-    # action to be executed depending on the selected index
-
-    [System.Environment]::SetEnvironmentVariable('NODEJS_HOME', "$arg2", [System.EnvironmentVariableTarget]::User)
-
-    $CurrentValue = [System.Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::User)
-    $NewValue = "%$arg1%"
-    if ($CurrentValue -notlike "*$NewValue*") {
-        $NewPath = "$CurrentValue$NewValue"
-    #1#    [System.Environment]::SetEnvironmentVariable("PATH", $NewPath, [System.EnvironmentVariableTarget]::User)
-    #2#    Set-ItemProperty -Path "HKCU:\Environment" -Name "PATH" -Value $NewPath
-        $NewPath = $NewPath.Replace("\", "\\")
-        $arg2 = $arg2.Replace("\", "\\")
-        $regContent = @"
-Windows Registry Editor Version 5.00
-
-[HKEY_CURRENT_USER\Environment]
-`"NODEJS_HOME`"=`"D:\\AppServ\\nodejs\\node-v14.17.3-win-x64`"
-`"Path`"=hex(2):25,00,55,00,53,00,45,00,52,00,50,00,52,00,4f,00,46,00,49,00,4c,\
-  00,45,00,25,00,5c,00,41,00,70,00,70,00,44,00,61,00,74,00,61,00,5c,00,4c,00,\
-  6f,00,63,00,61,00,6c,00,5c,00,4d,00,69,00,63,00,72,00,6f,00,73,00,6f,00,66,\
-  00,74,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,00,73,00,41,00,70,00,70,00,\
-  73,00,3b,00,25,00,4e,00,4f,00,44,00,45,00,4a,00,53,00,5f,00,48,00,4f,00,4d,\
-  00,45,00,25,00,3b,00,00,00
-"@
-        $regContent | Out-File -FilePath "$env:TEMP\temp_env_vars.reg"
-        Start-Process -Wait -FilePath "reg.exe" -ArgumentList "import $env:TEMP\temp_env_vars.reg"
-        Remove-Item -Path "$env:TEMP\temp_env_vars.reg" -Force
-    }
+    # Requires AWAP Modules to be already installed
+    Set-EnvironmentVariable -envVarName $arg1 -envVarValue $arg2
 }
-
-
-
 
 # -------------------- DO NOT CHANGE CODE BELOW --------------------
 

@@ -18,6 +18,23 @@
 #    - name: Show all variables
 #      ansible.builtin.debug: msg="{{ lookup('ansible.builtin.varnames', '.+')}}"
 
+- name: "Install PowerShell modules"
+  hosts: all
+  gather_facts: no
+  tags: psmodules
+  roles:
+    - role: install-psmodules
+      vars:
+        setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: awap-modules/awap-modules-0.1.0.zip
+                destination: C:\Program Files\WindowsPowerShell\Modules\
+                unzip: yes
+
 
 - name: "Setup Notepad++"
   hosts: all
@@ -32,7 +49,7 @@
               - software_fullname: Notepad++ # Provide a relevant name that is both human-readable and recognizable by the system (check: tools/check_software_installed.ps1)
                 file_relative_url: notepadpp/npp.8.5.4.Installer.x64.exe
                 type: exe
-                arguments: /S /D=D:\AppServ\Notepad++ 
+                arguments: /S /D=D:\AppServ\Notepad++
         post_setup:
           - configurations:
             - update_resource:
@@ -434,7 +451,7 @@
                 type: zip
                 root_install_dir: D:\AppServ
                 main_app_launcher: 'depends.exe'
-                #desktop_shortcut: no # Default: no
+                #desktop_shortcut: yes # Default: no
                 #startmenu_shortcut: yes # Default: yes
 
 
