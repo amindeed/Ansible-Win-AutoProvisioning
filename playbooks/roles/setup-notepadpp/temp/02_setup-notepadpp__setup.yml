@@ -1,0 +1,106 @@
+---
+- name: "Start operations.."
+  meta: noop
+
+
+- name: "Initialization.."
+  win_file:
+    path: '{{ win_temp_dir_path }}'
+    state: directory
+
+
+                    
+
+- name: "[SETUP] (1/1) Check 'Notepad++' status *BEFORE* installation"
+  win_shell: |
+    $appName = "Notepad++"
+    $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
+    $regPath1 = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regPath2 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regCheck1 = Get-ChildItem -Path $regPath1 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    $regCheck2 = Get-ChildItem -Path $regPath2 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    if ($wmiQuery -or $regCheck1 -or $regCheck2) { $status = "Installed" } else { $status = "Not Installed" }
+    Write-Host "$appName is $status"
+  register: initial_software_status
+  changed_when: false
+  no_log: true
+
+
+- name: "[SETUP] (1/1) Download 'Notepad++' files"
+  win_get_url:
+    url: "{{ pkgs_repo_base_url }}/notepadpp/npp.8.5.4.Installer.x64.exe"
+    dest: '{{ win_temp_dir_path }}\npp.8.5.4.Installer.x64.exe'
+    url_username: "{{ http_auth_username }}"
+    url_password: "{{ http_auth_password }}"
+    timeout: 60
+  when: "'Not Installed' in initial_software_status.stdout"
+
+ 
+
+
+  
+
+
+- name: "[SETUP] (1/1) Check custom target installation directory"
+  win_file:
+    path: 'D:\AppServ'
+    state: directory
+  when: "'Not Installed' in initial_software_status.stdout"
+
+
+
+
+- name: "[SETUP] (1/1) Install 'Notepad++'"
+  win_shell: |
+    $installResult = $null
+    $installSuccess = $false
+
+     try {
+      $installResult = (Start-Process -FilePath "{{ win_temp_dir_path }}\npp.8.5.4.Installer.x64.exe" -ArgumentList "/S /D=D:\AppServ\Notepad++" -Wait -PassThru).ExitCode
+
+ 
+      $installResult = 0
+    } catch {
+      $errorMessage = $_.Exception.Message
+      Write-Host "ERROR: $errorMessage"
+      $installResult = 1
+    }
+        # "0" as exit success code; typically for common installers like NSIS
+    if ($installResult -eq 0) {$installSuccess = $true}
+
+
+    if (-not $installSuccess) {
+        Write-Output "Notepad++ installation failed. Exit Code: $installResult"
+        exit 1 }
+  register: component_install_result
+  failed_when: component_install_result.rc != 0 or 'installation failed' in component_install_result.stdout
+  when: "'Not Installed' in initial_software_status.stdout"
+
+
+- name: "[SETUP] (1/1) Check 'Notepad++' status *AFTER* installation"
+  win_shell: |
+    $appName = "Notepad++"
+    $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
+    $regPath1 = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regPath2 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regPath3 = "HKLM:\SOFTWARE"
+    $regCheck1 = Get-ChildItem -Path $regPath1 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    $regCheck2 = Get-ChildItem -Path $regPath2 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    $regCheck3 = Get-ChildItem -Path $regPath3 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    if ($wmiQuery -or $regCheck1 -or $regCheck2 -or $regCheck3) { $status = "Installed" } else { $status = "Not Installed" }
+    Write-Host "$appName is $status"
+  register: new_software_status
+  changed_when: false
+  failed_when: new_software_status.rc != 0 or 'Not Installed' in new_software_status.stdout
+  ignore_errors: no  
+  when: "'Not Installed' in initial_software_status.stdout"
+
+                  
+
+
+
+
+
+
+
+  

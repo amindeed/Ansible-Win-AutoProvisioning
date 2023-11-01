@@ -1,0 +1,35 @@
+---
+- name: "Start operations.."
+  meta: noop
+
+
+- name: "Initialization.."
+  win_file:
+    path: '{{ win_temp_dir_path }}'
+    state: directory
+
+
+      
+              
+
+  
+- name: "[POST-SETUP] (1/1) Download \"ms-office-kms-activate.ps1\""
+  win_get_url:
+    url: "{{ pkgs_repo_base_url }}/ms-office-16/scripts/ms-office-kms-activate.ps1"
+    dest: '{{ win_temp_dir_path }}\ms-office-kms-activate.ps1'
+    url_username: "{{ http_auth_username }}"
+    url_password: "{{ http_auth_password }}"
+
+  
+
+- name: "[POST-SETUP] (1/1) Run the script \"ms-office-kms-activate.ps1\""
+  win_shell: '{{ win_temp_dir_path }}\ms-office-kms-activate.ps1 kms.server.local'
+  register: script_result
+  changed_when: script_result.rc == 0 and 'OK_CHANGE' in script_result.stdout
+  failed_when: script_result.rc != 0 or 'KO_FAILURE' in script_result.stdout
+  ignore_errors: no    
+              
+          
+
+
+  

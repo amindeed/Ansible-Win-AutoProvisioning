@@ -1,0 +1,43 @@
+---
+- name: "Start operations.."
+  meta: noop
+
+
+- name: "Initialization.."
+  win_file:
+    path: '{{ win_temp_dir_path }}'
+    state: directory
+
+
+      
+              
+- name: "[PRE-SETUP] (1/1) Check Required TCP Network flows"
+  win_shell: |
+    $net_test = Test-NetConnection -ComputerName kms.server.local -Port 1688
+    if($net_test.TcpTestSucceeded) {
+      Write-Host "success"
+    } else {
+      Write-Host "failure"
+    }
+  register: netflow_check_result
+  changed_when: false
+
+- name: "[PRE-SETUP] (1/1) Results of TCP Network flow check"
+  assert:
+    that:
+      - "'success' in netflow_check_result.stdout"
+      - "'failure' not in netflow_check_result.stdout"
+    fail_msg: "Failed to establish TCP connection to 'kms.server.local:1688'"
+    success_msg: "TCP connection to 'kms.server.local:1688' succeeded!"
+  ignore_errors: yes
+              
+          
+
+
+
+
+
+
+
+
+  

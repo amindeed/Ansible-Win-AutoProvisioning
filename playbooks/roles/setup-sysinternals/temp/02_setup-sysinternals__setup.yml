@@ -1,0 +1,177 @@
+---
+- name: "Start operations.."
+  meta: noop
+
+
+- name: "Initialization.."
+  win_file:
+    path: '{{ win_temp_dir_path }}'
+    state: directory
+
+
+                    
+
+- name: "[SETUP] (1/1) Check 'Sysinternals Suite' status *BEFORE* installation"
+  win_shell: |
+    $appName = "Sysinternals Suite"
+    $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
+    $regPath1 = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regPath2 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regCheck1 = Get-ChildItem -Path $regPath1 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    $regCheck2 = Get-ChildItem -Path $regPath2 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    if ($wmiQuery -or $regCheck1 -or $regCheck2) { $status = "Installed" } else { $status = "Not Installed" }
+    Write-Host "$appName is $status"
+  register: initial_software_status
+  changed_when: false
+  no_log: true
+
+
+- name: "[SETUP] (1/1) Download 'Sysinternals Suite' files"
+  win_get_url:
+    url: "{{ pkgs_repo_base_url }}/sysinternals/SysinternalsSuite.zip"
+    dest: '{{ win_temp_dir_path }}\SysinternalsSuite.zip'
+    url_username: "{{ http_auth_username }}"
+    url_password: "{{ http_auth_password }}"
+    timeout: 60
+  when: "'Not Installed' in initial_software_status.stdout"
+
+ 
+
+
+  
+
+
+- name: "[SETUP] (1/1) Check custom target installation directory"
+  win_file:
+    path: 'D:\AppServ'
+    state: directory
+  when: "'Not Installed' in initial_software_status.stdout"
+
+
+- name: "[SETUP] (1/1) Unzip 'SysinternalsSuite.zip'"
+  win_unzip:
+    src: '{{ win_temp_dir_path }}\SysinternalsSuite.zip'
+    dest: 'D:\AppServ\Sysinternals Suite'
+    creates: 'D:\AppServ\Sysinternals Suite'
+  when: "'Not Installed' in initial_software_status.stdout"
+
+
+- name: "[SETUP] (1/1) Install 'Sysinternals Suite'"
+  win_shell: |
+    $installResult = $null
+    $installSuccess = $false
+
+    try {
+      $mainAppLauncher = 'D:\AppServ'
+      $mainAppLauncher += '\'
+      $mainAppLauncher += 'Sysinternals Suite'
+      $mainAppLauncher += '\'
+      $mainAppLauncher += ''
+      $softwareVersion = $((Get-Item $mainAppLauncher).VersionInfo.ProductVersion)
+      
+      $registryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Sysinternals Suite$(if($softwareVersion){' '+$softwareVersion})"
+
+      # Generate uninstaller file content
+      $uninstallerScriptContent = @"
+    # Define the path to the folder to be deleted
+    `$folderPath = Split-Path -Parent -Path `$MyInvocation.MyCommand.Path
+
+    # Remove the read-only attribute if it is set
+    if ((Get-Item `$folderPath).Attributes -band [System.IO.FileAttributes]::ReadOnly) {
+        Set-ItemProperty -Path `$folderPath -Name IsReadOnly -Value `$false
+    }
+
+    `$publicDesktopShortcut = `"`$env:PUBLIC\Desktop\Sysinternals Suite*.lnk`"
+    `$commonStartMenuShortcut = `"`$env:ALLUSERSPROFILE\Microsoft\Windows\Start Menu\Programs\Sysinternals Suite*.lnk`"
+
+    # Check if shared shortcuts exist and remove them
+    if (Test-Path -Path `$publicDesktopShortcut) {
+        Remove-Item -Path `$publicDesktopShortcut -Recurse -Force
+    }
+    if (Test-Path -Path `$commonStartMenuShortcut) {
+        Remove-Item -Path `$commonStartMenuShortcut -Recurse -Force
+    }
+
+    # Delete the folder and its contents
+    Remove-Item -Path `$folderPath -Force -Recurse
+
+    Remove-Item -Path `"$registryPath`" -Recurse -Force
+    "@
+
+      Set-Content -Path "D:\AppServ\Sysinternals Suite\uninstall.ps1" -Value $uninstallerScriptContent
+
+      $WshShell = New-Object -ComObject WScript.Shell
+      $Shortcut = $WshShell.CreateShortcut("$env:ALLUSERSPROFILE\Microsoft\Windows\Start Menu\Programs\Sysinternals Suite.lnk")
+      $startmenuTargetPath = 'D:\AppServ'
+      $startmenuTargetPath += '\'
+      $startmenuTargetPath += 'Sysinternals Suite'
+      $startmenuTargetPath += '\'
+      $startmenuTargetPath += ''
+      $Shortcut.TargetPath = $startmenuTargetPath
+            
+      
+      $Shortcut.Save()
+
+      $directoryPath = "D:\AppServ\Sysinternals Suite"
+      $directoryInfo = Get-Item -Path $directoryPath
+      $directorySize = Get-ChildItem -Path $directoryPath -Recurse | Measure-Object -Property Length -Sum
+      $sizeInBytes = $directorySize.Sum
+      $sizeInKB = [math]::Round($sizeInBytes / 1KB)
+
+      $registryREGSZValues = @{
+          "DisplayName" = "Sysinternals Suite  __Manual Install__"
+          "UninstallString" = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File `"D:\AppServ\Sysinternals Suite\uninstall.ps1`" -Verb RunAs"
+          "DisplayVersion" = "$softwareVersion"
+      }
+
+      New-Item -Path $registryPath -Force
+      foreach ($key in $registryREGSZValues.Keys) {
+          Set-ItemProperty -Path $registryPath -Name $key -Value $registryREGSZValues[$key]
+      }
+
+      New-ItemProperty -Path $registryPath -Name "EstimatedSize" -Value $sizeInKB -PropertyType DWORD -Force
+
+      $installResult = 0
+    } catch {
+      $errorMessage = $_.Exception.Message
+      Write-Host "ERROR: $errorMessage"
+      $installResult = 1
+    }
+    if ($installResult -eq 0) {$installSuccess = $true}
+
+
+    if (-not $installSuccess) {
+        Write-Output "Sysinternals Suite installation failed. Exit Code: $installResult"
+        exit 1 }
+  register: component_install_result
+  failed_when: component_install_result.rc != 0 or 'installation failed' in component_install_result.stdout
+  when: "'Not Installed' in initial_software_status.stdout"
+
+
+- name: "[SETUP] (1/1) Check 'Sysinternals Suite' status *AFTER* installation"
+  win_shell: |
+    $appName = "Sysinternals Suite"
+    $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
+    $regPath1 = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regPath2 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regPath3 = "HKLM:\SOFTWARE"
+    $regCheck1 = Get-ChildItem -Path $regPath1 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    $regCheck2 = Get-ChildItem -Path $regPath2 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    $regCheck3 = Get-ChildItem -Path $regPath3 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    if ($wmiQuery -or $regCheck1 -or $regCheck2 -or $regCheck3) { $status = "Installed" } else { $status = "Not Installed" }
+    Write-Host "$appName is $status"
+  register: new_software_status
+  changed_when: false
+  failed_when: new_software_status.rc != 0 or 'Not Installed' in new_software_status.stdout
+  ignore_errors: no  
+  when: "'Not Installed' in initial_software_status.stdout"
+
+                  
+
+
+
+
+
+
+
+  

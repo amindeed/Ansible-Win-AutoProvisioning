@@ -1,0 +1,10 @@
+---
+- name: 'Generate "PRE-SETUP" tasks file from template'
+  template:
+    src: "{{ role_path }}/tasks/templates/operations.yml.j2"
+    dest: "{{ role_path }}/temp/01_{{ role_name }}__pre-setup.yml"
+  vars:
+    label: "[PRE-SETUP]"
+    setup_phase_operations: "{{ pre_setup | default([]) }}"
+  delegate_to: localhost
+  changed_when: false

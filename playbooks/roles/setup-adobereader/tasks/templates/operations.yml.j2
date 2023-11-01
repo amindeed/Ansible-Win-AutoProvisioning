@@ -671,7 +671,6 @@
 
       $fileContent = @"
 {{ update_item.source.file_text_content | indent(width=4, indentfirst=True) }}    "@
-{#{{ update_item.source.file_text_content | indent(width=4, first=True) }}    "@#}
 
       $tempdir = New-TemporaryDirectory | Select-Object -ExpandProperty FullName
       Set-Content -Path "$tempdir\temp_file.tmp" -Value $fileContent
@@ -781,7 +780,6 @@
 
         $contentToAdd = @"
 {{ update_item.source.file_text_content | indent(width=4, indentfirst=True) }}    "@
-{#{{ update_item.source.file_text_content | indent(width=4, first=True) }}    "@#}
         Add-Content -Path "{{ update_item.destination }}" -Value $contentToAdd
         Write-Output "[OK_CHANGE] Content appended."
         exit 0
@@ -868,7 +866,6 @@
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Run user-provided script ({{ job_item.description | default('') }})"
   win_shell: |
 {{ job_item.script_content | indent(width=4, indentfirst=True) }}
-{#{{ job_item.script_content | indent(width=4, first=True) }}#}
 {% else %}
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Run the script \"{{ file_url.split('/')[-1] }}\""
   win_shell: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_url.split("/")[-1] }} {{ job_item.arguments | default("") }}'

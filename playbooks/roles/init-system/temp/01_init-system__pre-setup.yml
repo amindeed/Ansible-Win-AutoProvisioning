@@ -1,0 +1,57 @@
+---
+- name: "Start operations.."
+  meta: noop
+
+
+- name: "Initialization.."
+  win_file:
+    path: '{{ win_temp_dir_path }}'
+    state: directory
+
+
+                    
+
+
+
+
+  
+
+- name: '[PRE-SETUP] (1/1) Ensure destination "C:\Program Files\WindowsPowerShell\Modules\" exists'
+  win_file: 
+    path: 'C:\Program Files\WindowsPowerShell\Modules\'
+    state: directory
+  register: win_file_dest_check
+
+- name: "[PRE-SETUP] (1/1) Download 'awap-psmodules-0.1.0.zip'"
+  win_get_url:
+    url: "{{ pkgs_repo_base_url }}/awap-psmodules/awap-psmodules-0.1.0.zip"
+    dest: '{{ win_temp_dir_path }}\awap-psmodules-0.1.0.zip'
+    url_username: "{{ http_auth_username }}"
+    url_password: "{{ http_auth_password }}"
+    timeout: 60
+  register: auth_dl_result
+
+ 
+
+
+
+- name: "[PRE-SETUP] (1/1) Unzip 'awap-psmodules-0.1.0.zip' to user-defined destination (overwritten upon user-set configuration)"
+  win_unzip:
+    src: '{{ win_temp_dir_path }}\awap-psmodules-0.1.0.zip'
+    dest: 'C:\Program Files\WindowsPowerShell\Modules\'
+    
+  when: "not win_file_dest_check.changed"
+
+- name: "[PRE-SETUP] (1/1) Unzip 'awap-psmodules-0.1.0.zip' to user-defined destination (empty target dir.)"
+  win_unzip:
+    src: '{{ win_temp_dir_path }}\awap-psmodules-0.1.0.zip'
+    dest: 'C:\Program Files\WindowsPowerShell\Modules\'
+  when: "win_file_dest_check.changed"
+
+
+
+                  
+
+
+
+  
