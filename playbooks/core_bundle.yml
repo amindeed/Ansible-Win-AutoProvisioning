@@ -18,23 +18,31 @@
 #    - name: Show all variables
 #      ansible.builtin.debug: msg="{{ lookup('ansible.builtin.varnames', '.+')}}"
 
-- name: "Install PowerShell modules"
+- name: "Initialize the system"
   hosts: all
   gather_facts: no
-  tags: psmodules
+  tags: initsys
   roles:
-    - role: install-psmodules
+    - role: init-system
       vars:
-        setup:
+        pre_setup:
           - configurations:
             - update_resource:
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: awap-modules/awap-modules-0.1.0.zip
+                  file_relative_url: awap-psmodules/awap-psmodules-0.1.0.zip
                 destination: C:\Program Files\WindowsPowerShell\Modules\
                 unzip: yes
-
+                #overwrite_dest: no # Default: yes
+              #- resource_type: file_system
+              #  operation_type: create
+              #  source:
+              #    file_text_content: |
+              #      # Scripts to be launched on each user's logon
+              #      # ----------
+              #  destination: '%ProgramData%\Microsoft\Windows\Start Menu\Programs\StartUp\starter.ps1'
+                
 
 - name: "Setup Notepad++"
   hosts: all
@@ -62,12 +70,6 @@
                 operation_type: transfer
                 source:
                   file_relative_url: notepadpp/plugins/AutoSave_dll_2v00_x64.zip
-                  # OR:
-                  #file_full_url:
-                  #upload_file:
-                  #file_content: |
-                    #1st line of content
-                    #2nd line of content
                 destination: D:\AppServ\Notepad++\plugins\AutoSave\
                 unzip: yes # Default: 'no'
                 overwrite_dest: no # Default: yes
@@ -317,7 +319,7 @@
           - installations:
             - software_components:
               - software_fullname: "MarkText"
-                file_relative_url: marktext/marktext-setup.exe
+                file_relative_url: marktext/marktext-setup_v0_17_1.exe
                 type: exe
                 arguments: /allusers /S /D=D:\AppServ\MarkText
 
@@ -336,10 +338,12 @@
                 operation_type: transfer
                 source:
                   file_relative_url: vscode/extensions/esbenp.prettier-vscode-9.16.0.vsix
+                destination: "{{ win_temp_dir_path }}"
               - resource_type: file_system
                 operation_type: transfer
                 source:
                   file_relative_url: vscode/extensions/PKief.material-icon-theme-4.28.0.vsix
+                destination: "{{ win_temp_dir_path }}"
         setup:
           - installations:
             - software_components:
@@ -451,8 +455,8 @@
                 type: zip
                 root_install_dir: D:\AppServ
                 main_app_launcher: 'depends.exe'
-                #desktop_shortcut: yes # Default: no
-                #startmenu_shortcut: yes # Default: yes
+                desktop_shortcut: yes # Default: no
+                startmenu_shortcut: yes # Default: yes
 
 
 - name: "Setup TreeSize"
@@ -466,6 +470,14 @@
           - installations:
             - software_components:
               - software_fullname: "TreeSize"
-                file_relative_url: treesize/TreeSizeFreeSetup.exe
+                file_relative_url: treesize/TreeSizeFreeSetup_v4_7.exe
                 type: exe
                 arguments: /DIR=D:\AppServ\TreeSize /VERYSILENT /NORESTART
+
+
+#- name: "Finalize the system"
+#  hosts: all
+#  gather_facts: no
+#  tags: finalize
+#  roles:
+#    - role: finalize-system

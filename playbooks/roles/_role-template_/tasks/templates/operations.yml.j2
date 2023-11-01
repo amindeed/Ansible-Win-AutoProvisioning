@@ -93,27 +93,6 @@
 {# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
 
 {% if software_item.upload_file is not defined and (software_item.file_full_url is defined or software_item.file_relative_url is defined) %}
-{# -------------
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check if HTTP authentication is required for file download"
-  win_shell: |
-{% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
-    $url = "{{ software_item.file_full_url }}"
-{% elif software_item.file_relative_url is defined and software_item.file_relative_url is not none %}
-    $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ software_item.file_relative_url }}"
-{% endif %}
-    $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
-
-    if ($responseStatusCode -eq 401) { 
-        Write-Host "Auth required" 
-    } else { 
-        Write-Host "Auth not required" 
-    }
-  register: auth_check
-  changed_when: false
-  no_log: true
-  when: "'Not Installed' in initial_software_status.stdout"
--------------- #}
-
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files"
   win_get_url:
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
@@ -126,22 +105,8 @@
     username: "{{ software_item.http_auth_username | default('{{ http_auth_username }}') }}"
     password: "{{ software_item.http_auth_password | default('{{ http_auth_password }}') }}"
     timeout: 60
-{#  when: "'Not Installed' in initial_software_status.stdout and 'Auth required' in auth_check.stdout" #}
   when: "'Not Installed' in initial_software_status.stdout"
 
-{# -------------
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files (without authentication)"
-  win_get_url:
-{% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
-    url: "{{ software_item.file_full_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.file_full_url.split("/")[-1] }}'
-{% elif software_item.file_relative_url is defined and software_item.file_relative_url is not none %}
-    url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ software_item.file_relative_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.file_relative_url.split("/")[-1] }}'
-{% endif %}
-    timeout: 60
-  when: "'Not Installed' in initial_software_status.stdout and 'Auth not required' in auth_check.stdout"
--------------- #}
 {% endif %} {# end process 'Download' #}
 
 
@@ -279,10 +244,6 @@
 
       $Shortcut.Save()
 {% endif %}
-
-
-
-
 
       $directoryPath = "{{ software_item.manual_registration.root_install_dir | default('C:\Program Files') }}\{{ software_item.software_fullname }}"
       $directoryInfo = Get-Item -Path $directoryPath
@@ -482,7 +443,7 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle System Environment Variables ︵‿︵‿︵‿︵‿ #}
 {% if update_item.resource_type == 'env_var' %}
-{% if update_item.resource_name == 'PATH' %}
+{% if update_item.resource_name|lower == 'path' %}
 - name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Append "{{ update_item.value }}" to "{{ update_item.resource_name }}"'
 {% else %}
 - name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Set "{{ update_item.resource_name }}" system environment variable'
@@ -496,23 +457,25 @@
     }
     try {
       $newEnvVarValue = '{{ update_item.value | default("") }}'
-      $currentEnvVarValue = [Environment]::GetEnvironmentVariable("{{ update_item.resource_name }}", [System.EnvironmentVariableTarget]::Machine)
+      $currentEnvVarValue = (Get-Item -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Environment").GetValue('{{ update_item.resource_name }}',$null,'DoNotExpandEnvironmentNames')
       $action = '{{ update_item.action | default("append") }}'
 
       if (IsVar $currentEnvVarValue) {
         if ($action -eq 'append') {
-          $envvarItemsList = $currentEnvVarValue -split ";"
-          $envvarContainsNewVal = $envvarItemsList -contains $newEnvVarValue
-          if (-not $envvarContainsNewVal) {
+          #$envvarItemsList = $currentEnvVarValue -split ";"
+          #$envvarContainsNewVal = $envvarItemsList -contains $newEnvVarValue
+
+          if ($currentEnvVarValue -notlike "*$newEnvVarValue*") {
             $currentEnvVarValue += ';{{ update_item.value | default("") }}'
-            [Environment]::SetEnvironmentVariable("{{ update_item.resource_name }}", $currentEnvVarValue, [System.EnvironmentVariableTarget]::Machine)
+            #[Environment]::SetEnvironmentVariable("{{ update_item.resource_name }}", $currentEnvVarValue, [System.EnvironmentVariableTarget]::Machine)
+            New-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Environment" -Name "{{ update_item.resource_name }}" -Value $currentEnvVarValue -PropertyType ExpandString -Force
             Write-Host "[OK_CHANGE] New value appended to system environment variable '{{ update_item.resource_name }}'."
             exit 0
           } else {
               Write-Host "[OK_NO_CHANGE] Value already in system environment variable '{{ update_item.resource_name }}'."
               exit 0
             }
-        } elseif ('{{ update_item.resource_name }}' -eq 'PATH') {
+        } elseif ('{{ update_item.resource_name }}' -ieq 'PATH') {
             Write-Host "[KO_FAILURE] Only 'append' action is allowed for 'PATH' environment variable."
             exit 1
         } elseif ($action -eq 'modify') {
@@ -573,10 +536,13 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Shortcut ︵‿︵‿︵‿︵‿ #}
 {% if update_item.operation_type == 'shortcut' %}
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Create shortcut "{{ update_item.source }}"'
+- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Create shortcut to "{{ update_item.source }}"'
   win_shortcut:
     src: '{{ update_item.source }}'
     dest: '{{ update_item.destination }}'
+{% if update_item.icon is defined %}
+    icon: '{{ update_item.icon }}'
+{% endif %}
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Transfer ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'transfer' %}
@@ -591,26 +557,6 @@
 
 {# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
 {% if update_item.source.upload_file is not defined and (update_item.source.file_full_url is defined or update_item.source.file_relative_url is defined) %}
-
-{# --------------
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check if HTTP auth. is required to download "{{ file_name }}"'
-  win_shell: |
-{% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
-    $url = "{{ update_item.source.file_full_url }}"
-{% elif update_item.source.file_relative_url is defined and update_item.source.file_relative_url is not none %}
-    $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ update_item.source.file_relative_url }}"
-{% endif %}
-    $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
-
-    if ($responseStatusCode -eq 401) { 
-        Write-Host "Auth required" 
-    } else { 
-        Write-Host "Auth not required" 
-    }
-  register: auth_check
-  changed_when: false
-  no_log: true
--------------- #}
 
 {% if update_item.destination is defined %}
 - name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
@@ -633,22 +579,7 @@
     password: "{{ update_item.source.http_auth_password | default('{{ http_auth_password }}') }}"
     timeout: 60
   register: auth_dl_result
-{#  when: "'Auth required' in auth_check.stdout" #}
 
-{# --------------
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ file_name }}' (without authentication)"
-  win_get_url:
-{% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
-    url: "{{ update_item.source.file_full_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
-{% elif update_item.source.file_relative_url is defined and update_item.source.file_relative_url is not none %}
-    url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ update_item.source.file_relative_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
-{% endif %}
-    timeout: 60
-  register: no_auth_dl_result
-  when: "'Auth not required' in auth_check.stdout"
--------------- #}
 {% endif %} {# end process 'Download' #}
 
 {# ︵‿︵‿ Upload files from Ansible Controller machine ︵‿︵‿ #}
@@ -662,9 +593,16 @@
 {% endif %}
 
 {# Down/Upload: Unzip file if 'unzip: yes' #}
-{% if update_item.unzip is defined and update_item.unzip %}
-{% if update_item.destination is defined %}
+
+{#{% if update_item.destination is not defined %}
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}' to user-defined destination"
+  fail:
+    msg: "Destination not set by the user."
+
+{% else %} #}
+
+{% if update_item.unzip is defined and update_item.unzip %}
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}' to user-defined destination (overwritten upon user-set configuration)"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
@@ -672,20 +610,23 @@
 
   when: "not win_file_dest_check.changed"
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) [ALWAYS OVERWRITE DEST.] Unzip '{{ file_name }}' to user-defined destination"
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}' to user-defined destination (empty target dir.)"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
   when: "win_file_dest_check.changed"
+{% else %} {# regular file transfer #}
 
-{% else %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}' to user-defined destination"
-  fail:
-    msg: "Unzip destination not set by the user."
+{% if update_item.destination is defined and update_item.destination != win_temp_dir_path %}
+- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Copy '{{ file_name }}' to user-defined destination"
+  win_copy:
+    src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+    dest: '{{ update_item.destination }}'
+    remote_src: yes
 {% endif %}
 {% endif %}
 
-{# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Move ︵‿︵‿︵‿︵‿ #}
+{# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Move/Rename ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'move' %}
 - name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Move/Rename "{{ update_item.source }}"'
   win_shell: |
@@ -709,30 +650,161 @@
   
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Create ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'create' %}
+{% if update_item.source is not defined and update_item.destination is defined %}
+- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Create directory "{{ update_item.destination }}"'
+  win_file:
+    path: {{ update_item.destination }}
+    state: directory
+
+{% else %}
 - name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Create file "{{ update_item.destination }}"'
   win_shell: |
     try {
+      $ErrorActionPreference = "Stop"
+
+      Function New-TemporaryDirectory 
+      {
+          $parent = [System.IO.Path]::GetTempPath()
+          $name = [System.IO.Path]::GetRandomFileName()
+          New-Item -ItemType Directory -Path (Join-Path $parent $name)
+      }
+
       $fileContent = @"
-{{ update_item.source.file_text_content | indent(width=4, indentfirst=True) }}
-    "@
-      Set-Content -Path "{{ update_item.destination }}" -Value $fileContent
+{{ update_item.source.file_text_content | indent(width=4, indentfirst=True) }}    "@
+
+      $tempdir = New-TemporaryDirectory | Select-Object -ExpandProperty FullName
+      Set-Content -Path "$tempdir\temp_file.tmp" -Value $fileContent
+      $fileContentHash = Get-FileHash -Algorithm MD5 -LiteralPath "$tempdir\temp_file.tmp"
+
+      if (-not(Test-Path -Path "{{ update_item.destination }}") -or ($fileContentHash.Hash -ne $(Get-FileHash -Algorithm MD5 -Path "{{ update_item.destination }}").Hash)) {
+        Set-Content -Path "{{ update_item.destination }}" -Value $fileContent
+        Write-Output "[OK_CHANGE] File created."
+        Remove-Item -Recurse -Force $tempdir > $null
+        exit 0
+      } else {
+        Write-Output "[OK_NO_CHANGE] File already exists with the exact content."
+        Remove-Item -Recurse -Force $tempdir > $null
+        exit 0
+      }
     } catch {
-        Write-Output "ERROR: $_"
-        exit 1
+      Write-Output "[KO_FAILURE] ERROR: $_.Exception.Message"
+      Remove-Item -Recurse -Force $tempdir > $null
+      exit 1
     }
+  register: file_create_result
+  changed_when: file_create_result.rc == 0 and 'OK_CHANGE' in file_create_result.stdout
+  failed_when: file_create_result.rc != 0 or 'KO_FAILURE' in file_create_result.stdout
+{% endif  %}
+
+{# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Remove ︵‿︵‿︵‿︵‿ #}
+{% elif update_item.operation_type == 'remove' %}
+- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Remove "{{ update_item.destination }}"'
+  win_file:
+    path: {{ update_item.destination }}
+    state: absent
+
+{# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Append ︵‿︵‿︵‿︵‿ #}
+{% elif update_item.operation_type == 'append' %}
+
+- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Append text content to "{{ update_item.destination }}"'
+  win_shell: |
+    try {
+      $ErrorActionPreference = "Stop"
+
+      function IsBinary {
+      # Checks for ASCII NUL Byte or UTF-8 Overlong, and returns 'True' (i.e the file is binary) if they exist
+      # Inspired from: https://stackoverflow.com/questions/1077634/powershell-search-script-that-ignores-binary-files
+      # Limited to supporting files less than 2 gigabytes in size.
+
+          param(
+              [string]$filePath
+          )
+
+          # Read the file as a byte array
+          $fileBytes = [System.IO.File]::ReadAllBytes($filePath)
+
+          # Function to check for ASCII NUL byte
+          function ContainsNullByte($bytes) {
+              foreach ($byte in $bytes) {
+                  if ($byte -eq 0) {
+                      return $true
+                  }
+              }
+              return $false
+          }
+
+          # Function to check for UTF-8 overlong sequences
+          function ContainsOverlongUTF8($bytes) {
+              $index = 0
+              while ($index -lt $bytes.Length) {
+                  $byte = $bytes[$index]
+
+                  if ($byte -le 0x7F) {
+                      # ASCII character, continue
+                      $index++
+                  } elseif ($byte -ge 0xC0 -and $byte -le 0xDF) {
+                      # 2-byte sequence
+                      if ($index + 1 -ge $bytes.Length -or $bytes[$index + 1] -lt 0x80 -or $bytes[$index + 1] -gt 0xBF) {
+                          return $true
+                      }
+                      $index += 2
+                  } elseif ($byte -ge 0xE0 -and $byte -le 0xEF) {
+                      # 3-byte sequence
+                      if ($index + 2 -ge $bytes.Length -or $bytes[$index + 1] -lt 0x80 -or $bytes[$index + 1] -gt 0xBF -or $bytes[$index + 2] -lt 0x80 -or $bytes[$index + 2] -gt 0xBF) {
+                          return $true
+                      }
+                      $index += 3
+                  } elseif ($byte -ge 0xF0 -and $byte -le 0xF4) {
+                      # 4-byte sequence
+                      if ($index + 3 -ge $bytes.Length -or $bytes[$index + 1] -lt 0x80 -or $bytes[$index + 1] -gt 0xBF -or $bytes[$index + 2] -lt 0x80 -or $bytes[$index + 2] -gt 0xBF -or $bytes[$index + 3] -lt 0x80 -or $bytes[$index + 3] -gt 0xBF) {
+                          return $true
+                      }
+                      $index += 4
+                  } else {
+                      return $true
+                  }
+              }
+              return $false
+          }
+
+          # Check for NUL byte
+          $containsNullByte = ContainsNullByte($fileBytes)
+
+          # Check for overlong UTF-8 sequences
+          $containsOverlongUTF8 = ContainsOverlongUTF8($fileBytes)
+
+          return ($containsNullByte -or $containsOverlongUTF8)
+      }
+
+      if ((Test-Path -Path "{{ update_item.destination }}" -PathType Leaf) -and -not (IsBinary "{{ update_item.destination }}")) {
+
+        $contentToAdd = @"
+{{ update_item.source.file_text_content | indent(width=4, indentfirst=True) }}    "@
+        Add-Content -Path "{{ update_item.destination }}" -Value $contentToAdd
+        Write-Output "[OK_CHANGE] Content appended."
+        exit 0
+      } else {
+        $errorMessage = "'{{ update_item.destination }}' is either non-existent or not a text file."
+        throw [System.Exception]::new($errorMessage)
+      }
+    } catch {
+      Write-Output "[KO_FAILURE] ERROR: $_.Exception.Message"
+      exit 1
+    }
+  register: append_content_result
+  changed_when: append_content_result.rc == 0 and 'OK_CHANGE' in append_content_result.stdout
+  failed_when: append_content_result.rc != 0 or 'KO_FAILURE' in append_content_result.stdout
+
+
+
 
 {# ....
-- Create/modify/move/rename/delete files
+- modify/move/rename
   - Modify: overwrite content, append content, find [text matching pattern] and replace
-  - Create: download, or create from content (plain text or base64-encoded binary files)
 
 - create
   - source
-    - file_content
     - template
-  - destination
-    - file path (include resource name)
-      > w / w/o trailing slash
 
 - modify
   - type
@@ -741,9 +813,6 @@
     - find_replace
     - append
     - prepend
-
-- delete
-  - destionation/source
 
 .... #}
 
@@ -769,27 +838,6 @@
 
 {% if job_item.script_content | default("") == "" %} {# X #}
 {% if job_item.file_full_url is defined or job_item.file_relative_url is defined %} {# XX #}
-
-{# --------------
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check if authentication is required for script file download"
-  win_shell: |
-{% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
-    $url = "{{ job_item.file_full_url }}"
-{% elif job_item.file_relative_url is defined and job_item.file_relative_url is not none %}
-    $url = "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ job_item.file_relative_url }}"
-{% endif %}
-    $responseStatusCode = $(try { Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
-
-    if ($responseStatusCode -eq 401) { 
-        Write-Host "Auth required" 
-    } else { 
-        Write-Host "Auth not required" 
-    }
-  register: auth_check
-  changed_when: false
-  no_log: true
--------------- #}
-
 {% set file_url = job_item.file_full_url | default(job_item.file_relative_url) %}
 
 - name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\""
@@ -803,20 +851,6 @@
 {% endif %}
     username: "{{ job_item.http_auth_username | default('{{ http_auth_username }}') }}"
     password: "{{ job_item.http_auth_password | default('{{ http_auth_password }}') }}"
-{#  when: "'Auth required' in auth_check.stdout" #}
-
-{# --------------
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\" (without authentication)"
-  win_get_url:
-{% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
-    url: "{{ job_item.file_full_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ job_item.file_full_url.split("/")[-1] }}'
-{% elif job_item.file_relative_url is defined and job_item.file_relative_url is not none %}
-    url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ job_item.file_relative_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ job_item.file_relative_url.split("/")[-1] }}'
-{% endif %}
-  when: "'Auth not required' in auth_check.stdout"
--------------- #}
 
 {% endif %} {# XX #}
 {% endif %} {# X #}

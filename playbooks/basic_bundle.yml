@@ -1,6 +1,32 @@
 ---
 # ansible-playbook main.yml -i ../inventories/environments/dev.yml
 
+
+- name: TEST
+  hosts: all
+  gather_facts: no
+  tags: test
+  roles:
+    - role: test
+      vars:
+        setup:
+          #- configurations:
+          #  - update_resource:
+          #    - resource_type: file_system
+          #      operation_type: append
+          #      source:
+          #        file_text_content: |
+          #          `nAppend this to the end of the file
+          #      destination: D:\AppServ\MarkText\MarkText.exe
+          - configurations:
+            - update_resource:
+              - resource_type: env_var
+                resource_name: KJFKJFGKJ
+                value: iuiuiu
+                action: delete # [create, modify, delete] # Default behaviour: attempts 'create' action
+                #abort_on_failure: yes # Default: 'no'
+
+
 - name: Setup NVM For Windows for Node.JS v14, v16 and v18
   hosts: all
   gather_facts: no
@@ -17,8 +43,8 @@
                   file_relative_url: nodejs/node-v14.17.3-win-x64.zip
                 destination: D:\AppServ\NodeJS\
                 unzip: yes
-                #overwrite_dest: no # Default: yes
-                skip_if_path_exists: D:\AppServ\NodeJS\node-v14.17.3-win-x64
+                #overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
+                skip_if_path_exists: D:\AppServ\NodeJS\node-v14.17.3-win-x64 # Default: "destination" path # Ignored when unzip == 'no'
 
               - resource_type: file_system
                 operation_type: transfer
@@ -26,8 +52,8 @@
                   file_relative_url: nodejs/node-v16.16.0-win-x64.zip
                 destination: D:\AppServ\NodeJS\
                 unzip: yes
-                #overwrite_dest: no # Default: yes
-                skip_if_path_exists: D:\AppServ\NodeJS\node-v16.16.0-win-x64
+                #overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
+                skip_if_path_exists: D:\AppServ\NodeJS\node-v16.16.0-win-x64 # Default: "destination" path # Ignored when unzip == 'no'
 
               - resource_type: file_system
                 operation_type: transfer
@@ -35,8 +61,37 @@
                   file_relative_url: nodejs/node-v18.18.0-win-x64.zip
                 destination: D:\AppServ\NodeJS\
                 unzip: yes
-                #overwrite_dest: no # Default: yes
-                skip_if_path_exists: D:\AppServ\NodeJS\node-v18.18.0-win-x64
+                #overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
+                skip_if_path_exists: D:\AppServ\NodeJS\node-v18.18.0-win-x64 # Default: "destination" path # Ignored when unzip == 'no'
+
+        post_setup:
+          - configurations:
+            #- resource_type: file_system
+            #  operation_type: create
+            #  source:
+            #    file_text_content: |
+            #      TEST TEST TEST TEST TEST
+            #      TEST TEST TEST TEST TEST
+            #  destination: D:\AppServ\NodeJS\test.txt
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: setup-nodejs/set_NODEJS_HOME.ps1
+                  #file_relative_url: nodejs/set_NODEJS_HOME.ps1
+                destination: D:\AppServ\NodeJS\
+              
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: setup-nodejs/EXEC__set_NODEJS_HOME.vbs
+                destination: D:\AppServ\NodeJS\
+
+              - resource_type: file_system
+                operation_type: shortcut
+                source: D:\AppServ\NodeJS\EXEC__set_NODEJS_HOME.vbs
+                destination: '%PUBLIC%\Desktop\NODEJS HOME.lnk'
+                icon: D:\AppServ\NodeJS\node-v18.18.0-win-x64\node.exe,0
 
               # "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe " -WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\nodejs\set_NODEJS_HOME_form.ps1"
 
@@ -53,14 +108,14 @@
             - resource_type: file_system
               operation_type: transfer
               source:
-                file_relative_url: cygwin/cygwin64install.zip
-              destination: D:\AppServ\Cygwin\cygwin64install\
+                file_relative_url: cygwin/cygwin64install_cyg_v3_4_9.zip
+              destination: D:\AppServ\Cygwin\
               unzip: yes # Default: 'no'
-              overwrite_dest: no # Default: yes
+              overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
         - installations:
           - software_components:
             - software_fullname: Cygwin
-              file_relative_url: cygwin/setup-x86_64.exe
+              file_relative_url: cygwin/cygwin_v3_4_9_setup-x86_64.exe
               type: exe
               arguments: --quiet-mode --local-install --local-package-dir D:\AppServ\Cygwin\cygwin64install --root D:\AppServ\Cygwin\cygwin64 --no-shortcuts --packages libpopt-common,terminfo,tzdata,cygwin-devel,w32api-headers,windows-default-manifest,libsource-highlight-common,publicsuffix-list-dafsa,libgsasl-common,gsettings-desktop-schemas,cygwin,libiconv2,libintl8,w32api-runtime,libintl-devel,libncursesw10,libreadline7,bash,libzstd1,crypto-policies,base-cygwin,zlib0,libpng16,libgpg-error0,libpcre1,libidn12,libjbig2,libdeflate0,libXdmcp6,libXau6,libwebp7,liblcms2_2,libbrotlicommon1,libnghttp2_14,libidn2_0,libntlm0,libkrb5support0,libedit0,cygrunsrv,libpkgconf4,libsqlite3_0,m4,libatomic1,libiconv,gettext,libxxhash0,libexpat1,libcrypt2,libltdl7,libffi8,libunistring5,which,vim-minimal,tzcode,sed,run,ncurses,mintty,login,libtasn1_6,libsmartcols1,libsigsegv2,libpopt0,libpipeline1,libpcre2_8_0,liblzma5,liblz4_1,libgmp10,libgcc1,libffi6,libbz2_1,libattr1,libargp,ipc-utils,hostname,gzip,editrights,diffutils,dash,binutils,alternatives,libgcrypt20,libxcb1,libwebpmux3,libwebpdemux2,libbrotlidec1,libk5crypto3,pkgconf,libtool,libpsl5,cygutils,less,grep,libxml2,xz,libisl23,libjpeg8,libcom_err2,libquadmath0,libgomp1,perl_base,libgc1,libuuid1,libstdc++6,libmpfr6,libgdbm6,libp11-kit0,file,bzip2,coreutils,getent,rebase,info,_autorebase,libfreetype6,pkg-config,libglib2.0_0,desktop-file-utils,libkrb5_3,libimagequant0,libguile3.0_1,libblkid1,libgraphite2_3,libtiff6,libdb5.3,libicu61,libncurses++w10,zstd,libuchardet0,libmpc3,gawk,libgdbm_compat4,p11-kit-trust,p11-kit,findutils,gamin,libfam0,libgssapi_krb5_2,make,libfdisk1,libboost_regex1.66,libncurses-devel,tar,groff,gcc-core,csih,perl,ca-certificates,base-files,shared-mime-info,libgsasl18,util-linux,libsource-highlight4,gcc-g++,autoconf2.1,perl-JSON-PP,libssl3,libssl1.1,libharfbuzz0,libfribidi0,man-db,perl_autorebase,openssl,libsasl2_3,libssh2_1,libfido2,python39,python39-platformdirs,python39-setuptools,rsync,libraqm0,autoconf2.7,autoconf2.5,texinfo,perl-TermReadKey,perl-Error,libopenldap2,openssh,python39-iniconfig,python39-six,python39-idna,python39-toml,python39-pluggy,python39-babel,python39-markupsafe,python39-snowballstemmer,python39-imagesize,python39-olefile,python39-chardet,autoconf,libopenldap2_4_2,libcurl4,python39-urllib3,python39-jinja2,automake1.9,automake1.16,automake1.13,automake1.12,automake1.11,automake1.10,automake1.14,automake1.15,git,python39-requests,python39-pyparsing,automake,python39-packaging,python39-pytest,python39-imaging,python39-pygments,python39-docutils,python39-sphinx,python39-pip,python39-sphinxcontrib-serializinghtml,python3,gdb,gettext-devel,libsodium-common,xxd,libsodium23,vim-common,vim
               manual_registration:
@@ -168,7 +223,7 @@
           - installations:
             - software_components:
               - software_fullname: "UMLDesigner" # /!\ Attention when 'create_directory' is set to 'no' /!\
-                file_relative_url: umldesigner/UMLDesigner-win32.win32.x86_64.zip
+                file_relative_url: umldesigner/UMLDesigner_v9-win32.win32.x86_64.zip
                 type: zip
                 root_install_dir: D:\AppServ
                 create_directory: no # Default: yes
@@ -221,3 +276,20 @@
                 #additional_arguments: ALLUSERS=1 ADDLOCAL=ALL
                 additional_arguments: ALLUSERS=1 ADDLOCAL=DefaultFeature,TclTk,Documentation,Tools,pip_feature,Testsuite
                 #abort_on_aftercheck_failure: no # Temporarilly...
+
+
+- name: "Finalize the system"
+  hosts: all
+  gather_facts: no
+  tags: finalize
+  roles:
+    - role: finalize-system
+      vars:
+        post_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: finalize-system/set_PATH_EnvVars.ps1
+                destination: XXXXXXXXX
