@@ -30,14 +30,14 @@
   tasks:                                                    #         "full": "2.9.27",
     - name: Check variable value (example task 1)           #         "major": 2,
       debug:                                                #         "minor": 9,
-        var: ansible_version                                #         "revision": 27,
+        var: ansible_version.full                                #         "revision": 27,
                                                             #         "string": "2.9.27"
     - name: Check variable value (example task 2)           #     }
-      debug: msg="{{ ansible_version }}"                    # }
+      debug: msg="{{ ansible_version.full }}"                    # }
                                                             # 
     - name: Check variable value (example task 3)           # ## Output of Example 3 : ##
       debug:                                                # 
-        msg: "Ansible version is: {{ ansible_version }}"    # ok: [192.168.66.12] => {
+        msg: "Ansible version is: {{ ansible_version.full }}"    # ok: [192.168.66.12] => {
                                                             #     "msg": "Ansible version is: {'string': '2.9.27', 'full': '2.9.27', 'major': 2, 'minor': 9, 'revision': 27}"
                                                             # }
 
