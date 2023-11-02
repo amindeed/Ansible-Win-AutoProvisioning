@@ -10,10 +10,25 @@
     path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}'
     state: directory
 
+{# ▰▰▰▰▰▰▰▰▰▰▰▰ Tests / Debug ▰▰▰▰▰▰▰▰▰▰▰▰ #}
+
+  {% if 'tests' in operation %}
+    {% for test_item in operation.tests %}
+
+- name: [TEST/DEBUG] 
+  debug:
+    msg: {{ test_item.test_var }}
+
+    {% endfor %}
+
 {# ▰▰▰▰▰▰▰▰▰▰▰▰ Checks ▰▰▰▰▰▰▰▰▰▰▰▰ #}
 
   {% if 'checks' in operation %}
     {% for check_item in operation.checks %}
+
+{# ..... #}
+
+
 
 {# ︵‿︵‿ Check TCP Network Flows ︵‿︵‿ #}
       {% if 'check_net_flows' in check_item %}

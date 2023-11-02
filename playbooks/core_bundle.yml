@@ -1,22 +1,46 @@
 ---
 # ansible-playbook main.yml -i ../inventories/environments/dev.yml
 
+
 #- name: "Gather and display all facts"
 #  hosts: all
 #  tags: gatherfacts
 #  tasks:
-#    - name: "Gather all facts
+#    - name: Gather all facts
 #      setup:
-#    - name: "Display all gathered facts
+#    - name: Display all gathered facts
 #      debug:
 #        var: ansible_facts
 
-#- name: "Show all variables"
+
+
+#- name: Show all variables
 #  hosts: all
-#  tags: gatherfacts
+#  tags: showallvars
 #  tasks:
 #    - name: Show all variables
 #      ansible.builtin.debug: msg="{{ lookup('ansible.builtin.varnames', '.+')}}"
+
+
+
+- name: Check value of a variable                           # ## Output of Example 1 & 2 : ##
+  hosts: all                                                #      
+  gather_facts: no                                          # ok: [192.168.66.12] => {
+  tags: checkvar                                            #     "msg": {
+  tasks:                                                    #         "full": "2.9.27",
+    - name: Check variable value (example task 1)           #         "major": 2,
+      debug:                                                #         "minor": 9,
+        var: ansible_version                                #         "revision": 27,
+                                                            #         "string": "2.9.27"
+    - name: Check variable value (example task 2)           #     }
+      debug: msg="{{ ansible_version }}"                    # }
+                                                            # 
+    - name: Check variable value (example task 3)           # ## Output of Example 3 : ##
+      debug:                                                # 
+        msg: "Ansible version is: {{ ansible_version }}"    # ok: [192.168.66.12] => {
+                                                            #     "msg": "Ansible version is: {'string': '2.9.27', 'full': '2.9.27', 'major': 2, 'minor': 9, 'revision': 27}"
+                                                            # }
+
 
 - name: "Initialize the system"
   hosts: all
