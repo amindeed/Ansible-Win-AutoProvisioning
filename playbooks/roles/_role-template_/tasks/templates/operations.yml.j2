@@ -896,4 +896,30 @@
 
 {# ▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ #}
   {% endif %}
+
+- name: {{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Expand Windows host's Temp directory full path name
+  raw: Write-Output "$ENV:LOCALAPPDATA\Temp"
+  register: path_out
+  changed_when: false
+
+- name: {{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Find Ansible temporary directories
+  win_find:
+    paths: "{{ path_out.stdout_lines[0] }}"
+    patterns: ^ansible-[A-Za-z0-9]*tmp-.+$
+    use_regex: true
+    file_type: directory
+  register: ansible_tmp
+                                  
+- name: {{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) List all Ansible temporary directories
+  debug:                                     
+    msg: "{{ ansible_tmp.files | map(attribute='path') | list }}"
+  when: ansible_tmp.matched > 0
+
+- name: {{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Force cleanup of Ansible temporary directories
+  win_file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ ansible_tmp.files }}"
+  when: ansible_tmp.matched > 0
+
 {% endfor %}

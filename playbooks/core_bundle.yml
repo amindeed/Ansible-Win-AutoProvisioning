@@ -40,7 +40,7 @@
 #        msg: "Ansible version is: {{ ansible_version.full }}"    # ok: [192.168.66.12] => {
 #                                                            #     "msg": "Ansible version is: {'string': '2.9.27', 'full': '2.9.27', 'major': 2, 'minor': 9, 'revision': 27}"
                                                             # }
-#- name: "Gather and display all facts"
+#- name: "Clean Temp files"
 #  hosts: all
 #  tags: test22
 #  gather_facts: no
@@ -56,9 +56,19 @@
 #        use_regex: true
 #        file_type: directory
 #      register: ansible_tmp                                  
-#    - name: Force Ansible temporary directories cleanup
+#    - name: List all Ansible temporary directories
 #      debug:                                     
-#        msg: "{{ ansible_tmp.files | map(attribute='path') | list }}"  
+#        msg: "{{ ansible_tmp.files | map(attribute='path') | list }}"
+#      when: ansible_tmp.matched > 0
+#    - name: Force cleanup of Ansible temporary directories
+#      win_file:
+#        path: "{{ item.path }}"
+#        state: absent
+#      loop: "{{ ansible_tmp.files }}"
+#      when: ansible_tmp.matched > 0
+
+
+
 
 
 
