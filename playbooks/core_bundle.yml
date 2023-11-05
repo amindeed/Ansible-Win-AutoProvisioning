@@ -14,7 +14,7 @@
 
 
 
-#- name: Show all variables
+#- name: Show all built-in variables
 #  hosts: all
 #  tags: showallvars
 #  tasks:
@@ -23,23 +23,43 @@
 
 
 
-- name: Check value of a variable                           # ## Output of Example 1 & 2 : ##
-  hosts: all                                                #      
-  gather_facts: no                                          # ok: [192.168.66.12] => {
-  tags: checkvar                                            #     "msg": {
-  tasks:                                                    #         "full": "2.9.27",
-    - name: Check variable value (example task 1)           #         "major": 2,
-      debug:                                                #         "minor": 9,
-        var: ansible_version.full                                #         "revision": 27,
-                                                            #         "string": "2.9.27"
-    - name: Check variable value (example task 2)           #     }
-      debug: msg="{{ ansible_version.full }}"                    # }
-                                                            # 
-    - name: Check variable value (example task 3)           # ## Output of Example 3 : ##
-      debug:                                                # 
-        msg: "Ansible version is: {{ ansible_version.full }}"    # ok: [192.168.66.12] => {
-                                                            #     "msg": "Ansible version is: {'string': '2.9.27', 'full': '2.9.27', 'major': 2, 'minor': 9, 'revision': 27}"
+#- name: Check value of a variable                           # ## Output of Example 1 & 2 : ##
+#  hosts: all                                                #      
+#  gather_facts: no                                          # ok: [192.168.66.12] => {
+#  tags: checkvar                                            #     "msg": {
+#  tasks:                                                    #         "full": "2.9.27",
+#    - name: Check variable value (example task 1)           #         "major": 2,
+#      debug:                                                #         "minor": 9,
+#        var: ansible_version.full                                #         "revision": 27,
+#                                                            #         "string": "2.9.27"
+#    - name: Check variable value (example task 2)           #     }
+#      debug: msg="{{ ansible_version.full }}"                    # }
+#                                                            # 
+#    - name: Check variable value (example task 3)           # ## Output of Example 3 : ##
+#      debug:                                                # 
+#        msg: "Ansible version is: {{ ansible_version.full }}"    # ok: [192.168.66.12] => {
+#                                                            #     "msg": "Ansible version is: {'string': '2.9.27', 'full': '2.9.27', 'major': 2, 'minor': 9, 'revision': 27}"
                                                             # }
+#- name: "Gather and display all facts"
+#  hosts: all
+#  tags: test22
+#  gather_facts: no
+#  tasks:
+#    - name: Expand Temp directory path name
+#      raw: Write-Output "$ENV:LOCALAPPDATA\Temp"
+#      register: path_out
+#      changed_when: false
+#    - name: Find Ansible temporary directories
+#      win_find:
+#        paths: "{{ path_out.stdout_lines[0] }}"
+#        patterns: ^ansible-[A-Za-z0-9]*tmp-.+$
+#        use_regex: true
+#        file_type: directory
+#      register: ansible_tmp                                  
+#    - name: Force Ansible temporary directories cleanup
+#      debug:                                     
+#        msg: "{{ ansible_tmp.files | map(attribute='path') | list }}"  
+
 
 
 - name: "Initialize the system"
