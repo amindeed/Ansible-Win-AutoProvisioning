@@ -83,7 +83,7 @@
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
                 arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\nodejs\set_NODEJS_HOME.ps1"'
                 destination: '%PUBLIC%\Desktop\NODEJS HOME.lnk'
-                icon: D:\AppServ\NodeJS\node-v18.18.0-win-x64\node.exe,0
+                icon: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64\node.exe,0
 
 
 - name: Setup Cygwin x64

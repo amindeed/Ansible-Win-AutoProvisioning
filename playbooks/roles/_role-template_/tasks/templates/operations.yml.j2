@@ -3,7 +3,7 @@
   meta: noop
 
 {% for operation in setup_phase_operations %}
-{% set upper_loop = loop %}
+{# {% set upper_loop = loop %} #}
 
 - name: "Initialization.."
   win_file:
@@ -19,7 +19,7 @@
       {% if 'check_net_flows' in check_item %}
         {% for flow_item in check_item.check_net_flows %}
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check Required TCP Network flows"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check Required TCP Network flows"
   win_shell: |
     $net_test = Test-NetConnection -ComputerName {{ flow_item.target_host }} -Port {{ flow_item.target_port }}
     if($net_test.TcpTestSucceeded) {
@@ -30,7 +30,7 @@
   register: netflow_check_result
   changed_when: false
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Results of TCP Network flow check"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Results of TCP Network flow check"
   assert:
     that:
       - "'success' in netflow_check_result.stdout"
@@ -76,7 +76,7 @@
         {% for software_item in installation_item.software_components %}
 
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check '{{ software_item.software_fullname }}' status *BEFORE* installation"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check '{{ software_item.software_fullname }}' status *BEFORE* installation"
   win_shell: |
     $appName = "{{ software_item.software_fullname }}"
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
@@ -93,7 +93,7 @@
 {# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
 
 {% if software_item.upload_file is not defined and (software_item.file_full_url is defined or software_item.file_relative_url is defined) %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ software_item.software_fullname }}' files"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ software_item.software_fullname }}' files"
   win_get_url:
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
     url: "{{ software_item.file_full_url }}"
@@ -112,7 +112,7 @@
 
 {# ︵‿︵‿ Upload packages from Ansible Controller machine ︵‿︵‿ #}
 {% if software_item.upload_file is defined and software_item.upload_file is not none %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Upload '{{ software_item.software_fullname }}' files to target host"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ software_item.software_fullname }}' files to target host"
   win_copy:
     src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ software_item.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.upload_file }}'
@@ -129,7 +129,7 @@
 {% endif %}
 
 {% if software_item.type == 'bundle' %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}'"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}'"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name.split(".")[0] }}'
@@ -139,7 +139,7 @@
 
 
 {% if software_item.root_install_dir is defined or root_install_dir is defined %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check custom target installation directory"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check custom target installation directory"
   win_file:
     path: '{{ software_item.root_install_dir | default(root_install_dir) }}'
     state: directory
@@ -148,7 +148,7 @@
 
 
 {% if software_item.type == 'zip' %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}'"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}'"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ software_item.root_install_dir | default("C:\\Program Files") }}\{% if software_item.create_directory is not defined or software_item.create_directory %}{{ software_item.software_fullname }}{% endif %}'
@@ -157,7 +157,7 @@
 {% endif %}
 
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Install '{{ software_item.software_fullname }}'"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Install '{{ software_item.software_fullname }}'"
   win_shell: |
     $installResult = $null
     $installSuccess = $false
@@ -402,7 +402,7 @@
   when: "'Not Installed' in initial_software_status.stdout"
 
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check '{{ software_item.software_fullname }}' status *AFTER* installation"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check '{{ software_item.software_fullname }}' status *AFTER* installation"
   win_shell: |
     $appName = "{{ software_item.software_fullname }}"
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
@@ -444,9 +444,9 @@
 {# ︵‿︵‿︵‿︵‿ Handle System Environment Variables ︵‿︵‿︵‿︵‿ #}
 {% if update_item.resource_type == 'env_var' %}
 {% if update_item.resource_name|lower == 'path' %}
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Append "{{ update_item.value }}" to "{{ update_item.resource_name }}"'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Append "{{ update_item.value }}" to "{{ update_item.resource_name }}"'
 {% else %}
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Set "{{ update_item.resource_name }}" system environment variable'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Set "{{ update_item.resource_name }}" system environment variable'
 {% endif %}
   win_shell: |
     function IsVar($var) {
@@ -536,7 +536,7 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Shortcut ︵‿︵‿︵‿︵‿ #}
 {% if update_item.operation_type == 'shortcut' %}
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Create shortcut to "{{ update_item.source }}"'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Create shortcut to "{{ update_item.source }}"'
   win_shortcut:
     src: '{{ update_item.source }}'
 {% if update_item.arguments is defined %}
@@ -562,14 +562,14 @@
 {% if update_item.source.upload_file is not defined and (update_item.source.file_full_url is defined or update_item.source.file_relative_url is defined) %}
 
 {% if update_item.destination is defined %}
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
   win_file: 
     path: '{{ update_item.destination }}'
     state: directory
   register: win_file_dest_check
 {% endif %}
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download '{{ file_name }}'"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
   win_get_url:
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
     url: "{{ update_item.source.file_full_url }}"
@@ -588,7 +588,7 @@
 {# ︵‿︵‿ Upload files from Ansible Controller machine ︵‿︵‿ #}
 {% if update_item.source.upload_file is defined and update_item.source.upload_file is not none %}
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Upload '{{ file_name }}' to target host"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' to target host"
   win_copy:
     src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
@@ -598,14 +598,14 @@
 {# Down/Upload: Unzip file if 'unzip: yes' #}
 
 {#{% if update_item.destination is not defined %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}' to user-defined destination"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination"
   fail:
     msg: "Destination not set by the user."
 
 {% else %} #}
 
 {% if update_item.unzip is defined and update_item.unzip %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}' to user-defined destination (overwritten upon user-set configuration)"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination (overwritten upon user-set configuration)"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
@@ -613,7 +613,7 @@
 
   when: "not win_file_dest_check.changed"
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Unzip '{{ file_name }}' to user-defined destination (empty target dir.)"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination (empty target dir.)"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
@@ -621,7 +621,7 @@
 {% else %} {# regular file transfer #}
 
 {% if update_item.destination is defined and update_item.destination != win_temp_dir_path %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Copy '{{ file_name }}' to user-defined destination"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Copy '{{ file_name }}' to user-defined destination"
   win_copy:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
@@ -631,7 +631,7 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Move/Rename ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'move' %}
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Move/Rename "{{ update_item.source }}"'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Move/Rename "{{ update_item.source }}"'
   win_shell: |
     try {
         if (Test-Path -Path "{{ update_item.source }}") {
@@ -654,13 +654,13 @@
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Create ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'create' %}
 {% if update_item.source is not defined and update_item.destination is defined %}
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Create directory "{{ update_item.destination }}"'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Create directory "{{ update_item.destination }}"'
   win_file:
     path: {{ update_item.destination }}
     state: directory
 
 {% else %}
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Create file "{{ update_item.destination }}"'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Create file "{{ update_item.destination }}"'
   win_shell: |
     try {
       $ErrorActionPreference = "Stop"
@@ -701,7 +701,7 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Remove ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'remove' %}
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Remove "{{ update_item.destination }}"'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}"'
   win_file:
     path: {{ update_item.destination }}
     state: absent
@@ -709,7 +709,7 @@
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Append ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'append' %}
 
-- name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Append text content to "{{ update_item.destination }}"'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Append text content to "{{ update_item.destination }}"'
   win_shell: |
     try {
       $ErrorActionPreference = "Stop"
@@ -843,7 +843,7 @@
 {% if job_item.file_full_url is defined or job_item.file_relative_url is defined %} {# XX #}
 {% set file_url = job_item.file_full_url | default(job_item.file_relative_url) %}
 
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Download \"{{ file_url.split('/')[-1] }}\""
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download \"{{ file_url.split('/')[-1] }}\""
   win_get_url:
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
     url: "{{ job_item.file_full_url }}"
@@ -859,18 +859,18 @@
 {% endif %} {# X #}
 
 {% if job_item.working_directory is defined and job_item.working_directory is not none %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Check provided working directory for script execution"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check provided working directory for script execution"
   win_file:
     path: '{{ job_item.working_directory }}'
     state: directory
 {% endif %}
 
 {% if job_item.script_content is defined %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Run user-provided script ({{ job_item.description | default('') }})"
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run user-provided script ({{ job_item.description | default('') }})"
   win_shell: |
 {{ job_item.script_content | indent(width=4, first=True) }}
 {% else %}
-- name: "{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Run the script \"{{ file_url.split('/')[-1] }}\""
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run the script \"{{ file_url.split('/')[-1] }}\""
   win_shell: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_url.split("/")[-1] }} {{ job_item.arguments | default("") }}'
 {% if job_item.working_directory is defined and job_item.working_directory is not none %}
   args:
