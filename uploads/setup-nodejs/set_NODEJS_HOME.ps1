@@ -1,7 +1,8 @@
 $envvar = 'NODEJS_HOME'
-$exePath = "D:\AppServ\nodejs\node-v18.18.0-win-x64\node.exe"  # Replace with the path to your executable
+$exePath = "D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64\node.exe"  # Replace with the path to your executable
 $iconIndex = 0
-$items = @("D:\AppServ\nodejs\node-v14.17.3-win-x64", "D:\AppServ\nodejs\node-v16.16.0-win-x64", "D:\AppServ\nodejs\node-v18.18.0-win-x64")
+#$items = @("D:\AppServ\nodejs\node-v14.17.3-win-x64", "D:\AppServ\nodejs\node-v16.16.0-win-x64", "D:\AppServ\nodejs\node-v18.18.0-win-x64")
+$items = @("D:\AppServ\nodejs\NodeJS v14.17.3\node-v14.17.3-win-x64", "D:\AppServ\nodejs\NodeJS v16.16.0\node-v16.16.0-win-x64", "D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64")
 #$preselectedIndex = 0
 $windowTitle = "Select Node.JS version"
 $actionDescription = "Select Node.JS version :"

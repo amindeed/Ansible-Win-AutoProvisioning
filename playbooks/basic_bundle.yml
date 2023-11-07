@@ -38,34 +38,28 @@
     - role: setup-nodejs
       vars:
         setup:
-          - configurations:
-            - update_resource:
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: nodejs/node-v14.17.3-win-x64.zip
-                destination: D:\AppServ\NodeJS\
-                unzip: yes
-                #overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
-                skip_if_path_exists: D:\AppServ\NodeJS\node-v14.17.3-win-x64 # Default: "destination" path # Ignored when unzip == 'no'
+          - installations:
+            - software_components:
+              - software_fullname: "NodeJS v14.17.3" 
+                file_relative_url: nodejs/node-v14.17.3-win-x64.zip
+                type: zip
+                root_install_dir: D:\AppServ\nodejs
+                desktop_shortcut: no # Default: no
+                startmenu_shortcut: no # Default: yes
 
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: nodejs/node-v16.16.0-win-x64.zip
-                destination: D:\AppServ\NodeJS\
-                unzip: yes
-                #overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
-                skip_if_path_exists: D:\AppServ\NodeJS\node-v16.16.0-win-x64 # Default: "destination" path # Ignored when unzip == 'no'
+              - software_fullname: "NodeJS v16.16.0" 
+                file_relative_url: nodejs/node-v16.16.0-win-x64.zip
+                type: zip
+                root_install_dir: D:\AppServ\nodejs
+                desktop_shortcut: no # Default: no
+                startmenu_shortcut: no # Default: yes
 
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: nodejs/node-v18.18.0-win-x64.zip
-                destination: D:\AppServ\NodeJS\
-                unzip: yes
-                #overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
-                skip_if_path_exists: D:\AppServ\NodeJS\node-v18.18.0-win-x64 # Default: "destination" path # Ignored when unzip == 'no'
+              - software_fullname: "NodeJS v18.18.0" 
+                file_relative_url: nodejs/node-v18.18.0-win-x64.zip
+                type: zip
+                root_install_dir: D:\AppServ\nodejs
+                desktop_shortcut: no # Default: no
+                startmenu_shortcut: no # Default: yes
 
         post_setup:
           - configurations:
@@ -83,22 +77,13 @@
                   upload_file: setup-nodejs/set_NODEJS_HOME.ps1
                   #file_relative_url: nodejs/set_NODEJS_HOME.ps1
                 destination: D:\AppServ\NodeJS\
-              
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  upload_file: setup-nodejs/EXEC__set_NODEJS_HOME.vbs
-                destination: D:\AppServ\NodeJS\
 
               - resource_type: file_system
                 operation_type: shortcut
-                #source: D:\AppServ\NodeJS\EXEC__set_NODEJS_HOME.vbs
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
                 arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\nodejs\set_NODEJS_HOME.ps1"'
                 destination: '%PUBLIC%\Desktop\NODEJS HOME.lnk'
                 icon: D:\AppServ\NodeJS\node-v18.18.0-win-x64\node.exe,0
-
-              # "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe " -WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\nodejs\set_NODEJS_HOME_form.ps1"
 
 
 - name: Setup Cygwin x64
