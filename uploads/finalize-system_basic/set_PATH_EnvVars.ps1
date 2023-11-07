@@ -13,7 +13,7 @@ $envVars = @(
     },
     @{
         Name = "JAVA_HOME"
-        Value = "C:\java"
+        Value = "D:\AppServ\Java\Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)\bin"
     }
 )
 

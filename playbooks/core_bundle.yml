@@ -529,9 +529,28 @@
                 arguments: /DIR=D:\AppServ\TreeSize /VERYSILENT /NORESTART
 
 
-#- name: "Finalize the system"
-#  hosts: all
-#  gather_facts: no
-#  tags: finalize
-#  roles:
-#    - role: finalize-system
+- name: "Finalize the system (upload starter script)"
+  hosts: all
+  gather_facts: no
+  tags: finalize
+  roles:
+    - role: finalize-system_core
+      vars:
+        post_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: finalize-system_core/starter.ps1
+                destination: C:\opt\ScriptPS\Starter\
+
+              - resource_type: file_system
+                operation_type: shortcut
+                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\opt\ScriptPS\Starter\starter.ps1"'
+                destination: '%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup\starter.ps1.lnk'
+
+              - resource_type: file_system
+                operation_type: create
+                destination: C:\opt\ScriptPS\Starter\startup_scripts

@@ -243,18 +243,18 @@
                 #abort_on_aftercheck_failure: no # Temporarilly...
 
 
-#- name: "Finalize the system"
-#  hosts: all
-#  gather_facts: no
-#  tags: finalize
-#  roles:
-#    - role: finalize-system
-#      vars:
-#        post_setup:
-#          - configurations:
-#            - update_resource:
-#              - resource_type: file_system
-#                operation_type: transfer
-#                source:
-#                  upload_file: finalize-system/set_PATH_EnvVars.ps1
-#                destination: XXXXXXXXX
+- name: "Finalize the system"
+  hosts: all
+  gather_facts: no
+  tags: finalize
+  roles:
+    - role: finalize-system_basic
+      vars:
+        post_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: finalize-system_basic/set_PATH_EnvVars.ps1
+                destination: C:\opt\ScriptPS\Starter\startup_scripts\
