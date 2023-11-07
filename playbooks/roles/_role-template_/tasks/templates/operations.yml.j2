@@ -610,13 +610,13 @@
     dest: '{{ update_item.destination }}'
     {% if (update_item.overwrite_dest is defined and not update_item.overwrite_dest) or update_item.skip_if_path_exists is defined %}creates: '{{ update_item.skip_if_path_exists | default(update_item.destination) }}'{% endif %}
 
-  when: "not win_file_dest_check.changed"
+  #when: "not win_file_dest_check.changed"
 
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination (empty target dir.)"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
-  when: "win_file_dest_check.changed"
+  #when: "win_file_dest_check.changed"
 {% else %} {# regular file transfer #}
 
 {% if update_item.destination is defined and update_item.destination != win_temp_dir_path %}
