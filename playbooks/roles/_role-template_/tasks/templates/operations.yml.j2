@@ -558,16 +558,17 @@
 {% endif %}
 
 {# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
-{% if update_item.source.upload_file is not defined and (update_item.source.file_full_url is defined or update_item.source.file_relative_url is defined) %}
+{#  #}
 
 {% if update_item.destination is defined %}
-######### - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
-#########   win_file: 
-#########     path: '{{ update_item.destination }}'
-#########     state: directory
-#########   register: win_file_dest_check
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
+  win_file: 
+    path: '{{ update_item.destination }}'
+    state: directory
+  register: win_file_dest_check
 {% endif %}
 
+{% if update_item.source.upload_file is not defined and (update_item.source.file_full_url is defined or update_item.source.file_relative_url is defined) %}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
   win_get_url:
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
@@ -610,13 +611,13 @@
     dest: '{{ update_item.destination }}'
     {% if (update_item.overwrite_dest is defined and not update_item.overwrite_dest) or update_item.skip_if_path_exists is defined %}creates: '{{ update_item.skip_if_path_exists | default(update_item.destination) }}'{% endif %}
 
-  #when: "not win_file_dest_check.changed"
+  when: not (win_file_dest_check is defined and win_file_dest_check.changed | default(true) | bool)
 
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination (empty target dir.)"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
-  #when: "win_file_dest_check.changed"
+  when: win_file_dest_check is defined and win_file_dest_check.changed | default(false) | bool
 {% else %} {# regular file transfer #}
 
 {% if update_item.destination is defined and update_item.destination != win_temp_dir_path %}
