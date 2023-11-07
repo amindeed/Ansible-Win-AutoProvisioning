@@ -30,7 +30,7 @@
                 #abort_on_failure: yes # Default: 'no'
 
 
-- name: Setup NVM For Windows for Node.JS v14, v16 and v18
+- name: Setup Node.JS v14, v16 and v18
   hosts: all
   gather_facts: no
   tags: nodejs
@@ -92,7 +92,9 @@
 
               - resource_type: file_system
                 operation_type: shortcut
-                source: D:\AppServ\NodeJS\EXEC__set_NODEJS_HOME.vbs
+                #source: D:\AppServ\NodeJS\EXEC__set_NODEJS_HOME.vbs
+                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\nodejs\set_NODEJS_HOME.ps1"'
                 destination: '%PUBLIC%\Desktop\NODEJS HOME.lnk'
                 icon: D:\AppServ\NodeJS\node-v18.18.0-win-x64\node.exe,0
 

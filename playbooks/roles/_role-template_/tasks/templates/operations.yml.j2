@@ -539,6 +539,9 @@
 - name: '{{ label }} ({{ upper_loop.index }}/{{ upper_loop.length }}) Create shortcut to "{{ update_item.source }}"'
   win_shortcut:
     src: '{{ update_item.source }}'
+{% if update_item.arguments is defined %}
+    arguments: {{ update_item.arguments }}
+{% endif %}
     dest: '{{ update_item.destination }}'
 {% if update_item.icon is defined %}
     icon: '{{ update_item.icon }}'
@@ -897,13 +900,13 @@
 {# ▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ #}
   {% endif %}
 
-- name: "{{ label }} Ensure Temp files cleanup (1/3)"
+- name: "{{ label }} Temp files cleanup (1/3)"
   raw: Write-Output "$ENV:LOCALAPPDATA\Temp"
   register: path_out
   changed_when: false
   no_log: yes
 
-- name: "{{ label }} Ensure Temp files cleanup (2/3)"
+- name: "{{ label }} Temp files cleanup (2/3)"
   win_find:
     paths: "{% raw %}{{ path_out.stdout_lines[0] }}{% endraw %}"
     patterns: ^ansible-[A-Za-z0-9]*tmp-.+$
@@ -918,7 +921,7 @@
 #    msg: "{% raw %}{{ ansible_tmp.files | map(attribute='path') | list }}{% endraw %}"
 #  when: ansible_tmp.matched > 0
 
-- name: "{{ label }} Ensure Temp files cleanup (3/3)"
+- name: "{{ label }} Temp files cleanup (3/3)"
   win_file:
     path: "{% raw %}{{ item.path }}{% endraw %}"
     state: absent
