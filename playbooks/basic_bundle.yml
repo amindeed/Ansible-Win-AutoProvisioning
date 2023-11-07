@@ -5,31 +5,6 @@
 # ....
 
 
-- name: TEST
-  hosts: all
-  gather_facts: no
-  tags: test
-  roles:
-    - role: test
-      vars:
-        setup:
-          #- configurations:
-          #  - update_resource:
-          #    - resource_type: file_system
-          #      operation_type: append
-          #      source:
-          #        file_text_content: |
-          #          `nAppend this to the end of the file
-          #      destination: D:\AppServ\MarkText\MarkText.exe
-          - configurations:
-            - update_resource:
-              - resource_type: env_var
-                resource_name: KJFKJFGKJ
-                value: iuiuiu
-                action: delete # [create, modify, delete] # Default behaviour: attempts 'create' action
-                #abort_on_failure: yes # Default: 'no'
-
-
 - name: Setup Node.JS v14, v16 and v18
   hosts: all
   gather_facts: no
@@ -268,18 +243,18 @@
                 #abort_on_aftercheck_failure: no # Temporarilly...
 
 
-- name: "Finalize the system"
-  hosts: all
-  gather_facts: no
-  tags: finalize
-  roles:
-    - role: finalize-system
-      vars:
-        post_setup:
-          - configurations:
-            - update_resource:
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  upload_file: finalize-system/set_PATH_EnvVars.ps1
-                destination: XXXXXXXXX
+#- name: "Finalize the system"
+#  hosts: all
+#  gather_facts: no
+#  tags: finalize
+#  roles:
+#    - role: finalize-system
+#      vars:
+#        post_setup:
+#          - configurations:
+#            - update_resource:
+#              - resource_type: file_system
+#                operation_type: transfer
+#                source:
+#                  upload_file: finalize-system/set_PATH_EnvVars.ps1
+#                destination: XXXXXXXXX

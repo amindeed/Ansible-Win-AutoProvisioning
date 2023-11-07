@@ -9,7 +9,7 @@ function IsVar($var) {
 $envVars = @(
     @{
         Name = "NODEJS_HOME"
-        Value = "D:\AppServ\nodejs\node-v18.18.0-win-x64"
+        Value = "D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64"
     },
     @{
         Name = "JAVA_HOME"
