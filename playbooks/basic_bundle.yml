@@ -49,6 +49,12 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
+                  file_relative_url: nodejs/check_NODEJS_HOME.ps1
+                destination: C:\opt\ScriptPS\Starter\startup_scripts\
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
                   upload_file: setup-nodejs/set_NODEJS_HOME.ps1
                   #file_relative_url: nodejs/set_NODEJS_HOME.ps1
                 destination: D:\AppServ\NodeJS\
@@ -60,6 +66,135 @@
                 destination: '%PUBLIC%\Desktop\NODEJS HOME.lnk'
                 icon: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64\node.exe,0
 
+
+- name: Setup Eclipse Temurin JDK 8, 11 and 17
+  hosts: all
+  gather_facts: no
+  tags: openjdk
+  roles:
+    - role: setup-openjdk
+      vars:
+        setup:
+          - installations:
+            - software_components:
+              - software_fullname: Eclipse Temurin JDK with Hotspot 8u382-b05 (x64)
+                file_relative_url: eclipse_temurin_openjdk/OpenJDK8U-jdk_x64_windows_hotspot_8u382b05.msi
+                type: msi
+                additional_arguments: ADDLOCAL=FeatureMain
+                root_install_dir: D:\AppServ\Java
+                #abort_on_aftercheck_failure: no # Temporarilly...
+
+              - software_fullname: Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)
+                file_relative_url: eclipse_temurin_openjdk/OpenJDK11U-jdk_x64_windows_hotspot_11.0.20.1_1.msi
+                type: msi
+                additional_arguments: ADDLOCAL=FeatureMain
+                root_install_dir: D:\AppServ\Java
+                #abort_on_aftercheck_failure: no # Temporarilly...
+
+              - software_fullname: Eclipse Temurin JDK with Hotspot 17.0.8.1+1 (x64)
+                file_relative_url: eclipse_temurin_openjdk/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.msi
+                type: msi
+                additional_arguments: ADDLOCAL=FeatureMain
+                root_install_dir: D:\AppServ\Java
+                #abort_on_aftercheck_failure: no # Temporarilly...
+
+        post_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: eclipse_temurin_openjdk/check_JAVA_HOME.ps1
+                destination: C:\opt\ScriptPS\Starter\startup_scripts\
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: setup-openjdk/set_JAVA_HOME.ps1
+                destination: D:\AppServ\Java\
+
+              - resource_type: file_system
+                operation_type: shortcut
+                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Java\set_JAVA_HOME.ps1"'
+                destination: '%PUBLIC%\Desktop\JAVA HOME.lnk'
+                icon: D:\AppServ\Java\Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)\bin\java.exe,0
+
+
+- name: Setup Eclipse IDE for JEE
+  hosts: all
+  gather_facts: no
+  tags: eclipseide
+  roles:
+    - role: setup-eclipseide
+      vars:
+        setup:
+          - configurations:
+            - update_resource:  
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: eclipse_jee_ide/eclipse-jee-2020-06-R-win32-x86_64.zip
+                destination: D:\AppServ
+                unzip: yes
+                skip_if_path_exists: 'D:\AppServ\Eclipse IDE 2020-06'
+              - resource_type: file_system
+                operation_type: move
+                source: D:\AppServ\eclipse
+                destination: 'D:\AppServ\Eclipse IDE 2020-06'
+              - resource_type: file_system
+                operation_type: shortcut
+                source: 'D:\AppServ\Eclipse IDE 2020-06\eclipse.exe'
+                destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE 2020-06.lnk'
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: eclipse_jee_ide/eclipse-jee-2022-12-R-win32-x86_64.zip
+                destination: D:\AppServ
+                unzip: yes
+                skip_if_path_exists: 'D:\AppServ\Eclipse IDE 2022-12'
+              - resource_type: file_system
+                operation_type: move
+                source: D:\AppServ\eclipse
+                destination: 'D:\AppServ\Eclipse IDE 2022-12'
+              - resource_type: file_system
+                operation_type: shortcut
+                source: 'D:\AppServ\Eclipse IDE 2022-12\eclipse.exe'
+                destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE 2022-12.lnk'
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: eclipse_jee_ide/eclipse-jee-neon-3-win32-x86_64.zip
+                destination: D:\AppServ
+                unzip: yes
+                skip_if_path_exists: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)'
+              - resource_type: file_system
+                operation_type: move
+                source: D:\AppServ\eclipse
+                destination: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)'
+              - resource_type: file_system
+                operation_type: shortcut
+                source: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)\eclipse.exe'
+                destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE Neon 3 (2016-06).lnk'
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: eclipse_jee_ide/eclipse-jee-oxygen-R-win32-x86_64.zip
+                destination: D:\AppServ
+                unzip: yes
+                skip_if_path_exists: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)'
+              - resource_type: file_system
+                operation_type: move
+                source: D:\AppServ\eclipse
+                destination: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)'
+              - resource_type: file_system
+                operation_type: shortcut
+                source: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)\eclipse.exe'
+                destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE Oxygen (2017-06).lnk'
+              
 
 - name: Setup Cygwin x64
   hosts: all
@@ -93,57 +228,6 @@
               #abort_on_aftercheck_failure: no # Temporarilly...
 
 
-- name: "Setup OpenJDK 8"
-  hosts: all
-  gather_facts: no
-  tags: openjdk8
-  roles:
-    - role: setup-openjdk8
-      vars:
-        setup:
-          - installations:
-            - software_components:
-              - software_fullname: Eclipse Temurin JDK with Hotspot 8u382-b05 (x64)
-                file_relative_url: eclipse_temurin_openjdk/OpenJDK8U-jdk_x64_windows_hotspot_8u382b05.msi
-                type: msi
-                root_install_dir: D:\AppServ\Java
-                #abort_on_aftercheck_failure: no # Temporarilly...
-
-
-- name: "Setup OpenJDK 11"
-  hosts: all
-  gather_facts: no
-  tags: openjdk11
-  roles:
-    - role: setup-openjdk11
-      vars:
-        setup:
-          - installations:
-            - software_components:
-              - software_fullname: Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)
-                file_relative_url: eclipse_temurin_openjdk/OpenJDK11U-jdk_x64_windows_hotspot_11.0.20.1_1.msi
-                type: msi
-                root_install_dir: D:\AppServ\Java
-                #abort_on_aftercheck_failure: no # Temporarilly...
-
-
-- name: "Setup OpenJDK 17"
-  hosts: all
-  gather_facts: no
-  tags: openjdk17
-  roles:
-    - role: setup-openjdk17
-      vars:
-        setup:
-          - installations:
-            - software_components:
-              - software_fullname: Eclipse Temurin JDK with Hotspot 17.0.8.1+1 (x64)
-                file_relative_url: eclipse_temurin_openjdk/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.msi
-                type: msi
-                root_install_dir: D:\AppServ\Java
-                #abort_on_aftercheck_failure: no # Temporarilly...
-
-
 - name: "Setup DBeaver"
   hosts: all
   gather_facts: no
@@ -167,6 +251,20 @@
   roles:
     - role: setup-gitextensions
       vars:
+        pre_setup:
+          - installations:
+            - software_components:
+              - software_fullname: Microsoft Windows Desktop Runtime
+                file_relative_url: ms-dotnet/windowsdesktop-runtime-6.0.24-win-x64.exe
+                type: msi
+              - software_fullname: Git
+                file_relative_url: git/Git-2.42.0.2-64-bit.exe
+                type: exe
+                arguments: /DIR=D:\AppServ\Git /VERYSILENT /NORESTART /COMPONENTS=icons,icons\desktop,ext,ext\shellhere,ext\guihere,gitlfs,assoc,assoc_sh
+              - software_fullname: "kdiff3"
+                file_relative_url: kdiff3/kdiff3-1.10.5-windows-x86_64.exe
+                type: exe
+                arguments: /S /D=D:\AppServ\KDiff3
         setup:
           - installations:
             - software_components:
@@ -174,7 +272,6 @@
                 file_relative_url: gitextensions/GitExtensions-4.1.0.16698-1fe52a137.msi
                 type: msi
                 root_install_dir: D:\AppServ
-                #abort_on_aftercheck_failure: no # Temporarilly...
 
 
 - name: "Setup UML Designer"
@@ -234,7 +331,7 @@
           - installations:
             - software_components:
               - software_fullname: Python 2.7.18 (64-bit)
-                file_relative_url: python/python-2.7.18.amd64.msi
+                file_relative_url: python2/python-2.7.18.amd64.msi
                 type: msi
                 root_install_dir: D:\AppServ
                 install_directory_name: python2
@@ -243,18 +340,93 @@
                 #abort_on_aftercheck_failure: no # Temporarilly...
 
 
-- name: "Finalize the system"
+- name: "Setup Python 3.12"
   hosts: all
   gather_facts: no
-  tags: finalize
+  tags: python312
   roles:
-    - role: finalize-system_basic
+    - role: setup-python312
       vars:
-        post_setup:
+        pre_setup:
           - configurations:
             - update_resource:
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: finalize-system_basic/set_PATH_EnvVars.ps1
-                destination: C:\opt\ScriptPS\Starter\startup_scripts\
+                  file_relative_url: python312/core_pdb.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/core_d.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/exe_pdb.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/exe_d.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/dev_d.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/lib_pdb.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/lib_d.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/test_pdb.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/test_d.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/tcltk_pdb.msi
+                destination: "{{ win_temp_dir_path }}"
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/tcltk_d.msi
+                destination: "{{ win_temp_dir_path }}"
+        setup:
+          - installations:
+            - software_components:
+              - software_fullname: "Python 3.12.0"
+                file_relative_url: python312/python-3.12.0-amd64.exe
+                type: exe
+                arguments: /quiet InstallAllUsers=1 TargetDir=D:\AppServ\Python312 PrependPath=0 AppendPath=0 AssociateFiles=0 Include_symbols=1 Include_debug=1
+                root_install_dir: D:\AppServ\Python312
+
+
+#- name: "Finalize the system"
+#  hosts: all
+#  gather_facts: no
+#  tags: finalize
+#  roles:
+#    - role: finalize-system_basic
+#      vars:
+#        post_setup:
+#          - configurations:
+#            - update_resource:
+#              - resource_type: file_system
+#                operation_type: transfer
+#                source:
+#                  upload_file: finalize-system_basic/set_PATH_EnvVars.ps1
+#                destination: C:\opt\ScriptPS\Starter\startup_scripts\

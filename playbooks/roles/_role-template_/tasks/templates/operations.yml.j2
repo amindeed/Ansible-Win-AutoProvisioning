@@ -1,5 +1,5 @@
 ---
-- name: "..."
+- name: ""
   meta: noop
 
 {% for operation in setup_phase_operations %}
@@ -416,7 +416,7 @@
   register: new_software_status
   changed_when: false
   failed_when: new_software_status.rc != 0 or 'Not Installed' in new_software_status.stdout
-{# Temporarilly added to speed up the release of a first release of 'Basic Bundle' code. #}
+{# Temporarilly added to speed up the release of 'Basic Bundle' code. #}
   ignore_errors: {% if software_item.abort_on_aftercheck_failure is defined and not software_item.abort_on_aftercheck_failure %}yes{% else %}no{% endif %}
   
   when: "'Not Installed' in initial_software_status.stdout"

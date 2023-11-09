@@ -68,10 +68,6 @@
 #      when: ansible_tmp.matched > 0
 
 
-
-
-
-
 - name: "Initialize the system"
   hosts: all
   gather_facts: no
@@ -88,14 +84,22 @@
                   file_relative_url: awap-psmodules/awap-psmodules-0.1.0.zip
                 destination: C:\Program Files\WindowsPowerShell\Modules\
                 unzip: yes
-                #overwrite_dest: no # Default: yes
-              #- resource_type: file_system
-              #  operation_type: create
-              #  source:
-              #    file_text_content: |
-              #      # Scripts to be launched on each user's logon
-              #      # ----------
-              #  destination: '%ProgramData%\Microsoft\Windows\Start Menu\Programs\StartUp\starter.ps1'
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: finalize-system_core/starter.ps1
+                destination: C:\opt\ScriptPS\Starter\
+
+              - resource_type: file_system
+                operation_type: shortcut
+                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\opt\ScriptPS\Starter\starter.ps1"'
+                destination: '%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup\starter.ps1.lnk'
+
+              - resource_type: file_system
+                operation_type: create
+                destination: C:\opt\ScriptPS\Starter\startup_scripts
                 
 
 - name: "Setup Notepad++"
@@ -119,7 +123,8 @@
                 operation_type: shortcut
                 source: 'D:\AppServ\Notepad++\notepad++.exe'
                 destination: '%PUBLIC%\Desktop\Notepad++.lnk'
-                
+
+              # https://github.com/notepad-plus-plus/nppPluginList/blob/master/doc/plugin_list_x64.md  
               - resource_type: file_system
                 operation_type: transfer
                 source:
@@ -181,6 +186,46 @@
                 source:
                   file_relative_url: notepadpp/plugins/TopMost_dll_1v42_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\TopMost\
+                unzip: yes
+                overwrite_dest: no # Default: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/ComparePlus_cp_1.1.0_x64.zip
+                destination: D:\AppServ\Notepad++\plugins\ComparePlus\
+                unzip: yes
+                overwrite_dest: no # Default: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/JSToolNPP.1.2308.0.uni.64.zip
+                destination: D:\AppServ\Notepad++\plugins\JSMinNPP\
+                unzip: yes
+                overwrite_dest: no # Default: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/NppFTP-x64.zip
+                destination: D:\AppServ\Notepad++\plugins\NppFTP\
+                unzip: yes
+                overwrite_dest: no # Default: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/Python_Indent_x64_v1.0.0.5.zip
+                destination: 'D:\AppServ\Notepad++\plugins\Python Indent\'
+                unzip: yes
+                overwrite_dest: no # Default: yes
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: notepadpp/plugins/XMLTools-3.1.1.13-x64.zip
+                destination: D:\AppServ\Notepad++\plugins\XMLTools\
                 unzip: yes
                 overwrite_dest: no # Default: yes
               
@@ -419,8 +464,7 @@
                   }
                 description: Install 'Prettier' and 'Material Icons' extensions
 
-# According to MS doc, it is not possible to install MS Office to a custom directory:
-# https://support.microsoft.com/en-us/office/can-i-custom-install-office-apps-1eede13d-3426-40cc-b30b-9aa40226bb9e
+
 - name: "Setup Microsoft Office Standard 2016"
   hosts: all
   gather_facts: no
@@ -527,30 +571,3 @@
                 file_relative_url: treesize/TreeSizeFreeSetup_v4_7.exe
                 type: exe
                 arguments: /DIR=D:\AppServ\TreeSize /VERYSILENT /NORESTART
-
-
-- name: "Finalize the system (upload starter script)"
-  hosts: all
-  gather_facts: no
-  tags: finalize
-  roles:
-    - role: finalize-system_core
-      vars:
-        post_setup:
-          - configurations:
-            - update_resource:
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  upload_file: finalize-system_core/starter.ps1
-                destination: C:\opt\ScriptPS\Starter\
-
-              - resource_type: file_system
-                operation_type: shortcut
-                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
-                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\opt\ScriptPS\Starter\starter.ps1"'
-                destination: '%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup\starter.ps1.lnk'
-
-              - resource_type: file_system
-                operation_type: create
-                destination: C:\opt\ScriptPS\Starter\startup_scripts
