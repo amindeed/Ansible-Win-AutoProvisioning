@@ -2,72 +2,6 @@
 # ansible-playbook main.yml -i ../inventories/environments/dev.yml
 
 
-#- name: "Gather and display all facts"
-#  hosts: all
-#  tags: gatherfacts
-#  tasks:
-#    - name: Gather all facts
-#      setup:
-#    - name: Display all gathered facts
-#      debug:
-#        var: ansible_facts
-
-
-
-#- name: Show all built-in variables
-#  hosts: all
-#  tags: showallvars
-#  tasks:
-#    - name: Show all variables
-#      ansible.builtin.debug: msg="{{ lookup('ansible.builtin.varnames', '.+')}}"
-
-
-
-#- name: Check value of a variable                           # ## Output of Example 1 & 2 : ##
-#  hosts: all                                                #      
-#  gather_facts: no                                          # ok: [192.168.66.12] => {
-#  tags: checkvar                                            #     "msg": {
-#  tasks:                                                    #         "full": "2.9.27",
-#    - name: Check variable value (example task 1)           #         "major": 2,
-#      debug:                                                #         "minor": 9,
-#        var: ansible_version.full                                #         "revision": 27,
-#                                                            #         "string": "2.9.27"
-#    - name: Check variable value (example task 2)           #     }
-#      debug: msg="{{ ansible_version.full }}"                    # }
-#                                                            # 
-#    - name: Check variable value (example task 3)           # ## Output of Example 3 : ##
-#      debug:                                                # 
-#        msg: "Ansible version is: {{ ansible_version.full }}"    # ok: [192.168.66.12] => {
-#                                                            #     "msg": "Ansible version is: {'string': '2.9.27', 'full': '2.9.27', 'major': 2, 'minor': 9, 'revision': 27}"
-                                                            # }
-#- name: "Clean Temp files"
-#  hosts: all
-#  tags: test22
-#  gather_facts: no
-#  tasks:
-#    - name: Expand Temp directory path name
-#      raw: Write-Output "$ENV:LOCALAPPDATA\Temp"
-#      register: path_out
-#      changed_when: false
-#    - name: Find Ansible temporary directories
-#      win_find:
-#        paths: "{{ path_out.stdout_lines[0] }}"
-#        patterns: ^ansible-[A-Za-z0-9]*tmp-.+$
-#        use_regex: true
-#        file_type: directory
-#      register: ansible_tmp                                  
-#    - name: List all Ansible temporary directories
-#      debug:                                     
-#        msg: "{{ ansible_tmp.files | map(attribute='path') | list }}"
-#      when: ansible_tmp.matched > 0
-#    - name: Force cleanup of Ansible temporary directories
-#      win_file:
-#        path: "{{ item.path }}"
-#        state: absent
-#      loop: "{{ ansible_tmp.files }}"
-#      when: ansible_tmp.matched > 0
-
-
 - name: "Initialize the system"
   hosts: all
   gather_facts: no
@@ -101,6 +35,60 @@
                 operation_type: create
                 destination: C:\opt\ScriptPS\Starter\startup_scripts
                 
+
+- name: "Setup OpenJDK: Eclipse Temurin JDK 8, 11 and 17"
+  hosts: all
+  gather_facts: no
+  tags: openjdk
+  roles:
+    - role: setup-openjdk
+      vars:
+        setup:
+          - installations:
+            - software_components:
+              - software_fullname: Eclipse Temurin JDK with Hotspot 8u382-b05 (x64)
+                file_relative_url: eclipse_temurin_openjdk/OpenJDK8U-jdk_x64_windows_hotspot_8u382b05.msi
+                type: msi
+                additional_arguments: ADDLOCAL=FeatureMain
+                root_install_dir: D:\AppServ\Java
+                #abort_on_aftercheck_failure: no # Temporarilly...
+
+              - software_fullname: Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)
+                file_relative_url: eclipse_temurin_openjdk/OpenJDK11U-jdk_x64_windows_hotspot_11.0.20.1_1.msi
+                type: msi
+                additional_arguments: ADDLOCAL=FeatureMain
+                root_install_dir: D:\AppServ\Java
+                #abort_on_aftercheck_failure: no # Temporarilly...
+
+              - software_fullname: Eclipse Temurin JDK with Hotspot 17.0.8.1+1 (x64)
+                file_relative_url: eclipse_temurin_openjdk/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.msi
+                type: msi
+                additional_arguments: ADDLOCAL=FeatureMain
+                root_install_dir: D:\AppServ\Java
+                #abort_on_aftercheck_failure: no # Temporarilly...
+
+        post_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: eclipse_temurin_openjdk/check_JAVA_HOME.ps1
+                destination: C:\opt\ScriptPS\Starter\startup_scripts\
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: eclipse_temurin_openjdk/set_JAVA_HOME.ps1
+                destination: D:\AppServ\Java\
+
+              - resource_type: file_system
+                operation_type: shortcut
+                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Java\set_JAVA_HOME.ps1"'
+                destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set JAVA HOME.lnk'
+                icon: D:\AppServ\Java\Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)\bin\java.exe,0
+
 
 - name: "Setup Notepad++"
   hosts: all
@@ -404,7 +392,8 @@
               - software_fullname: "Keystore Explorer"
                 file_relative_url: keystore-explorer/kse-552-setup.exe
                 type: exe
-                arguments: /DIR=D:\AppServ\KeystoreExplorer /VERYSILENT /NORESTART /ALLUSERS /MERGETASKS=desktopicon
+                #arguments: /DIR=D:\AppServ\KeystoreExplorer /VERYSILENT /NORESTART /ALLUSERS /MERGETASKS=desktopicon
+                arguments: /DIR=D:\AppServ\KeystoreExplorer /VERYSILENT /NORESTART /ALLUSERS
 
 
 - name: "Setup MarkText"
@@ -421,6 +410,12 @@
                 file_relative_url: marktext/marktext-setup_v0_17_1.exe
                 type: exe
                 arguments: /allusers /S /D=D:\AppServ\MarkText
+        post_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: remove
+                destination: '%PUBLIC%\Desktop\Marktext.lnk'
 
 
 - name: "Setup VSCode"
@@ -553,7 +548,7 @@
                 type: zip
                 root_install_dir: D:\AppServ
                 main_app_launcher: 'depends.exe'
-                desktop_shortcut: yes # Default: no
+                desktop_shortcut: no # Default: no
                 startmenu_shortcut: yes # Default: yes
 
 

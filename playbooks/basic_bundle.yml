@@ -55,73 +55,19 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: setup-nodejs/set_NODEJS_HOME.ps1
-                  #file_relative_url: nodejs/set_NODEJS_HOME.ps1
+                  #upload_file: setup-nodejs/set_NODEJS_HOME.ps1
+                  file_relative_url: nodejs/set_NODEJS_HOME.ps1
                 destination: D:\AppServ\NodeJS\
 
               - resource_type: file_system
                 operation_type: shortcut
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
                 arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\nodejs\set_NODEJS_HOME.ps1"'
-                destination: '%PUBLIC%\Desktop\NODEJS HOME.lnk'
+                destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set NodeJs Version.lnk'
                 icon: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64\node.exe,0
 
 
-- name: Setup Eclipse Temurin JDK 8, 11 and 17
-  hosts: all
-  gather_facts: no
-  tags: openjdk
-  roles:
-    - role: setup-openjdk
-      vars:
-        setup:
-          - installations:
-            - software_components:
-              - software_fullname: Eclipse Temurin JDK with Hotspot 8u382-b05 (x64)
-                file_relative_url: eclipse_temurin_openjdk/OpenJDK8U-jdk_x64_windows_hotspot_8u382b05.msi
-                type: msi
-                additional_arguments: ADDLOCAL=FeatureMain
-                root_install_dir: D:\AppServ\Java
-                #abort_on_aftercheck_failure: no # Temporarilly...
-
-              - software_fullname: Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)
-                file_relative_url: eclipse_temurin_openjdk/OpenJDK11U-jdk_x64_windows_hotspot_11.0.20.1_1.msi
-                type: msi
-                additional_arguments: ADDLOCAL=FeatureMain
-                root_install_dir: D:\AppServ\Java
-                #abort_on_aftercheck_failure: no # Temporarilly...
-
-              - software_fullname: Eclipse Temurin JDK with Hotspot 17.0.8.1+1 (x64)
-                file_relative_url: eclipse_temurin_openjdk/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.msi
-                type: msi
-                additional_arguments: ADDLOCAL=FeatureMain
-                root_install_dir: D:\AppServ\Java
-                #abort_on_aftercheck_failure: no # Temporarilly...
-
-        post_setup:
-          - configurations:
-            - update_resource:
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: eclipse_temurin_openjdk/check_JAVA_HOME.ps1
-                destination: C:\opt\ScriptPS\Starter\startup_scripts\
-
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  upload_file: setup-openjdk/set_JAVA_HOME.ps1
-                destination: D:\AppServ\Java\
-
-              - resource_type: file_system
-                operation_type: shortcut
-                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
-                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Java\set_JAVA_HOME.ps1"'
-                destination: '%PUBLIC%\Desktop\JAVA HOME.lnk'
-                icon: D:\AppServ\Java\Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)\bin\java.exe,0
-
-
-- name: Setup Eclipse IDE for JEE
+- name: "Setup Eclipse IDE for JEE: 2022-12, 2020-06, Oxygen (2017-06) and Neon 3 (2016-06)"
   hosts: all
   gather_facts: no
   tags: eclipseide
@@ -129,71 +75,80 @@
     - role: setup-eclipseide
       vars:
         setup:
-          - configurations:
-            - update_resource:  
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: eclipse_jee_ide/eclipse-jee-2020-06-R-win32-x86_64.zip
-                destination: D:\AppServ
-                unzip: yes
-                skip_if_path_exists: 'D:\AppServ\Eclipse IDE 2020-06'
-              - resource_type: file_system
-                operation_type: move
-                source: D:\AppServ\eclipse
-                destination: 'D:\AppServ\Eclipse IDE 2020-06'
-              - resource_type: file_system
-                operation_type: shortcut
-                source: 'D:\AppServ\Eclipse IDE 2020-06\eclipse.exe'
-                destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE 2020-06.lnk'
-
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: eclipse_jee_ide/eclipse-jee-2022-12-R-win32-x86_64.zip
-                destination: D:\AppServ
-                unzip: yes
-                skip_if_path_exists: 'D:\AppServ\Eclipse IDE 2022-12'
-              - resource_type: file_system
-                operation_type: move
-                source: D:\AppServ\eclipse
-                destination: 'D:\AppServ\Eclipse IDE 2022-12'
-              - resource_type: file_system
-                operation_type: shortcut
-                source: 'D:\AppServ\Eclipse IDE 2022-12\eclipse.exe'
-                destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE 2022-12.lnk'
-
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: eclipse_jee_ide/eclipse-jee-neon-3-win32-x86_64.zip
-                destination: D:\AppServ
-                unzip: yes
-                skip_if_path_exists: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)'
-              - resource_type: file_system
-                operation_type: move
-                source: D:\AppServ\eclipse
-                destination: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)'
-              - resource_type: file_system
-                operation_type: shortcut
-                source: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)\eclipse.exe'
-                destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE Neon 3 (2016-06).lnk'
-
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: eclipse_jee_ide/eclipse-jee-oxygen-R-win32-x86_64.zip
-                destination: D:\AppServ
-                unzip: yes
-                skip_if_path_exists: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)'
-              - resource_type: file_system
-                operation_type: move
-                source: D:\AppServ\eclipse
-                destination: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)'
-              - resource_type: file_system
-                operation_type: shortcut
-                source: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)\eclipse.exe'
-                destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE Oxygen (2017-06).lnk'
+          - installations:
+            - software_components:
+              - software_fullname: "Eclipse IDE 2020-06" 
+                file_relative_url: eclipse_jee_ide/eclipse-jee-2020-06-R-win32-x86_64.zip
+                type: zip
+                root_install_dir: D:\AppServ
+                main_app_launcher: eclipse\eclipse.exe
+                desktop_shortcut: yes # Default: no
+                startmenu_shortcut: yes # Default: yes
+          #- configurations:
+          #  - update_resource:  
+          #    - resource_type: file_system
+          #      operation_type: transfer
+          #      source:
+          #        file_relative_url: eclipse_jee_ide/eclipse-jee-2020-06-R-win32-x86_64.zip
+          #      destination: D:\AppServ
+          #      unzip: yes
+          #      skip_if_path_exists: 'D:\AppServ\Eclipse IDE 2020-06'
+          #    - resource_type: file_system
+          #      operation_type: move
+          #      source: D:\AppServ\eclipse
+          #      destination: 'D:\AppServ\Eclipse IDE 2020-06'
+          #    - resource_type: file_system
+          #      operation_type: shortcut
+          #      source: 'D:\AppServ\Eclipse IDE 2020-06\eclipse.exe'
+          #      destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE 2020-06.lnk'
+#
+          #    - resource_type: file_system
+          #      operation_type: transfer
+          #      source:
+          #        file_relative_url: eclipse_jee_ide/eclipse-jee-2022-12-R-win32-x86_64.zip
+          #      destination: D:\AppServ
+          #      unzip: yes
+          #      skip_if_path_exists: 'D:\AppServ\Eclipse IDE 2022-12'
+          #    - resource_type: file_system
+          #      operation_type: move
+          #      source: D:\AppServ\eclipse
+          #      destination: 'D:\AppServ\Eclipse IDE 2022-12'
+          #    - resource_type: file_system
+          #      operation_type: shortcut
+          #      source: 'D:\AppServ\Eclipse IDE 2022-12\eclipse.exe'
+          #      destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE 2022-12.lnk'
+#
+          #    - resource_type: file_system
+          #      operation_type: transfer
+          #      source:
+          #        file_relative_url: eclipse_jee_ide/eclipse-jee-neon-3-win32-x86_64.zip
+          #      destination: D:\AppServ
+          #      unzip: yes
+          #      skip_if_path_exists: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)'
+          #    - resource_type: file_system
+          #      operation_type: move
+          #      source: D:\AppServ\eclipse
+          #      destination: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)'
+          #    - resource_type: file_system
+          #      operation_type: shortcut
+          #      source: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)\eclipse.exe'
+          #      destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE Neon 3 (2016-06).lnk'
+#
+          #    - resource_type: file_system
+          #      operation_type: transfer
+          #      source:
+          #        file_relative_url: eclipse_jee_ide/eclipse-jee-oxygen-R-win32-x86_64.zip
+          #      destination: D:\AppServ
+          #      unzip: yes
+          #      skip_if_path_exists: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)'
+          #    - resource_type: file_system
+          #      operation_type: move
+          #      source: D:\AppServ\eclipse
+          #      destination: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)'
+          #    - resource_type: file_system
+          #      operation_type: shortcut
+          #      source: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)\eclipse.exe'
+          #      destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE Oxygen (2017-06).lnk'
               
 
 - name: Setup Cygwin x64
@@ -256,7 +211,8 @@
             - software_components:
               - software_fullname: Microsoft Windows Desktop Runtime
                 file_relative_url: ms-dotnet/windowsdesktop-runtime-6.0.24-win-x64.exe
-                type: msi
+                type: exe
+                arguments: /install /quiet /norestart
               - software_fullname: Git
                 file_relative_url: git/Git-2.42.0.2-64-bit.exe
                 type: exe
@@ -327,6 +283,16 @@
   roles:
     - role: setup-python2
       vars:
+        pre_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python2/python-2.7.18.amd64-pdb.zip
+                destination: D:\AppServ\python2\Symbols
+                unzip: yes
+                skip_if_path_exists: D:\AppServ\python2\Symbols
         setup:
           - installations:
             - software_components:
@@ -414,19 +380,24 @@
                 arguments: /quiet InstallAllUsers=1 TargetDir=D:\AppServ\Python312 PrependPath=0 AppendPath=0 AssociateFiles=0 Include_symbols=1 Include_debug=1
                 root_install_dir: D:\AppServ\Python312
 
+        post_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/check_PYTHON_paths.ps1
+                destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
-#- name: "Finalize the system"
-#  hosts: all
-#  gather_facts: no
-#  tags: finalize
-#  roles:
-#    - role: finalize-system_basic
-#      vars:
-#        post_setup:
-#          - configurations:
-#            - update_resource:
-#              - resource_type: file_system
-#                operation_type: transfer
-#                source:
-#                  upload_file: finalize-system_basic/set_PATH_EnvVars.ps1
-#                destination: C:\opt\ScriptPS\Starter\startup_scripts\
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: python312/set_PYTHON_paths.ps1
+                destination: D:\AppServ\Python312\
+
+              - resource_type: file_system
+                operation_type: shortcut
+                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Python312\set_PYTHON_paths.ps1"'
+                destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set Python Version.lnk'
+                icon: D:\AppServ\Python2\python.exe,0

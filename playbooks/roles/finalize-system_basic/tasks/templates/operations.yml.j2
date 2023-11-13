@@ -535,17 +535,6 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Shortcut ︵‿︵‿︵‿︵‿ #}
 {% if update_item.operation_type == 'shortcut' %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure shortcut's parent directory is present <1/2>"
-  raw: |
-    [System.Environment]::ExpandEnvironmentVariables("{{ update_item.destination }}")
-  register: expand_shortcut_path
-  changed_when: false
-
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure shortcut's parent directory is present <2/2>"
-  win_file:
-    path: '{% raw %}{{ expand_shortcut_path.stdout_lines[0] | win_dirname }}{% endraw %}'
-    state: directory
-
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Create shortcut to "{{ update_item.source }}"'
   win_shortcut:
     src: '{{ update_item.source }}'
@@ -712,15 +701,9 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Remove ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'remove' %}
-- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}" <1/2>'
-  raw: |
-    [System.Environment]::ExpandEnvironmentVariables("{{ update_item.destination }}")
-  register: expand_item_path
-  changed_when: false
-
-- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}" <2/2>'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}"'
   win_file:
-    path: '{% raw %}{{ expand_item_path.stdout_lines[0] | win_dirname }}{% endraw %}'
+    path: {{ update_item.destination }}
     state: absent
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Append ︵‿︵‿︵‿︵‿ #}

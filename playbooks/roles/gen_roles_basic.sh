@@ -6,6 +6,6 @@ cd "$script_dir"
 
 #rm -rf setup-nodejs; rm -rf setup-cygwin; rm -rf setup-openjdk8; rm -rf setup-dbeaver; rm -rf setup-gitextensions; rm -rf setup-umldesigner; rm -rf setup-maven; rm -rf setup-python2; rm -rf setup-python3
 
-cp -r _role-template_ setup-nodejs; cp -r _role-template_ setup-cygwin; cp -r _role-template_ setup-openjdk; cp -r _role-template_ setup-dbeaver; cp -r _role-template_ setup-gitextensions; cp -r _role-template_ setup-umldesigner; cp -r _role-template_ setup-maven; cp -r _role-template_ setup-python2; cp -r _role-template_ setup-python312; cp -r _role-template_ test; cp -r _role-template_ finalize-system_basic; cp -r _role-template_ setup-eclipseide
+cp -r _role-template_ setup-nodejs; cp -r _role-template_ setup-cygwin; cp -r _role-template_ setup-dbeaver; cp -r _role-template_ setup-gitextensions; cp -r _role-template_ setup-umldesigner; cp -r _role-template_ setup-maven; cp -r _role-template_ setup-python2; cp -r _role-template_ setup-python312; cp -r _role-template_ test; cp -r _role-template_ setup-eclipseide
 
 cd "$original_dir"

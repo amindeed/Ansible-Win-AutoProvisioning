@@ -712,15 +712,9 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Remove ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'remove' %}
-- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}" <1/2>'
-  raw: |
-    [System.Environment]::ExpandEnvironmentVariables("{{ update_item.destination }}")
-  register: expand_item_path
-  changed_when: false
-
-- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}" <2/2>'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}"'
   win_file:
-    path: '{% raw %}{{ expand_item_path.stdout_lines[0] | win_dirname }}{% endraw %}'
+    path: {{ update_item.destination }}
     state: absent
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Append ︵‿︵‿︵‿︵‿ #}
