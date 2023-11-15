@@ -84,7 +84,9 @@ function Add-NewEnvValueToPath {
         [Parameter(Position = 1)]
         [string]$envVarValueAsPath,
 
-        [switch]$pathExists = $false
+        [switch]$pathExists = $false,
+
+		[switch]$nopercents = $false
     )
 	
 	$CurrentPATHValue = (Get-Item -Path HKCU:\Environment).GetValue('PATH',$null,'DoNotExpandEnvironmentNames')
@@ -113,11 +115,22 @@ function Add-NewEnvValueToPath {
 		} 
 	}
 
-	# Append '%$newValue%' to user's "PATH" if it does not exist
-	if ($CurrentPATHValue -notlike "*%$newValue%*") {
+	if ( $nopercents ) {
+		# Append '$newValue' to user's "PATH" if it does not exist
+		if ($CurrentPATHValue -notlike "*$newValue*") {
 
-		$FullNewPATHValue = "$CurrentPATHValue%$newValue%;"
-		New-ItemProperty -Path "HKCU:\Environment" -Name "Path" -Value $FullNewPATHValue -PropertyType ExpandString -Force
-		Update-EnvironmentVariables
+			$FullNewPATHValue = "$CurrentPATHValue$newValue;"
+			New-ItemProperty -Path "HKCU:\Environment" -Name "Path" -Value $FullNewPATHValue -PropertyType ExpandString -Force
+			Update-EnvironmentVariables
+		}
+	} else {
+
+		# Append '%$newValue%' to user's "PATH" if it does not exist
+		if ($CurrentPATHValue -notlike "*%$newValue%*") {
+
+			$FullNewPATHValue = "$CurrentPATHValue%$newValue%;"
+			New-ItemProperty -Path "HKCU:\Environment" -Name "Path" -Value $FullNewPATHValue -PropertyType ExpandString -Force
+			Update-EnvironmentVariables
+		}
 	}
 }
