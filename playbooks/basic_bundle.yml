@@ -166,7 +166,7 @@
                 file_relative_url: cygwin/cygwin64install_cyg_v3_4_9.zip
               destination: D:\AppServ\Cygwin\
               unzip: yes # Default: 'no'
-              overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
+              force_overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
         - installations:
           - software_components:
             - software_fullname: Cygwin

@@ -15,22 +15,23 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: awap-psmodules/awap-psmodules-0.1.0.zip
-                destination: C:\Program Files\WindowsPowerShell\Modules\
-                unzip: yes
+                  upload_file: AWAP.PSModules
+                destination: C:\Program Files\WindowsPowerShell\Modules\ # !!!!!
+                force_overwrite_dest: yes
+                #skip_if_path_exists: C:\Program Files\WindowsPowerShell\Modules\AWAP.PSModules\
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: finalize-system_core/starter.ps1
+                  upload_file: init-system/starter.ps1
                 destination: C:\opt\ScriptPS\Starter\
-
+              
               - resource_type: file_system
                 operation_type: shortcut
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
                 arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\opt\ScriptPS\Starter\starter.ps1"'
                 destination: '%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup\starter.ps1.lnk'
-
+              
               - resource_type: file_system
                 operation_type: create
                 destination: C:\opt\ScriptPS\Starter\startup_scripts
@@ -119,7 +120,7 @@
                   file_relative_url: notepadpp/plugins/AutoSave_dll_2v00_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\AutoSave\
                 unzip: yes # Default: 'no'
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -127,7 +128,7 @@
                   file_relative_url: notepadpp/plugins/DSpellCheck_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\DSpellCheck\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -135,7 +136,7 @@
                   file_relative_url: notepadpp/plugins/LanguageHelp_dll_1v75_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\LanguageHelp\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -143,7 +144,7 @@
                   file_relative_url: notepadpp/plugins/MenuIcons_dll_2v03_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\MenuIcons\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -151,7 +152,7 @@
                   file_relative_url: notepadpp/plugins/OpenSelection_dll_1v13_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\OpenSelection\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -159,7 +160,7 @@
                   file_relative_url: notepadpp/plugins/RunMe_dll_1v61_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\RunMe\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -167,7 +168,7 @@
                   file_relative_url: notepadpp/plugins/TakeNotes_dll_1v26_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\TakeNotes\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -175,7 +176,7 @@
                   file_relative_url: notepadpp/plugins/TopMost_dll_1v42_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\TopMost\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -183,7 +184,7 @@
                   file_relative_url: notepadpp/plugins/ComparePlus_cp_1.1.0_x64.zip
                 destination: D:\AppServ\Notepad++\plugins\ComparePlus\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -191,7 +192,7 @@
                   file_relative_url: notepadpp/plugins/JSToolNPP.1.2308.0.uni.64.zip
                 destination: D:\AppServ\Notepad++\plugins\JSMinNPP\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -199,7 +200,7 @@
                   file_relative_url: notepadpp/plugins/NppFTP-x64.zip
                 destination: D:\AppServ\Notepad++\plugins\NppFTP\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -207,7 +208,7 @@
                   file_relative_url: notepadpp/plugins/Python_Indent_x64_v1.0.0.5.zip
                 destination: 'D:\AppServ\Notepad++\plugins\Python Indent\'
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
 
               - resource_type: file_system
                 operation_type: transfer
@@ -215,7 +216,7 @@
                   file_relative_url: notepadpp/plugins/XMLTools-3.1.1.13-x64.zip
                 destination: D:\AppServ\Notepad++\plugins\XMLTools\
                 unzip: yes
-                overwrite_dest: no # Default: yes
+                force_overwrite_dest: no # Default: yes
               
 
 - name: "Setup 7-Zip"

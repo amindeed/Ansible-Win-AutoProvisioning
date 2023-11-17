@@ -106,7 +106,7 @@
     timeout: 60
   when: "'Not Installed' in initial_software_status.stdout"
 
-{% endif %} {# end process 'Download' #}
+{% endif %}{# end process 'Download' #}
 
 
 {# ︵‿︵‿ Upload packages from Ansible Controller machine ︵‿︵‿ #}
@@ -167,7 +167,7 @@
     if ($installResult -eq 0) {$installSuccess = $true}
 
 {# ︵‿︵‿ Install 'exe' ︵‿︵‿ #}
-{% elif software_item.type == 'exe' %} {# Typically for common installers like NSIS #}
+{% elif software_item.type == 'exe' %}{# Typically for common installers like NSIS #}
     try {% raw %}{{% endraw %}
 
       $installResult = (Start-Process -FilePath "{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}" -ArgumentList "{{ software_item.arguments | default("") }}" -Wait -PassThru).ExitCode
@@ -263,7 +263,7 @@
       }
 
       New-ItemProperty -Path $registryPath -Name "EstimatedSize" -Value $sizeInKB -PropertyType DWORD -Force
-{% endif %} {# end of 'if' statement for sofwtare manual registration #}
+{% endif %}{# end of 'if' statement for sofwtare manual registration #}
 
       $installResult = 0
     } catch {
@@ -568,16 +568,14 @@
   {% set file_name = update_item.source.file_relative_url.split('/')[-1] %}
 {% endif %}
 
-{# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
-{#  #}
+{# ︵‿︵‿ **Download** Packages from HTTP source ︵‿︵‿ #}
 
-{% if update_item.destination is defined %}
+{# /!\ this is only used in case of 'zip' files to be processed after transfer #}
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
   win_file: 
     path: '{{ update_item.destination }}'
     state: directory
   register: win_file_dest_check
-{% endif %}
 
 {% if update_item.source.upload_file is not defined and (update_item.source.file_full_url is defined or update_item.source.file_relative_url is defined) %}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
@@ -594,33 +592,43 @@
     timeout: 60
   register: auth_dl_result
 
-{% endif %} {# end process 'Download' #}
-
-{# ︵‿︵‿ Upload files from Ansible Controller machine ︵‿︵‿ #}
-{% if update_item.source.upload_file is defined and update_item.source.upload_file is not none %}
-
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' to target host"
-  win_copy:
-    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
-    #backup: yes
 {% endif %}
 
-{# Down/Upload: Unzip file if 'unzip: yes' #}
+{# ︵‿︵‿ **Upload** files from Ansible Controller machine ︵‿︵‿ #}
+{% if update_item.source.upload_file is defined and update_item.source.upload_file is not none %}
 
-{#{% if update_item.destination is not defined %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination"
-  fail:
-    msg: "Destination not set by the user."
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Register uploaded item type (file or directory)"
+  stat:
+    path: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
+  register: item_type
+  delegate_to: localhost
 
-{% else %} #}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (directory) to target host <1/2>"
+  win_file:
+    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+    state: absent
+  when: item_type.stat.isdir
 
-{% if update_item.unzip is defined and update_item.unzip %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (directory) to target host <2/2>"
+  win_copy:
+    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
+  when: item_type.stat.isdir
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
+  win_copy:
+    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
+  when: item_type.stat.isreg
+
+{% endif %}
+
+{% if update_item.unzip is defined and update_item.unzip %}{# if it's a zip file to extract content from #}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination (overwritten upon user-set configuration)"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
-    {% if (update_item.overwrite_dest is defined and not update_item.overwrite_dest) or update_item.skip_if_path_exists is defined %}creates: '{{ update_item.skip_if_path_exists | default(update_item.destination) }}'{% endif %}
+    {% if (update_item.force_overwrite_dest is defined and not update_item.force_overwrite_dest) or update_item.skip_if_path_exists is defined %}creates: '{{ update_item.skip_if_path_exists | default(update_item.destination) }}'{% endif %}
 
   when: not (win_file_dest_check is defined and win_file_dest_check.changed | default(true) | bool)
 
@@ -629,14 +637,28 @@
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
   when: win_file_dest_check is defined and win_file_dest_check.changed | default(false) | bool
-{% else %} {# regular file transfer #}
 
-{% if update_item.destination is defined and update_item.destination != win_temp_dir_path %}
+{% else %}{# case of regular file transfer #}
+
+{% if update_item.skip_if_path_exists is defined %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check if user-provided path exists"
+  win_stat:
+    path: '{{ update_item.skip_if_path_exists }}'
+  register: check_path
+{% endif %}
+
+{% if update_item.force_overwrite_dest is defined and update_item.force_overwrite_dest %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Force copy '{{ file_name }}' to user-defined destination"
+  raw: Copy-Item -Path '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}' -Destination '{{ update_item.destination }}' -Recurse -Force
+  when: not check_path.stat.exists | default(false)
+
+{% else %}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Copy '{{ file_name }}' to user-defined destination"
   win_copy:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
     remote_src: yes
+  when: not check_path.stat.exists | default(false)
 {% endif %}
 {% endif %}
 
@@ -720,7 +742,7 @@
 
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}" <2/2>'
   win_file:
-    path: '{% raw %}{{ expand_item_path.stdout_lines[0] | win_dirname }}{% endraw %}'
+    path: '{% raw %}{{ expand_item_path.stdout_lines[0] }}{% endraw %}'
     state: absent
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Append ︵‿︵‿︵‿︵‿ #}
@@ -856,8 +878,8 @@
         {% for job_item in exec_item.run_ps1_script %}
 
 
-{% if job_item.script_content | default("") == "" %} {# X #}
-{% if job_item.file_full_url is defined or job_item.file_relative_url is defined %} {# XX #}
+{% if job_item.script_content | default("") == "" %}{# X #}
+{% if job_item.file_full_url is defined or job_item.file_relative_url is defined %}{# XX #}
 {% set file_url = job_item.file_full_url | default(job_item.file_relative_url) %}
 
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download \"{{ file_url.split('/')[-1] }}\""
@@ -872,8 +894,8 @@
     url_username: "{{ job_item.http_auth_username | default('{{ http_auth_username }}') }}"
     url_password: "{{ job_item.http_auth_password | default('{{ http_auth_password }}') }}"
 
-{% endif %} {# XX #}
-{% endif %} {# X #}
+{% endif %}{# XX #}
+{% endif %}{# X #}
 
 {% if job_item.working_directory is defined and job_item.working_directory is not none %}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check provided working directory for script execution"
