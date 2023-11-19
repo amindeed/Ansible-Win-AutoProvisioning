@@ -15,9 +15,9 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: AWAP.PSModules
-                destination: C:\Program Files\WindowsPowerShell\Modules\ # !!!!!
-                force_overwrite_dest: yes
+                  upload_file: init-system/AWAP.PSModules
+                destination: C:\Program Files\WindowsPowerShell\Modules\
+                #force_overwrite_dest: no # By default, Files are only replaced if different, and folder are forced
                 #skip_if_path_exists: C:\Program Files\WindowsPowerShell\Modules\AWAP.PSModules\
 
               - resource_type: file_system
@@ -74,13 +74,13 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: eclipse_temurin_openjdk/check_JAVA_HOME.ps1
+                  upload_file: setup-openjdk/check_JAVA_HOME.ps1
                 destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: eclipse_temurin_openjdk/set_JAVA_HOME.ps1
+                  upload_file: setup-openjdk/set_JAVA_HOME.ps1
                 destination: D:\AppServ\Java\
 
               - resource_type: file_system
@@ -488,7 +488,7 @@
         post_setup:
           - executions:
             - run_ps1_script:
-              - file_relative_url: ms-office-16/scripts/ms-office-kms-activate.ps1
+              - upload_file: setup-msoffice/ms-office-kms-activate.ps1
                 #http_auth_username: john          # These override (only for this 'executionsrun_ps1_script' job) 
                 #http_auth_password: p@ssw0rd      # any globally-defined HTTP auth. credentials
                 arguments: "kms.server.local"

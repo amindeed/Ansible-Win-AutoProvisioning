@@ -120,7 +120,7 @@
 {% endif %}
 
 {% if software_item.upload_file is defined %}
-  {% set file_name = software_item.upload_file %}
+  {% set file_name = software_item.upload_file.split('/')[-1] | default(software_item.upload_file) %}
 {% elif software_item.file_full_url is defined %}
   {% set file_name = software_item.file_full_url.split('/')[-1] %}
 {% elif software_item.file_relative_url is defined %}
@@ -648,8 +648,13 @@
 {% endif %}
 
 {% if update_item.force_overwrite_dest is defined and update_item.force_overwrite_dest %}
+{# 
+  Trailing slash is removed from `update_item.destination` as it keeps
+  inexplicably causing a vague Jinja2 template rendering error:
+  "failed at splitting arguments, either an unbalanced jinja2 block or quotes"
+ #}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Force copy '{{ file_name }}' to user-defined destination"
-  raw: Copy-Item -Path '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}' -Destination '{{ update_item.destination }}' -Recurse -Force
+  win_shell: Copy-Item -Path "{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}" -Destination "{{ update_item.destination | regex_replace('[\\\\/]$', '') }}" -Recurse -Force
   when: not check_path.stat.exists | default(false)
 
 {% else %}
@@ -878,24 +883,38 @@
         {% for job_item in exec_item.run_ps1_script %}
 
 
-{% if job_item.script_content | default("") == "" %}{# X #}
-{% if job_item.file_full_url is defined or job_item.file_relative_url is defined %}{# XX #}
-{% set file_url = job_item.file_full_url | default(job_item.file_relative_url) %}
+{% if job_item.upload_file is defined %}
+  {% set file_name = job_item.upload_file.split('/')[-1] | default(job_item.upload_file) %}
+{% elif job_item.file_full_url is defined %}
+  {% set file_name = job_item.file_full_url.split('/')[-1] %}
+{% elif job_item.file_relative_url is defined %}
+  {% set file_name = job_item.file_relative_url.split('/')[-1] %}
+{% endif %}
 
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download \"{{ file_url.split('/')[-1] }}\""
+{% if job_item.script_content is not defined %}{# BEGIN #}
+
+{% if job_item.upload_file is defined and job_item.upload_file is not none %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
+  win_copy:
+    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ job_item.upload_file }}'
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
+
+{% else %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
   win_get_url:
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
     url: "{{ job_item.file_full_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ job_item.file_full_url.split("/")[-1] }}'
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
 {% elif job_item.file_relative_url is defined and job_item.file_relative_url is not none %}
     url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ job_item.file_relative_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ job_item.file_relative_url.split("/")[-1] }}'
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
 {% endif %}
     url_username: "{{ job_item.http_auth_username | default('{{ http_auth_username }}') }}"
     url_password: "{{ job_item.http_auth_password | default('{{ http_auth_password }}') }}"
+    timeout: 60
+{% endif %}
 
-{% endif %}{# XX #}
-{% endif %}{# X #}
+{% endif %}{# END: 'if job_item.script_content is not defined' #}
 
 {% if job_item.working_directory is defined and job_item.working_directory is not none %}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check provided working directory for script execution"
@@ -909,8 +928,8 @@
   win_shell: |
 {{ job_item.script_content | indent(width=4, first=True) }}
 {% else %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run the script \"{{ file_url.split('/')[-1] }}\""
-  win_shell: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_url.split("/")[-1] }} {{ job_item.arguments | default("") }}'
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run the script \"{{ file_name }}\""
+  win_shell: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }} {{ job_item.arguments | default("") }}'
 {% if job_item.working_directory is defined and job_item.working_directory is not none %}
   args:
     chdir: {{ job_item.working_directory }}

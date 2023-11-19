@@ -49,14 +49,13 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: nodejs/check_NODEJS_HOME.ps1
+                  upload_file: setup-nodejs/check_NODEJS_HOME.ps1
                 destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  #upload_file: setup-nodejs/set_NODEJS_HOME.ps1
-                  file_relative_url: nodejs/set_NODEJS_HOME.ps1
+                  upload_file: setup-nodejs/set_NODEJS_HOME.ps1
                 destination: D:\AppServ\NodeJS\
 
               - resource_type: file_system
@@ -386,13 +385,13 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: python312/check_PYTHON_paths.ps1
+                  upload_file: setup-python312/check_PYTHON_paths.ps1
                 destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: python312/set_PYTHON_paths.ps1
+                  upload_file: setup-python312/set_PYTHON_paths.ps1
                 destination: D:\AppServ\Python312\
 
               - resource_type: file_system
