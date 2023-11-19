@@ -35,6 +35,12 @@
               - resource_type: file_system
                 operation_type: create
                 destination: C:\opt\ScriptPS\Starter\startup_scripts
+
+              #- resource_type: file_system
+              #  operation_type: transfer
+              #  source:
+              #    file_full_url: URL_to_cert_bundle
+              #  destination: C:\ProgramData\AWAP\Certificates 
                 
 
 - name: "Setup OpenJDK: Eclipse Temurin JDK 8, 11 and 17"

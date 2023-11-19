@@ -946,7 +946,12 @@
 {# ︵‿︵‿ Run Executable Files ︵‿︵‿ #}
       {% elif 'run_executable' in exec_item %}
         {% for job_item in exec_item.run_executable %}
-          {# .... #}
+
+{#
+- name: Run the program
+  win_shell: "{{ program_path }} {{ program_arguments }}"
+#}
+
         {% endfor %}
 {# ︵‿︵‿︵‿︵‿ #}
 
@@ -960,8 +965,8 @@
 
 {#
   Following cleanup code was added to circumvent the following
-  warning seen on some environments 
-  (For instance: Alma Linux 8.4 x64 / Ansible core 2.15.5 
+  warning seen on some setups/environments 
+  (For instance: Controller: Alma Linux 8.4 x64 / Ansible core 2.15.5 
     ---> Win Server 2016 Standard - v1607 - OS Build 14393.693):
 
   "[WARNING]: Failure cleaning temp path 'C:\Users\Administrator\AppData\Local
