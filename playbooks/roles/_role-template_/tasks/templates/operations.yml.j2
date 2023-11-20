@@ -948,7 +948,10 @@
         {% for job_item in exec_item.run_executable %}
 
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run program (executable)"
-  win_shell: '"{{ job_item.exec_full_path }}" "{{ job_item.arguments }}"'
+  win_shell: |
+{% set run_exec_args = job_item.arguments | default("") %}
+{% set run_exec_full_cli = '"' + job_item.exec_full_path + '"' + ' ' + '"' + run_exec_args + '"' %}
+{{ run_exec_full_cli | indent(width=4, first=True) }}
 {% if job_item.win_shell_parameters is defined %}
   args:
 {% for param in job_item.win_shell_parameters | default([]) %}
