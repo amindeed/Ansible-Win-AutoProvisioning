@@ -943,14 +943,20 @@
         {% endfor %}
 {# ︵‿︵‿︵‿︵‿ #}
       
-{# ︵‿︵‿ Run Executable Files ︵‿︵‿ #}
+{# ︵‿︵‿ Run Executable Files (already existing on target host) ︵‿︵‿ #}
       {% elif 'run_executable' in exec_item %}
         {% for job_item in exec_item.run_executable %}
 
-{#
-- name: Run the program
-  win_shell: "{{ program_path }} {{ program_arguments }}"
-#}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run program (executable)"
+  win_shell: '"{{ job_item.exec_full_path }}" "{{ job_item.arguments }}"'
+{% if job_item.win_shell_parameters is defined %}
+  args:
+{% for param in job_item.win_shell_parameters | default([]) %}
+    {{ param.keys() | first }}: {{ param.values() | first }}
+{% endfor %}
+{% endif %}
+  register: run_executable_result
+  failed_when: run_executable_result.rc != 0 or run_executable_result.stderr != ""
 
         {% endfor %}
 {# ︵‿︵‿︵‿︵‿ #}
@@ -964,10 +970,10 @@
   {% endif %}
 
 {#
-  Following cleanup code was added to circumvent the following
-  warning seen on some setups/environments 
-  (For instance: Controller: Alma Linux 8.4 x64 / Ansible core 2.15.5 
-    ---> Win Server 2016 Standard - v1607 - OS Build 14393.693):
+  Following cleanup code was added to circumvent the warning message 
+  below, seen on some setups/environments (For instance, with: Controller: 
+  Alma Linux 8.4 x64 / Ansible core 2.15.5 ---> Win Server 2016 Standard - 
+  v1607 - OS Build 14393.693):
 
   "[WARNING]: Failure cleaning temp path 'C:\Users\Administrator\AppData\Local
   \Temp\ansible-moduletmp-133448875697120474-2680-1071435376': Win32Exception

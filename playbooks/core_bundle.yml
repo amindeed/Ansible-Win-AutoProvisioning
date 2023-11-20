@@ -1,6 +1,22 @@
 ---
 # ansible-playbook main.yml -i ../inventories/environments/dev.yml
 
+- name: "TEST"
+  hosts: all
+  gather_facts: no
+  tags: test
+  roles:
+    - role: test
+      vars:
+        setup:
+          - executions:
+            - run_executable:
+              - exec_full_path: D:\AppServ\Python312\python.exe
+                arguments: C:\Users\nader\Desktop\aaa bbb\test.py
+                #win_shell_parameters:
+                #  - chdir: C:\
+                #  - aaa: bbb
+
 
 - name: "Initialize the system"
   hosts: all
