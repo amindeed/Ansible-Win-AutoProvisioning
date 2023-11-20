@@ -947,6 +947,7 @@
       {% elif 'run_executable' in exec_item %}
         {% for job_item in exec_item.run_executable %}
 
+
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run program (executable)"
   win_shell: |
 {% set run_exec_full_cli = "\"'"+ job_item.exec_full_path + "'" + " " + "'" + job_item.arguments + "'\"" %}
