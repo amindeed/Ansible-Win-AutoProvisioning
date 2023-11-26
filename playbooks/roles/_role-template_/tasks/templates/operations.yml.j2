@@ -44,7 +44,28 @@
 {# ︵‿︵‿ Check HTTP Server Status ︵‿︵‿ #}
       {% elif 'check_http_status' in check_item %}
         {% for http_check_item in check_item.check_http_status %}
-          {# .... #}
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check HTTP connection to user-provided target URL"
+  win_shell: |
+    $url = "http://mygiteaserver:3000/amine/ansible-windows-auto-provisioning/commits/branch/main"
+    $responseStatusCode = $(try { Invoke-WebRequest -Uri "{{ http_check_item.target_url }}" {% if http_check_item.follow_redirects is not defined or not http_check_item.follow_redirects %}-MaximumRedirection 0{% endif %} | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
+
+    if (-not $responseStatusCode) {
+        Write-Output "KO_FAILURE"
+    } else {
+        Write-Output "$responseStatusCode"
+    }
+  register: http_check_result
+  changed_when: false
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Results of HTTP connection check"
+  assert:
+    that:
+      - "'KO_FAILURE' not in http_check_result.stdout"
+    fail_msg: "Failed to establish HTTP connection to '{{ http_check_item.target_url }}'"
+    success_msg: "HTTP status code: {% raw %}{{ http_check_result.stdout_lines[0] }}{% endraw %}"
+  ignore_errors: {% if http_check_item.abort_on_failure is defined and http_check_item.abort_on_failure %}no{% else %}yes{% endif %}
+
         {% endfor %}
 {# ︵‿︵‿︵‿︵‿ #}
       
@@ -52,7 +73,54 @@
 {# ︵‿︵‿ Check Windows Service Status ︵‿︵‿ #}
       {% elif 'check_service_status' in check_item %}
         {% for service_check_item in check_item.check_service_status %}
-          {# .... #}
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Get info for services matching "{{ service_check_item.service_name_pattern }}"'
+  ansible.windows.win_service_info:
+    name: {{ service_check_item.service_name_pattern }}
+  register: service_info
+  changed_when: false
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Show info for services matching "{{ service_check_item.service_name_pattern }}"'
+  debug:
+    msg: '{% raw %}{{ item.display_name }} [{{ item.name }}]{% endraw %}: { {{ service_check_item.gather_info[0] }}: {% raw %}{{ item.{% endraw %}{{ service_check_item.gather_info[0] }}{% raw %}}}{% endraw %} }{% for gathered_item in service_check_item.gather_info[1:] %}, { {{ gathered_item }}: {% raw %}{{ item.{% endraw %}{{ gathered_item }}{% raw %}}}{% endraw %} }{% endfor %}'
+  loop: "{% raw %}{{ service_info.services }}{% endraw %}"
+  loop_control:
+     label: ""
+
+        {% endfor %}
+{# ︵‿︵‿︵‿︵‿ #}
+      
+
+{# ︵‿︵‿ Check TCP port status ︵‿︵‿ #}
+      {% elif 'check_ports' in check_item %}
+        {% for ports_check_item in check_item.check_ports %}
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Get listening {{ ports_check_item.protocol | upper }} ports (1/2)"
+  community.windows.win_listen_ports_facts:
+  register: listening_ports
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Get listening {{ ports_check_item.protocol | upper }} ports (2/2)"
+  XXXXX
+
+  loop: 
+
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Generate list of {{ ports_check_item.protocol | upper }} ports to be checked"
+  set_fact:
+    ports_to_check:
+{% for item in ports_check_item.ports_to_check %}
+      - {{ item }}
+{% endfor %}
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Display {{ ports_check_item.protocol | upper }} ports status"
+  debug:
+    msg: "{% raw %}{{ port }}{% endraw %} TCP port {% raw %}{% if port in listening_ports.ansible_facts.tcp_ports %}{% endraw %}is used.{% raw %}{% else %}{% endraw %}is not used.{% raw %}{% endif %}{% endraw %}"
+  loop: "{% raw %}{{ ports_to_check }}{% endraw %}"
+  loop_control:
+    loop_var: port
+    label: ""
+
+
         {% endfor %}
 {# ︵‿︵‿︵‿︵‿ #}
 
@@ -81,9 +149,11 @@
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
     $regPath1 = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
     $regPath2 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    $regPath3 = "HKLM:\SOFTWARE"
     $regCheck1 = Get-ChildItem -Path $regPath1 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
     $regCheck2 = Get-ChildItem -Path $regPath2 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
-    if ($wmiQuery -or $regCheck1 -or $regCheck2) { $status = "Installed" } else { $status = "Not Installed" }
+    $regCheck3 = Get-ChildItem -Path $regPath3 | Where-Object { $_.GetValue("DisplayName") -like "*$appName*" }
+    if ($wmiQuery -or $regCheck1 -or $regCheck2 -or $regCheck3) { $status = "Installed" } else { $status = "Not Installed" }
     Write-Host "$appName is $status"
   register: initial_software_status
   changed_when: false
@@ -106,7 +176,8 @@
     timeout: 60
   when: "'Not Installed' in initial_software_status.stdout"
 
-{% endif %}{# end process 'Download' #}
+{% endif %}
+{# end: Downloads #}
 
 
 {# ︵‿︵‿ Upload packages from Ansible Controller machine ︵‿︵‿ #}
@@ -135,7 +206,7 @@
     creates: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name.split(".")[0] }}'
   when: "'Not Installed' in initial_software_status.stdout"
 {% endif %}
-
+{# end: Uploads #}
 
 {% if software_item.root_install_dir is defined or root_install_dir is defined %}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check custom target installation directory"
@@ -172,7 +243,7 @@
 
       $installResult = (Start-Process -FilePath "{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}" -ArgumentList "{{ software_item.arguments | default("") }}" -Wait -PassThru).ExitCode
 
-{# Manual registration is typically for portable software with 'exe' insatllers like 'Cygwin' #}
+{# Manual registration is typically for portable software with 'exe' installers like 'Cygwin' #}
 {% if software_item.manual_registration is defined %}
       $registryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{{ software_item.software_fullname }}"
 
@@ -263,7 +334,7 @@
       }
 
       New-ItemProperty -Path $registryPath -Name "EstimatedSize" -Value $sizeInKB -PropertyType DWORD -Force
-{% endif %}{# end of 'if' statement for sofwtare manual registration #}
+{% endif %}{# end of 'manual registration' #}
 
       $installResult = 0
     } catch {
@@ -271,7 +342,7 @@
       Write-Host "ERROR: $errorMessage"
       $installResult = 1
     }
-    {# "0" as exit success code; typically for common installers like NSIS #}
+    {# "0" as exit success code; typically for common installers like NSIS' #}
     # "0" as exit success code; typically for common installers like NSIS
     if ($installResult -eq 0) {$installSuccess = $true}
 
@@ -416,7 +487,6 @@
   register: new_software_status
   changed_when: false
   failed_when: new_software_status.rc != 0 or 'Not Installed' in new_software_status.stdout
-{# Temporarilly added to speed up the release of 'Basic Bundle' code. #}
   ignore_errors: {% if software_item.abort_on_aftercheck_failure is defined and not software_item.abort_on_aftercheck_failure %}yes{% else %}no{% endif %}
   
   when: "'Not Installed' in initial_software_status.stdout"
@@ -525,9 +595,7 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Registry Keys & Properties ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.resource_type == 'registry' %}
-{#
-.... 
-#}
+²&
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations ︵‿︵‿︵‿︵‿ #}
 
@@ -649,7 +717,7 @@
 
 {% if update_item.force_overwrite_dest is defined and update_item.force_overwrite_dest %}
 {# 
-  Trailing slash is removed from `update_item.destination` as it keeps
+  Any trailing slash is removed from `update_item.destination` as it keeps
   inexplicably causing a vague Jinja2 template rendering error:
   "failed at splitting arguments, either an unbalanced jinja2 block or quotes"
  #}
@@ -846,8 +914,6 @@
 
 
 {# ....
-- modify/move/rename
-  - Modify: overwrite content, append content, find [text matching pattern] and replace
 
 - create
   - source
@@ -858,7 +924,6 @@
     - empty
     - insert
     - find_replace
-    - append
     - prepend
 
 .... #}
@@ -947,16 +1012,11 @@
       {% elif 'run_executable' in exec_item %}
         {% for job_item in exec_item.run_executable %}
 
-
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Run program (executable)"
-  win_shell: |
-{% set run_exec_full_cli = "\"'"+ job_item.exec_full_path + "'" + " " + "'" + job_item.arguments + "'\"" %}
-{{ run_exec_full_cli | indent(width=4, first=True) }}
-{% if job_item.win_shell_parameters is defined %}
-  args:
-{% for param in job_item.win_shell_parameters | default([]) %}
-    {{ param.keys() | first }}: {{ param.values() | first }}
-{% endfor %}
+  win_command: 
+    cmd: '"{{ job_item.exec_full_path }}" {{ job_item.arguments | default("") }}'
+{% if job_item.working_directory is defined and job_item.working_directory is not none %}
+    chdir: {{ job_item.working_directory }}
 {% endif %}
   register: run_executable_result
   failed_when: run_executable_result.rc != 0 or run_executable_result.stderr != ""

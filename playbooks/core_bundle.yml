@@ -1,6 +1,54 @@
 ---
 # ansible-playbook main.yml -i ../inventories/environments/dev.yml
 
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: test
+#      vars:
+#        setup:
+#          - executions:
+#            - run_executable:
+#              - exec_full_path: D:\AppServ\Python312\python.exe
+#                # /!\ For `arguments`, you have to escape special characters and enclose strings with spaces in [double] quotes /!\
+#                #arguments: '"D:\xxx yyy\test.py" --first_name "Mateusz" --last_name "Kowalczyk" --output_file "test_output.txt"'
+#                arguments: '"C:\Users\nader\Desktop\aaa bbb\test.py"'
+#                working_directory: D:\
+
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: test
+#      vars:
+#        pre_setup:
+#          - checks:
+#            - check_http_status:
+#              - target_url: http://192.168.66.1:3000/amine/ansible-windows-auto-provisioning/commits/branch/main
+#                #follow_redirects: yes # Default: 'no'
+#                #abort_on_failure: yes # Default: 
+
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: test
+#      vars:
+#        pre_setup:
+#          - checks:
+#            - check_service_status:
+#              #- service_name_pattern: WinRM
+#              - service_name_pattern: '"*winrm*"'  # /!\ For patterns, note the double quotes enclosure: '" ... "'
+#                gather_info:
+#                  - state
+#                  #- start_mode
+#                  #- path
+
+
 - name: "TEST"
   hosts: all
   gather_facts: no
@@ -8,14 +56,15 @@
   roles:
     - role: test
       vars:
-        setup:
-          - executions:
-            - run_executable:
-              - exec_full_path: D:\AppServ\Python312\python.exe
-                arguments: C:\Users\nader\Desktop\aaa bbb\test.py
-                #win_shell_parameters:
-                #  - chdir: C:\
-                #  - aaa: bbb
+        pre_setup:
+          - checks:
+            - check_ports:
+              - protocol: tcp
+                ports_to_check:
+                  - 80
+                  - 8080
+
+
 
 
 - name: "Initialize the system"
