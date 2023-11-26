@@ -48,22 +48,20 @@
 #                  #- start_mode
 #                  #- path
 
-
-- name: "TEST"
-  hosts: all
-  gather_facts: no
-  tags: test
-  roles:
-    - role: test
-      vars:
-        pre_setup:
-          - checks:
-            - check_ports:
-              - protocol: tcp
-                ports_to_check:
-                  - 80
-                  - 8080
-
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: test
+#      vars:
+#        pre_setup:
+#          - checks:
+#            - check_ports:
+#              - protocol: tcp
+#                ports_to_check:
+#                  - 5985
+#
 
 
 
@@ -333,8 +331,7 @@
               - resource_type: env_var
                 resource_name: PATH
                 value: D:\AppServ\OpenSSL-Win64\bin
-                action: append # [create, modify, delete] # Default behaviour: attempts 'create' action
-                #abort_on_failure: yes # Default: 'no'
+                action: append # Accepted values: 'append' (typically for PATH), 'set' and 'remove'
 
 
 - name: "Setup KeePass"
