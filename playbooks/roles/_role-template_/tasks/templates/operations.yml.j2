@@ -111,16 +111,6 @@
     loop_var: item
     label: ""
 
-{#
-
-
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Generate list of {{ ports_check_item.protocol | upper }} ports to be checked"
-  set_fact:
-    ports_to_check:
-{% for item in ports_check_item.ports_to_check %}
-      - {{ item }}
-{% endfor %}
-#}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Display {{ ports_check_item.protocol | upper }} ports status"
   debug:
     msg: "{% raw %}{{ port }}{% endraw %} {{ ports_check_item.protocol | upper }} port {% raw %}{% if port in listening_ports %}{% endraw %}is used.{% raw %}{% else %}{% endraw %}is not used.{% raw %}{% endif %}{% endraw %}"

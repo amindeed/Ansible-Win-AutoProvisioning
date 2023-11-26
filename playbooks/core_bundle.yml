@@ -48,20 +48,20 @@
 #                  #- start_mode
 #                  #- path
 
-#- name: "TEST"
-#  hosts: all
-#  gather_facts: no
-#  tags: test
-#  roles:
-#    - role: test
-#      vars:
-#        pre_setup:
-#          - checks:
-#            - check_ports:
-#              - protocol: tcp
-#                ports_to_check:
-#                  - 5985
-#
+- name: "TEST"
+  hosts: all
+  gather_facts: no
+  tags: test
+  roles:
+    - role: test
+      vars:
+        pre_setup:
+          - checks:
+            - check_ports:
+              - protocol: tcp
+                ports_to_check:
+                  - 5985
+
 
 
 
