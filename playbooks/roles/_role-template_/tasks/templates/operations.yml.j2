@@ -114,7 +114,7 @@
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Display {{ ports_check_item.protocol | upper }} ports status"
   debug:
     msg: "{% raw %}{{ port }}{% endraw %} {{ ports_check_item.protocol | upper }} port {% raw %}{% if port in listening_ports %}{% endraw %}is used.{% raw %}{% else %}{% endraw %}is not used.{% raw %}{% endif %}{% endraw %}"
-  loop: "{% raw %}{{ pre_setup[0].checks[0].check_ports[0].ports_to_check }}{% endraw %}"
+  loop: "{% raw %}{{ {% endraw %}{{ setup_phase }}{% raw %}[1].checks[0].check_ports[0].ports_to_check }}{% endraw %}"
   loop_control:
     loop_var: port
     label: ""
@@ -571,6 +571,18 @@
 {# ︵‿︵‿︵‿︵‿ Handle Registry Keys & Properties ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.resource_type == 'registry' %}
 
+{# (1) Add/Update value[s (list)] #}
+{% if update_item.operation_type == 'set' %}
+
+{# (2) Delete values (list) #}
+{% elif update_item.operation_type == 'remove' %}
+
+{# (3) merge .reg file into Registry: upload file #}
+{% elif update_item.operation_type == 'merge' %}
+
+{# (4) merge .reg file into Registry: provide content #}
+
+{% endif %}
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations ︵‿︵‿︵‿︵‿ #}
 
@@ -754,7 +766,7 @@
       }
 
       $fileContent = @"
-{{ update_item.source.file_text_content | indent(width=4, first=True) }}    "@
+{{ update_item.source.file_content | indent(width=4, first=True) }}    "@
 
       $tempdir = New-TemporaryDirectory | Select-Object -ExpandProperty FullName
       Set-Content -Path "$tempdir\temp_file.tmp" -Value $fileContent
@@ -869,7 +881,7 @@
       if ((Test-Path -Path "{{ update_item.destination }}" -PathType Leaf) -and -not (IsBinary "{{ update_item.destination }}")) {
 
         $contentToAdd = @"
-{{ update_item.source.file_text_content | indent(width=4, first=True) }}    "@
+{{ update_item.source.file_content | indent(width=4, first=True) }}    "@
         Add-Content -Path "{{ update_item.destination }}" -Value $contentToAdd
         Write-Output "[OK_CHANGE] Content appended."
         exit 0

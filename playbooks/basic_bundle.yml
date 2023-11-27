@@ -41,7 +41,7 @@
             #- resource_type: file_system
             #  operation_type: create
             #  source:
-            #    file_text_content: |
+            #    file_content: |
             #      TEST TEST TEST TEST TEST
             #      TEST TEST TEST TEST TEST
             #  destination: D:\AppServ\NodeJS\test.txt

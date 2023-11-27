@@ -5,6 +5,7 @@
     dest: "{{ role_path }}/temp/02_{{ role_name }}__setup.yml"
   vars:
     label: "[SETUP]"
+    setup_phase: setup
     setup_phase_operations: "{{ setup | default([]) }}"
   delegate_to: localhost
   changed_when: false
