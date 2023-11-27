@@ -64,9 +64,45 @@
                 arguments: /S /D=D:\AppServ\Notepad++
           - checks:
             - check_ports:
+              - protocol: udp
+                ports_to_check:
+                  - 49669
+                  - 49668
+                  - 49667
+                  - 49666
+                  - 49665
+                  - 49664
+                  - 47001
+                  - 5985
+                  - 3389
+              - protocol: udp
+                ports_to_check:
+                  - 5355
+                  - 5353
+                  - 3389
+                  - 123
+                  - 58742
               - protocol: tcp
                 ports_to_check:
-                  - 5985
+                  - 445
+                  - 135
+                  - 49669
+                  - 49668
+                  - 49667
+                  - 49666
+                  - 49665
+                  - 49664
+                  - 3389
+                  - 139
+                  - 135
+              - protocol: tcp
+                ports_to_check:
+                  - 5355
+                  - 5353
+                  - 3389
+                  - 138
+                  - 137
+                  - 123
 
 
 #- name: "TEST"
