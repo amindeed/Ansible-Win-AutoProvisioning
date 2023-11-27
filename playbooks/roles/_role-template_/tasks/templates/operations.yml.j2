@@ -41,7 +41,7 @@
 
         {% endfor %}
 {# ︵‿︵‿︵‿︵‿ #}
-      
+
 {# ︵‿︵‿ Check HTTP Server Status ︵‿︵‿ #}
       {% elif 'check_http_status' in check_item %}
         {% for http_check_item in check_item.check_http_status %}
@@ -69,7 +69,6 @@
 
         {% endfor %}
 {# ︵‿︵‿︵‿︵‿ #}
-      
 
 {# ︵‿︵‿ Check Windows Service Status ︵‿︵‿ #}
       {% elif 'check_service_status' in check_item %}
@@ -90,7 +89,6 @@
 
         {% endfor %}
 {# ︵‿︵‿︵‿︵‿ #}
-      
 
 {# ︵‿︵‿ Check TCP/UDP port status ︵‿︵‿ #}
       {% elif 'check_ports' in check_item %}
@@ -132,16 +130,8 @@
         {% endfor %}
 {# ︵‿︵‿︵‿︵‿ #}
 
-
       {% endif %}
     {% endfor %}
-
-
-
-
-
-
-
 
 {# ▰▰▰▰▰▰▰▰▰▰▰▰  Installations ▰▰▰▰▰▰▰▰▰▰▰▰ #}
 
@@ -187,7 +177,6 @@
 {% endif %}
 {# end: Downloads #}
 
-
 {# ︵‿︵‿ Upload packages from Ansible Controller machine ︵‿︵‿ #}
 {% if software_item.upload_file is defined and software_item.upload_file is not none %}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ software_item.software_fullname }}' files to target host"
@@ -224,7 +213,6 @@
   when: "'Not Installed' in initial_software_status.stdout"
 {% endif %}
 
-
 {% if software_item.type == 'zip' %}
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}'"
   win_unzip:
@@ -233,7 +221,6 @@
     creates: '{{ software_item.root_install_dir | default("C:\\Program Files") }}\{{ software_item.software_fullname }}'
   when: "'Not Installed' in initial_software_status.stdout"
 {% endif %}
-
 
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Install '{{ software_item.software_fullname }}'"
   win_shell: |
@@ -290,7 +277,6 @@
     "@
 
       Set-Content -Path "{{ software_item.manual_registration.root_install_dir | default('C:\Program Files') }}\{{ software_item.software_fullname }}\uninstall.ps1" -Value $uninstallerScriptContent
-
 
 {% if software_item.manual_registration.desktop_shortcut is defined and software_item.manual_registration.desktop_shortcut %}
       $WshShell = New-Object -ComObject WScript.Shell
@@ -479,7 +465,6 @@
   failed_when: component_install_result.rc != 0 or 'installation failed' in component_install_result.stdout
   when: "'Not Installed' in initial_software_status.stdout"
 
-
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check '{{ software_item.software_fullname }}' status *AFTER* installation"
   win_shell: |
     $appName = "{{ software_item.software_fullname }}"
@@ -498,16 +483,9 @@
   ignore_errors: {% if software_item.abort_on_aftercheck_failure is defined and not software_item.abort_on_aftercheck_failure %}yes{% else %}no{% endif %}
   
   when: "'Not Installed' in initial_software_status.stdout"
-
         {% endfor %}
       {% endif %}
     {% endfor %}
-
-
-
-
-
-
 
 {# ▰▰▰▰▰▰▰▰▰▰▰▰ Configurations ▰▰▰▰▰▰▰▰▰▰▰▰ #}
 
@@ -515,8 +493,6 @@
     {% for config_item in operation.configurations %}
       {% if 'update_resource' in config_item %}
         {% for update_item in config_item.update_resource %}
-
-
 
 {# ︵‿︵‿︵‿︵‿ Handle System Environment Variables ︵‿︵‿︵‿︵‿ #}
 {% if update_item.resource_type == 'env_var' %}
@@ -576,20 +552,48 @@
 
 {% endif %}
 
-
 {# ︵‿︵‿︵‿︵‿ Handle Registry Keys & Properties ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.resource_type == 'registry' %}
 
 {# (1) Add/Update value[s (list)] #}
 {% if update_item.operation_type == 'set' %}
 
+- name: Add or update registry path MyCompany, with expand string entry 'hello'
+  ansible.windows.win_regedit:
+    path: HKCU:\Software\MyCompany
+    name: hello
+    data: '%appdata%\local'
+    type: expandstring
+
 {# (2) Delete values (list) #}
 {% elif update_item.operation_type == 'remove' %}
+
+- name: Remove entry 'hello' from registry path MyCompany
+  ansible.windows.win_regedit:
+    path: HKCU:\Software\MyCompany
+    name: hello
+    state: absent
+
+- name: Clear the existing (Default) entry at path MyCompany
+  ansible.windows.win_regedit:
+    path: HKCU:\Software\MyCompany
+    state: absent
+    delete_key: false
+
+- name: Remove registry path MyCompany (including all entries it contains)
+  ansible.windows.win_regedit:
+    path: HKCU:\Software\MyCompany
+    state: absent
+    delete_key: true
 
 {# (3) merge .reg file into Registry: upload file #}
 {% elif update_item.operation_type == 'merge' %}
 
 {# (4) merge .reg file into Registry: provide content #}
+
+- name: Merge in a registry file without comparing to current registry
+  community.windows.win_regmerge:
+    path: C:\autodeploy\myCompany-settings.reg
 
 {% endif %}
 
@@ -943,7 +947,6 @@
       {% if 'run_ps1_script' in exec_item %}
         {% for job_item in exec_item.run_ps1_script %}
 
-
 {% if job_item.upload_file is defined %}
   {% set file_name = job_item.upload_file.split('/')[-1] | default(job_item.upload_file) %}
 {% elif job_item.file_full_url is defined %}
@@ -1022,8 +1025,6 @@
 
       {% endif %}
     {% endfor %}
-
-
 
 {# ▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ #}
   {% endif %}

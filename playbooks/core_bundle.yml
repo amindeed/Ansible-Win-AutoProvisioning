@@ -48,63 +48,6 @@
 #                  #- start_mode
 #                  #- path
 
-- name: "TEST"
-  hosts: all
-  gather_facts: no
-  tags: test
-  roles:
-    - role: test
-      vars:
-        setup:
-          - installations:
-            - software_components:
-              - software_fullname: Notepad++ # Provide a relevant name that is both human-readable and recognizable by the system (check: tools/check_software_installed.ps1)
-                file_relative_url: notepadpp/npp.8.5.4.Installer.x64.exe
-                type: exe
-                arguments: /S /D=D:\AppServ\Notepad++
-          - checks:
-            - check_ports:
-              - protocol: udp
-                ports_to_check:
-                  - 49669
-                  - 49668
-                  - 49667
-                  - 49666
-                  - 49665
-                  - 49664
-                  - 47001
-                  - 5985
-                  - 3389
-              - protocol: udp
-                ports_to_check:
-                  - 5355
-                  - 5353
-                  - 3389
-                  - 123
-                  - 58742
-              - protocol: tcp
-                ports_to_check:
-                  - 445
-                  - 135
-                  - 49669
-                  - 49668
-                  - 49667
-                  - 49666
-                  - 49665
-                  - 49664
-                  - 3389
-                  - 139
-                  - 135
-              - protocol: tcp
-                ports_to_check:
-                  - 5355
-                  - 5353
-                  - 3389
-                  - 138
-                  - 137
-                  - 123
-
-
 #- name: "TEST"
 #  hosts: all
 #  gather_facts: no
@@ -112,45 +55,76 @@
 #  roles:
 #    - role: test
 #      vars:
-#        pre_setup:
-#          - configurations:
-#            - update_resource:
-#              - resource_type: registry
-#                operation_type: set     # Other choices: 'remove', 'merge'
-#                items_to_update:
-#                  - key_path: HKLM:\Software\MyTestKeyA
-#                    value_name: MyTestValueA01     # <=> key property/entry name
-#                    value_data: 'test data for MyTestValueA01 %PATH%'     # <=> key property/entry value
-#                    value_type: expandstring     # Default: string / Other choices: none, binary, dword, expandstring, multistring, qword
-#                    #
-#                  - path: HKLM:\Software\MyTestKeyB
-#                    value_name: MyTestValueB01 
-#                    value_data: test data for MyTestValueB01
-#                    #
-#                  - path: HKLM:\Software\MyTestKeyC
-#                    value_name: MyTestValueC01 
+#        post_setup:
+#          - checks:
+#            - check_ports:
+#              - protocol: udp
+#                ports_to_check:
+#                  - 49669
+#                  - 49668
+#                  - 49667
+#              - protocol: udp
+#                ports_to_check:
+#                  - 5355
+#                  - 5353
+#              - protocol: tcp
+#                ports_to_check:
+#                  - 445
+#                  - 135
+#                  - 49669
+#              - protocol: tcp
+#                ports_to_check:
+#                  - 5355
+#                  - 5353
 #
-#              - resource_type: registry
-#                operation_type: remove
-#                items_to_update:
-#                  - key_path: HKLM:\Software\MyTestKeyA
-#                    value_name: MyTestValueA01
-#                    #
-#                  - key_path: HKLM:\Software\MyTestKeyB
-#
-#              - resource_type: registry
-#                operation_type: merge
-#                source:
-#                  upload_file: test/test.reg
-#
-#              - resource_type: registry
-#                operation_type: merge
-#                source:
-#                  file_content: |
-#                    Windows Registry Editor Version 5.00
-#                    
-#                    [HKEY_LOCAL_MACHINE\Software\MyTestKeyE]
-#                    "MyTestValueE01"="Test Data for MyTestKeyE"
+
+
+- name: "TEST"
+  hosts: all
+  gather_facts: no
+  tags: test
+  roles:
+    - role: test
+      vars:
+        pre_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: registry
+                operation_type: set     # Other choices: 'remove', 'merge'
+                items_to_update:
+                  - key_path: HKLM:\Software\MyTestKeyA
+                    value_name: MyTestValueA01     # <=> key property/entry name
+                    value_data: 'test data for MyTestValueA01 %PATH%'     # <=> key property/entry value
+                    value_type: expandstring     # Default: string / Other choices: none, binary, dword, expandstring, multistring, qword
+                    #
+                  - path: HKLM:\Software\MyTestKeyB
+                    value_name: MyTestValueB01 
+                    value_data: test data for MyTestValueB01
+                    #
+                  - path: HKLM:\Software\MyTestKeyC
+                    value_name: MyTestValueC01 
+
+              - resource_type: registry
+                operation_type: remove
+                items_to_update:
+                  - key_path: HKLM:\Software\MyTestKeyA
+                    value_name: MyTestValueA01
+                    #
+                  - key_path: HKLM:\Software\MyTestKeyB
+
+              - resource_type: registry
+                operation_type: merge
+                source:
+                  upload_file: test/test.reg
+
+              - resource_type: registry
+                operation_type: merge
+                source:
+                  file_content: |
+                    Windows Registry Editor Version 5.00
+                    
+                    [HKEY_LOCAL_MACHINE\Software\MyTestKeyE]
+                    "MyTestValueE01"="Test Data for MyTestKeyE"
 
 
 
