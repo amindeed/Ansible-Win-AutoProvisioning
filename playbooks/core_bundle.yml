@@ -90,43 +90,47 @@
           - configurations:
             - update_resource:
               - resource_type: registry
-                operation_type: set     # Other choices: 'remove', 'merge'
+                operation_type: set     # Other choices: 'remove', 'merge' / `remove_value`, `remove_key`, `clear_key`, `merge`
                 items_to_update:
                   - key_path: HKLM:\Software\MyTestKeyA
                     value_name: MyTestValueA01     # <=> key property/entry name
-                    value_data: 'test data for MyTestValueA01 %PATH%'     # <=> key property/entry value
+                    value_data: 'test "data for ""MyTestValueA01""" %PATH%'     # <=> key property/entry value
                     value_type: expandstring     # Default: string / Other choices: none, binary, dword, expandstring, multistring, qword
                     #
-                  - path: HKLM:\Software\MyTestKeyB
+                  - key_path: HKLM:\Software\MyTestKeyB
                     value_name: MyTestValueB01 
                     value_data: test data for MyTestValueB01
                     #
-                  - path: HKLM:\Software\MyTestKeyC
-                    value_name: MyTestValueC01 
-
-              - resource_type: registry
-                operation_type: remove
-                items_to_update:
-                  - key_path: HKLM:\Software\MyTestKeyA
-                    value_name: MyTestValueA01
+                  - key_path: HKLM:\Software\MyTestKeyC
+                    value_name: MyTestValueC01
                     #
-                  - key_path: HKLM:\Software\MyTestKeyB
-
-              - resource_type: registry
-                operation_type: merge
-                source:
-                  upload_file: test/test.reg
-
-              - resource_type: registry
-                operation_type: merge
-                source:
-                  file_content: |
-                    Windows Registry Editor Version 5.00
-                    
-                    [HKEY_LOCAL_MACHINE\Software\MyTestKeyE]
-                    "MyTestValueE01"="Test Data for MyTestKeyE"
+                  - key_path: HKLM:\Software\MyTestKeyD
+                    value_data: test data for MyTestValueB01
+                    #
+                  - key_path: HKLM:\Software\MyTestKeyE
 
 
+              #- resource_type: registry
+              #  operation_type: remove
+              #  items_to_update:
+              #    - key_path: HKLM:\Software\MyTestKeyA
+              #      value_name: MyTestValueA01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyB
+              #
+              #- resource_type: registry
+              #  operation_type: merge
+              #  source:
+              #    upload_file: test/test.reg
+              #
+              #- resource_type: registry
+              #  operation_type: merge
+              #  source:
+              #    file_content: |
+              #      Windows Registry Editor Version 5.00
+              #      
+              #      [HKEY_LOCAL_MACHINE\Software\MyTestKeyE]
+              #      "MyTestValueE01"="Test Data for MyTestKeyE"  
 
 - name: "Initialize the system"
   hosts: all

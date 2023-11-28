@@ -48,7 +48,6 @@
 
 - name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Check HTTP connection to user-provided target URL"
   win_shell: |
-    $url = "http://mygiteaserver:3000/amine/ansible-windows-auto-provisioning/commits/branch/main"
     $responseStatusCode = $(try { Invoke-WebRequest -Uri "{{ http_check_item.target_url }}" {% if http_check_item.follow_redirects is not defined or not http_check_item.follow_redirects %}-MaximumRedirection 0{% endif %} | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
 
     if (-not $responseStatusCode) {
@@ -93,30 +92,17 @@
 {# ︵‿︵‿ Check TCP/UDP port status ︵‿︵‿ #}
       {% elif 'check_ports' in check_item %}
 
-- name: "{{ label }} (1/4) Get listening ports (all info)"
+- name: "{{ label }} (1/3) Get listening ports (all info)"
   community.windows.win_listen_ports_facts:
   register: all_listening_ports
 
-- name: "{{ label }} (2/4) Get listening ports (filter ports)"
+- name: "{{ label }} (2/3) Get listening ports (TCP)"
   set_fact:
-    listening_tcp_ports: []
-    listening_udp_ports: []
+    listening_tcp_ports: "{% raw %}{{ all_listening_ports.ansible_facts.tcp_listen | map(attribute='port') | list }}{% endraw %}"
 
-- name: "{{ label }} (3/4) Get listening ports (TCP)"
+- name: "{{ label }} (3/3) Get listening ports (UDP)"
   set_fact:
-    listening_tcp_ports: "{% raw %}{{ listening_tcp_ports + [ item.port ] }}{% endraw %}"
-  loop: "{% raw %}{{ all_listening_ports.ansible_facts.tcp_listen }}{% endraw %}"
-  loop_control:
-    loop_var: item
-    label: ""
-
-- name: "{{ label }} (4/4) Get listening ports (UDP)"
-  set_fact:
-    listening_udp_ports: "{% raw %}{{ listening_udp_ports + [ item.port ] }}{% endraw %}"
-  loop: "{% raw %}{{ all_listening_ports.ansible_facts.udp_listen }}{% endraw %}"
-  loop_control:
-    loop_var: item
-    label: ""
+    listening_udp_ports: "{% raw %}{{ all_listening_ports.ansible_facts.udp_listen | map(attribute='port') | list }}{% endraw %}"
 
         {% for ports_check_item in check_item.check_ports %}
 
@@ -555,45 +541,72 @@
 {# ︵‿︵‿︵‿︵‿ Handle Registry Keys & Properties ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.resource_type == 'registry' %}
 
-{# (1) Add/Update value[s (list)] #}
+{# {{ update_item.items_to_update }} #}
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Generate list of Windows registry items to update'
+  set_fact:
+    reg_items_to_update:
+{{ ' ' * 6 }}{% for item in update_item.items_to_update %}{% for key,value in item.items() %}{{ '- ' if loop.first else '  ' }}{{ key }}: {{ value }}{{ '\n' ~ ' ' * 6 }}{% endfor %}{% endfor %}
+
+{# (1) Add/Update keys/properties #}
 {% if update_item.operation_type == 'set' %}
 
-- name: Add or update registry path MyCompany, with expand string entry 'hello'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Add or update registry item'
   ansible.windows.win_regedit:
-    path: HKCU:\Software\MyCompany
-    name: hello
-    data: '%appdata%\local'
-    type: expandstring
+    path: '{% raw %}{{ reg_set_item.key_path }}{% endraw %}'
+    name: '{% raw %}{{ reg_set_item.value_name | default("") }}{% endraw %}' {# <-------- #}
+    data: '{% raw %}{{ reg_set_item.value_data | default("") }}{% endraw %}' {# <-------- #}
+    type: "{% raw %}{{ 'string' if reg_set_item.value_type is not defined or reg_set_item.value_type == 'string' else reg_set_item.value_type }}{% endraw %}"
+  loop: "{% raw %}{{ reg_items_to_update }}{% endraw %}"
+  loop_control:
+    loop_var: reg_set_item
+    label: ""
 
-{# (2) Delete values (list) #}
+{# (2) Delete keys/values #}
 {% elif update_item.operation_type == 'remove' %}
 
-- name: Remove entry 'hello' from registry path MyCompany
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove entry from registry'
   ansible.windows.win_regedit:
     path: HKCU:\Software\MyCompany
     name: hello
     state: absent
+  loop: update_item.items_to_update
+  loop_control:
+    loop_var: reg_remove_item
+    label: ""
 
-- name: Clear the existing (Default) entry at path MyCompany
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Clear all entries of given registry key'
   ansible.windows.win_regedit:
     path: HKCU:\Software\MyCompany
     state: absent
     delete_key: false
+  loop: update_item.items_to_update
+  loop_control:
+    loop_var: reg_remove_item
+    label: ""
 
-- name: Remove registry path MyCompany (including all entries it contains)
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove given registry key (along with all its entries)'
   ansible.windows.win_regedit:
     path: HKCU:\Software\MyCompany
     state: absent
     delete_key: true
+  loop: update_item.items_to_update
+  loop_control:
+    loop_var: reg_remove_item
+    label: ""
 
 {# (3) merge .reg file into Registry: upload file #}
 {% elif update_item.operation_type == 'merge' %}
 
 {# (4) merge .reg file into Registry: provide content #}
 
-- name: Merge in a registry file without comparing to current registry
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in a registry file'
   community.windows.win_regmerge:
     path: C:\autodeploy\myCompany-settings.reg
+    loop: update_item.items_to_update
+  loop_control:
+    loop_var: reg_merge_item
+    label: ""
 
 {% endif %}
 
