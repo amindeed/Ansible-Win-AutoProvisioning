@@ -79,6 +79,7 @@
 #
 
 
+
 - name: "TEST"
   hosts: all
   gather_facts: no
@@ -90,7 +91,7 @@
           - configurations:
             - update_resource:
               - resource_type: registry
-                operation_type: set     # Other choices: 'remove', 'merge' / `remove_value`, `remove_key`, `clear_key`, `merge`
+                operation_type: set     # Other choices: `remove_value`, `remove_key`, `merge`
                 items_to_update:
                   - key_path: HKLM:\Software\MyTestKeyA
                     value_name: MyTestValueA01     # <=> key property/entry name
@@ -108,16 +109,43 @@
                     value_data: test data for MyTestValueB01
                     #
                   - key_path: HKLM:\Software\MyTestKeyE
+                    #
+                  - key_path: HKLM:\Software\MyTestKeyX
+                    value_name: MyTestValueX01 
+                    value_data: test data for MyTestValueX01
+                    #
+                  - key_path: HKLM:\Software\MyTestKeyX
+                    value_name: MyTestValueX02 
+                    value_data: test data for MyTestValueX02
+                    type: dword
+                    #
+                  - key_path: HKLM:\Software\MyTestKeyY
+                    value_name: MyTestValueY01 
+                    value_data: test data for MyTestValueY01
+                    #
+                  - key_path: HKLM:\Software\MyTestKeyY
+                    value_name: MyTestValueY02 
+                    value_data: test data for MyTestValueY02
+                    #
+                  - key_path: HKLM:\Software\MyTestKeyZ
+                    value_name: MyTestValueZ01 
+                    value_data: test data for MyTestValueZ01
+                    #
+                  - key_path: HKLM:\Software\MyTestKeyZ
+                    value_name: MyTestValueZ02 
+                    value_data: test data for MyTestValueZ02
 
+              - resource_type: registry
+                operation_type: remove_value
+                items_to_update:
+                  - key_path: HKLM:\Software\MyTestKeyX
+                    value_name: MyTestValueX02
+              
+              - resource_type: registry
+                operation_type: remove_key
+                items_to_update:
+                  - key_path: HKLM:\Software\MyTestKeyZ
 
-              #- resource_type: registry
-              #  operation_type: remove
-              #  items_to_update:
-              #    - key_path: HKLM:\Software\MyTestKeyA
-              #      value_name: MyTestValueA01
-              #      #
-              #    - key_path: HKLM:\Software\MyTestKeyB
-              #
               #- resource_type: registry
               #  operation_type: merge
               #  source:

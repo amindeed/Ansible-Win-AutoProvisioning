@@ -541,8 +541,6 @@
 {# ︵‿︵‿︵‿︵‿ Handle Registry Keys & Properties ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.resource_type == 'registry' %}
 
-{# {{ update_item.items_to_update }} #}
-
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Generate list of Windows registry items to update'
   set_fact:
     reg_items_to_update:
@@ -553,59 +551,51 @@
 
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Add or update registry item'
   ansible.windows.win_regedit:
-    path: '{% raw %}{{ reg_set_item.key_path }}{% endraw %}'
-    name: '{% raw %}{{ reg_set_item.value_name | default("") }}{% endraw %}' {# <-------- #}
-    data: '{% raw %}{{ reg_set_item.value_data | default("") }}{% endraw %}' {# <-------- #}
-    type: "{% raw %}{{ 'string' if reg_set_item.value_type is not defined or reg_set_item.value_type == 'string' else reg_set_item.value_type }}{% endraw %}"
+    path: '{% raw %}{{ reg_update_item.key_path }}{% endraw %}'
+    name: '{% raw %}{{ reg_update_item.value_name | default(omit) }}{% endraw %}'
+    data: '{% raw %}{{ reg_update_item.value_data | default(omit) }}{% endraw %}'
+    type: '{% raw %}{{ reg_update_item.value_type | default(omit) }}{% endraw %}'
   loop: "{% raw %}{{ reg_items_to_update }}{% endraw %}"
   loop_control:
-    loop_var: reg_set_item
-    label: ""
+    loop_var: reg_update_item
+    #label: ""
 
-{# (2) Delete keys/values #}
-{% elif update_item.operation_type == 'remove' %}
+{# (2) Delete values #}
+{% elif update_item.operation_type == 'remove_value' %}
 
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove entry from registry'
   ansible.windows.win_regedit:
-    path: HKCU:\Software\MyCompany
-    name: hello
+    path: '{% raw %}{{ reg_update_item.key_path }}{% endraw %}'
+    name: '{% raw %}{{ reg_update_item.value_name }}{% endraw %}'
     state: absent
-  loop: update_item.items_to_update
+  loop: "{% raw %}{{ reg_items_to_update }}{% endraw %}"
   loop_control:
-    loop_var: reg_remove_item
-    label: ""
+    loop_var: reg_update_item
+    #label: ""
 
-- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Clear all entries of given registry key'
-  ansible.windows.win_regedit:
-    path: HKCU:\Software\MyCompany
-    state: absent
-    delete_key: false
-  loop: update_item.items_to_update
-  loop_control:
-    loop_var: reg_remove_item
-    label: ""
-
+{# (3) Delete keys #}
+{% elif update_item.operation_type == 'remove_key' %}
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove given registry key (along with all its entries)'
   ansible.windows.win_regedit:
-    path: HKCU:\Software\MyCompany
+    path: '{% raw %}{{ reg_update_item.key_path }}{% endraw %}'
     state: absent
-    delete_key: true
-  loop: update_item.items_to_update
+    #delete_key: true
+  loop: "{% raw %}{{ reg_items_to_update }}{% endraw %}"
   loop_control:
-    loop_var: reg_remove_item
-    label: ""
+    loop_var: reg_update_item
+    #label: ""
 
-{# (3) merge .reg file into Registry: upload file #}
+{# (4) merge .reg file into Registry: upload file #}
 {% elif update_item.operation_type == 'merge' %}
 
-{# (4) merge .reg file into Registry: provide content #}
+{# (5) merge .reg file into Registry: provide content #}
 
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in a registry file'
   community.windows.win_regmerge:
     path: C:\autodeploy\myCompany-settings.reg
     loop: update_item.items_to_update
   loop_control:
-    loop_var: reg_merge_item
+    loop_var: reg_update_item
     label: ""
 
 {% endif %}
