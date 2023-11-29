@@ -79,7 +79,6 @@
 #
 
 
-
 - name: "TEST"
   hosts: all
   gather_facts: no
@@ -90,75 +89,76 @@
         pre_setup:
           - configurations:
             - update_resource:
-              - resource_type: registry
-                operation_type: set     # Other choices: `remove_value`, `remove_key`, `merge`
-                items_to_update:
-                  - key_path: HKLM:\Software\MyTestKeyA
-                    value_name: MyTestValueA01     # <=> key property/entry name
-                    value_data: 'test "data for ""MyTestValueA01""" %PATH%'     # <=> key property/entry value
-                    value_type: expandstring     # Default: string / Other choices: none, binary, dword, expandstring, multistring, qword
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyB
-                    value_name: MyTestValueB01 
-                    value_data: test data for MyTestValueB01
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyC
-                    value_name: MyTestValueC01
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyD
-                    value_data: test data for MyTestValueB01
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyE
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyX
-                    value_name: MyTestValueX01 
-                    value_data: test data for MyTestValueX01
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyX
-                    value_name: MyTestValueX02 
-                    value_data: test data for MyTestValueX02
-                    type: dword
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyY
-                    value_name: MyTestValueY01 
-                    value_data: test data for MyTestValueY01
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyY
-                    value_name: MyTestValueY02 
-                    value_data: test data for MyTestValueY02
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyZ
-                    value_name: MyTestValueZ01 
-                    value_data: test data for MyTestValueZ01
-                    #
-                  - key_path: HKLM:\Software\MyTestKeyZ
-                    value_name: MyTestValueZ02 
-                    value_data: test data for MyTestValueZ02
-
-              - resource_type: registry
-                operation_type: remove_value
-                items_to_update:
-                  - key_path: HKLM:\Software\MyTestKeyX
-                    value_name: MyTestValueX02
-              
-              - resource_type: registry
-                operation_type: remove_key
-                items_to_update:
-                  - key_path: HKLM:\Software\MyTestKeyZ
+              #- resource_type: registry
+              #  operation_type: set     # Other choices: `remove_value`, `remove_key`, `merge`
+              #  items_to_update:
+              #    - key_path: HKLM:\Software\MyTestKeyA
+              #      value_name: MyTestValueA01     # <=> key property/entry name
+              #      value_data: 'test "data for ""MyTestValueA01""" %PATH%'     # <=> key property/entry value
+              #      value_type: expandstring     # Default: string / Other choices: none, binary, dword, expandstring, multistring, qword
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyB
+              #      value_name: MyTestValueB01 
+              #      value_data: test data for MyTestValueB01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyC
+              #      value_name: MyTestValueC01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyD
+              #      value_data: test data for MyTestValueB01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyE
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyX
+              #      value_name: MyTestValueX01 
+              #      value_data: test data for MyTestValueX01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyX
+              #      value_name: MyTestValueX02 
+              #      value_data: test data for MyTestValueX02
+              #      value_type: expandstring
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyY
+              #      value_name: MyTestValueY01 
+              #      value_data: test data for MyTestValueY01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyY
+              #      value_name: MyTestValueY02 
+              #      value_data: test data for MyTestValueY02
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyZ
+              #      value_name: MyTestValueZ01 
+              #      value_data: test data for MyTestValueZ01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyZ
+              #      value_name: MyTestValueZ02 
+              #      value_data: test data for MyTestValueZ02
 
               #- resource_type: registry
-              #  operation_type: merge
-              #  source:
-              #    upload_file: test/test.reg
+              #  operation_type: remove_value
+              #  items_to_update:
+              #    - key_path: HKLM:\Software\MyTestKeyX
+              #      value_name: MyTestValueX02
+              #
+              #- resource_type: registry
+              #  operation_type: remove_key
+              #  items_to_update:
+              #    - key_path: HKLM:\Software\MyTestKeyZ
               #
               #- resource_type: registry
               #  operation_type: merge
-              #  source:
-              #    file_content: |
-              #      Windows Registry Editor Version 5.00
-              #      
-              #      [HKEY_LOCAL_MACHINE\Software\MyTestKeyE]
-              #      "MyTestValueE01"="Test Data for MyTestKeyE"  
+              #  file_content: |                                     # Priority (1)
+              #    Windows Registry Editor Version 5.00
+              #    
+              #    [HKEY_LOCAL_MACHINE\Software\MyTestKeyE]
+              #    "MyTestValueE99"="Test Data for MyTestKeyE 99"  
+              #    "MyTestValueE88"="Test Data for MyTestKeyE 88"  
+              #  #upload_file: test/test_reg_uploaded.reg       # Priority (2)
+              #  #file_full_url: https://wrong_url/test_reg_wrong.reg 
+              #  #file_full_url: https://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts/test_reg_full_url.reg       # Priority (3)
+              #  #file_relative_url: test/test_reg.reg          # Priority (4)
+              #  #http_auth_username: wrong_username
+              #  #http_auth_password: wrong_password
 
 - name: "Initialize the system"
   hosts: all

@@ -541,10 +541,12 @@
 {# ︵‿︵‿︵‿︵‿ Handle Registry Keys & Properties ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.resource_type == 'registry' %}
 
+{% if update_item.operation_type != 'merge' %}
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Generate list of Windows registry items to update'
   set_fact:
     reg_items_to_update:
 {{ ' ' * 6 }}{% for item in update_item.items_to_update %}{% for key,value in item.items() %}{{ '- ' if loop.first else '  ' }}{{ key }}: {{ value }}{{ '\n' ~ ' ' * 6 }}{% endfor %}{% endfor %}
+{% endif %}
 
 {# (1) Add/Update keys/properties #}
 {% if update_item.operation_type == 'set' %}
@@ -588,16 +590,74 @@
 {# (4) merge .reg file into Registry: upload file #}
 {% elif update_item.operation_type == 'merge' %}
 
-{# (5) merge .reg file into Registry: provide content #}
+{% if update_item.upload_file is defined %}
+  {% set file_name = update_item.upload_file.split('/')[-1] | default(update_item.upload_file) %}
+{% elif update_item.file_full_url is defined %}
+  {% set file_name = update_item.file_full_url.split('/')[-1] %}
+{% elif update_item.file_relative_url is defined %}
+  {% set file_name = update_item.file_relative_url.split('/')[-1] %}
+{% endif %}
 
-- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in a registry file'
-  community.windows.win_regmerge:
-    path: C:\autodeploy\myCompany-settings.reg
-    loop: update_item.items_to_update
-  loop_control:
-    loop_var: reg_update_item
-    label: ""
+{% if update_item.file_content is not defined %}
 
+{% if update_item.upload_file is defined and update_item.upload_file is not none %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
+  win_copy:
+    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.upload_file }}'
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
+
+{% else %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
+  win_get_url:
+{% if update_item.file_full_url is defined and update_item.file_full_url is not none %}
+    url: "{{ update_item.file_full_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+{% elif update_item.file_relative_url is defined and update_item.file_relative_url is not none %}
+    url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ update_item.file_relative_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+{% endif %}
+    url_username: "{{ update_item.http_auth_username | default('{{ http_auth_username }}') }}"
+    url_password: "{{ update_item.http_auth_password | default('{{ http_auth_password }}') }}"
+    timeout: 60
+{% endif %}
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in "{{ file_name }}" file'
+  win_regmerge:
+    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+
+{% else %}{# i.e. 'if update_item.file_content' is defined #}
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Create a temporary .reg file with user-provided content (1/2)'
+  win_tempfile:
+    state: file
+    suffix: ".reg"
+  register: temp_file_result
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Create a temporary .reg file with user-provided content (2/2)'
+  win_shell: |
+    try {
+      $ErrorActionPreference = "Stop"
+      $fileContent = @"
+{{ update_item.file_content | indent(width=4, first=True) }}    "@
+
+      Set-Content -Path "{% raw %}{{ temp_file_result.path }}{% endraw %}" -Value $fileContent
+      Write-Output "[OK_CHANGE] temporary .reg file created."
+      exit 0
+    } catch {
+      Write-Output "[KO_FAILURE] ERROR: $_.Exception.Message"
+      Remove-Item -Recurse -Force "{% raw %}{{ temp_file_result.path }}{% endraw %}" > $null
+      exit 1
+    }
+  register: file_create_result
+  failed_when: file_create_result.rc != 0 or 'KO_FAILURE' in file_create_result.stdout
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in .reg file'
+  win_regmerge:
+    path: '{% raw %}{{ temp_file_result.path }}{% endraw %}'
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Delete the temporary .reg file'
+  win_shell: Remove-Item -Path "{% raw %}{{ temp_file_result.path }}{% endraw %}" -Force
+{% endif %}
 {% endif %}
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations ︵‿︵‿︵‿︵‿ #}

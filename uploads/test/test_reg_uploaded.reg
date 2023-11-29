@@ -1,0 +1,5 @@
+Windows Registry Editor Version 5.00
+                  
+[HKEY_LOCAL_MACHINE\Software\MyTestKeyH]
+"MyTestValueH33"="Test Data for MyTestValueH 33"  
+"MyTestValueH77"="Test Data for MyTestValueH 77"
