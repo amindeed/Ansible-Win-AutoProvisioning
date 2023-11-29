@@ -154,7 +154,6 @@
               #    "MyTestValueE99"="Test Data for MyTestKeyE 99"  
               #    "MyTestValueE88"="Test Data for MyTestKeyE 88"  
               #  #upload_file: test/test_reg_uploaded.reg       # Priority (2)
-              #  #file_full_url: https://wrong_url/test_reg_wrong.reg 
               #  #file_full_url: https://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts/test_reg_full_url.reg       # Priority (3)
               #  #file_relative_url: test/test_reg.reg          # Priority (4)
               #  #http_auth_username: wrong_username
