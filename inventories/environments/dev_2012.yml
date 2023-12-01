@@ -13,4 +13,5 @@ all:
     http_auth_password: "pwdUsr23"
     win_temp_dir_path: 'C:\AWAP_Temp'
     uploads_dir: '../uploads' # Path either full or related to where playbook's main file is located
+    templates_dir: '../templates'
     root_install_dir: D:\AppServ

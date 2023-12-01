@@ -147,6 +147,7 @@
               #
               #- resource_type: registry
               #  operation_type: merge
+              #  file_path: '{{ win_temp_dir_path }}\set_7zip_settings.reg'       # Priority (0)
               #  file_content: |                                     # Priority (1)
               #    Windows Registry Editor Version 5.00
               #    
@@ -172,7 +173,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: init-system/AWAP.PSModules
+                  upload_file: bundles/core/init-system/AWAP.PSModules
                 destination: C:\Program Files\WindowsPowerShell\Modules\
                 #force_overwrite_dest: no # By default, Files are only replaced if different, and folder are forced
                 #skip_if_path_exists: C:\Program Files\WindowsPowerShell\Modules\AWAP.PSModules\
@@ -180,7 +181,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: init-system/starter.ps1
+                  upload_file: bundles/core/init-system/starter.ps1
                 destination: C:\opt\ScriptPS\Starter\
               
               - resource_type: file_system
@@ -237,13 +238,13 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: setup-openjdk/check_JAVA_HOME.ps1
+                  upload_file: bundles/core/setup-openjdk/check_JAVA_HOME.ps1
                 destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: setup-openjdk/set_JAVA_HOME.ps1
+                  upload_file: bundles/core/setup-openjdk/set_JAVA_HOME.ps1
                 destination: D:\AppServ\Java\
 
               - resource_type: file_system
@@ -396,6 +397,21 @@
                 file_relative_url: 7zip/7z2301-x64.msi
                 type: msi
                 root_install_dir: D:\AppServ
+        #post_setup:
+        #  - configurations:
+        #    - update_resource:
+        #      - resource_type: file_system
+        #        operation_type: template
+        #        source:
+        #          upload_template: bundles/core/setup-7zip/set_7zip_settings.reg.j2
+        #        destination: '{{ win_temp_dir_path }}\set_7zip_settings.reg'
+        #  - configurations:
+        #    - update_resource:
+        #      - resource_type: registry
+        #        operation_type: merge
+        #        file_path: '{{ win_temp_dir_path }}\set_7zip_settings.reg'
+        #template_vars:
+        #  install_dir: D:\\AppServ\\7-Zip
 
 
 - name: "Setup OpenSSL"
@@ -650,7 +666,7 @@
         post_setup:
           - executions:
             - run_ps1_script:
-              - upload_file: setup-msoffice/ms-office-kms-activate.ps1
+              - upload_file: bundles/core/setup-msoffice/ms-office-kms-activate.ps1
                 #http_auth_username: john          # These override (only for this 'executionsrun_ps1_script' job) 
                 #http_auth_password: p@ssw0rd      # any globally-defined HTTP auth. credentials
                 arguments: "kms.server.local"

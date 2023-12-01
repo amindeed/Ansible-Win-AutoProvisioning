@@ -590,42 +590,14 @@
 {# (4) merge .reg file into Registry: upload file #}
 {% elif update_item.operation_type == 'merge' %}
 
-{% if update_item.upload_file is defined %}
-  {% set file_name = update_item.upload_file.split('/')[-1] | default(update_item.upload_file) %}
-{% elif update_item.file_full_url is defined %}
-  {% set file_name = update_item.file_full_url.split('/')[-1] %}
-{% elif update_item.file_relative_url is defined %}
-  {% set file_name = update_item.file_relative_url.split('/')[-1] %}
-{% endif %}
+{##}{% if update_item.file_path is defined %}
 
-{% if update_item.file_content is not defined %}
-
-{% if update_item.upload_file is defined and update_item.upload_file is not none %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
-  win_copy:
-    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.upload_file }}'
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
-
-{% else %}
-- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
-  win_get_url:
-{% if update_item.file_full_url is defined and update_item.file_full_url is not none %}
-    url: "{{ update_item.file_full_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
-{% elif update_item.file_relative_url is defined and update_item.file_relative_url is not none %}
-    url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ update_item.file_relative_url }}"
-    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
-{% endif %}
-    url_username: "{{ update_item.http_auth_username | default('{{ http_auth_username }}') }}"
-    url_password: "{{ update_item.http_auth_password | default('{{ http_auth_password }}') }}"
-    timeout: 60
-{% endif %}
-
-- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in "{{ file_name }}" file'
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in .reg file'
   win_regmerge:
-    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+    path: '{{ update_item.file_path }}'
 
-{% else %}{# i.e. 'if update_item.file_content' is defined #}
+{##}
+{% elif update_item.file_content is defined %}
 
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Create a temporary .reg file with user-provided content (1/2)'
   win_tempfile:
@@ -657,8 +629,46 @@
 
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Delete the temporary .reg file'
   win_shell: Remove-Item -Path "{% raw %}{{ temp_file_result.path }}{% endraw %}" -Force
+
+{##}
+{% elif update_item.upload_file is defined %}
+  {% set file_name = update_item.upload_file.split('/')[-1] | default(update_item.upload_file) %}
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
+  win_copy:
+    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.upload_file }}'
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in "{{ file_name }}" file'
+  win_regmerge:
+    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+
+{##}
+{% elif update_item.file_full_url is defined or update_item.file_relative_url is defined %}
+  {% set file_url = update_item.file_full_url | default(update_item.file_relative_url) %}
+  {% set file_name = file_url.split('/')[-1] if file_url is defined else '' %}
+
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
+  win_get_url:
+{% if update_item.file_full_url is defined and update_item.file_full_url is not none %}
+    url: "{{ update_item.file_full_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+{% elif update_item.file_relative_url is defined and update_item.file_relative_url is not none %}
+    url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ update_item.file_relative_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
 {% endif %}
+    url_username: "{{ update_item.http_auth_username | default('{{ http_auth_username }}') }}"
+    url_password: "{{ update_item.http_auth_password | default('{{ http_auth_password }}') }}"
+    timeout: 60
+
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in "{{ file_name }}" file'
+  win_regmerge:
+    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+
 {% endif %}
+{% endif %}{##}
+
+
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations ︵‿︵‿︵‿︵‿ #}
 
@@ -699,7 +709,7 @@
   {% set file_name = update_item.source.file_relative_url.split('/')[-1] %}
 {% endif %}
 
-{# ︵‿︵‿ **Download** Packages from HTTP source ︵‿︵‿ #}
+{# ︵‿︵‿ **Download** files from HTTP source ︵‿︵‿ #}
 
 {# /!\ this is only used in case of 'zip' files to be processed after transfer #}
 - name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
@@ -797,6 +807,53 @@
   when: not check_path.stat.exists | default(false)
 {% endif %}
 {% endif %}
+
+
+
+
+
+{# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Template ︵‿︵‿︵‿︵‿ #}
+{% elif update_item.operation_type == 'template' %}
+
+{% if update_item.source.upload_template is defined %}
+  {% set file_name = update_item.source.upload_template.split('/')[-1] | default(update_item.source.upload_template) %}
+{% elif update_item.source.file_full_url is defined %}
+  {% set file_name = update_item.source.file_full_url.split('/')[-1] %}
+{% elif update_item.source.file_relative_url is defined %}
+  {% set file_name = update_item.source.file_relative_url.split('/')[-1] %}
+{% endif %}
+
+{# ︵‿︵‿ **Download** files from HTTP source ︵‿︵‿ #}
+{% if update_item.source.upload_template is not defined and (update_item.source.file_full_url is defined or update_item.source.file_relative_url is defined) %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Download template '{{ file_name }}'"
+  win_get_url:
+{% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
+    url: "{{ update_item.source.file_full_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+{% elif update_item.source.file_relative_url is defined and update_item.source.file_relative_url is not none %}
+    url: "{% raw %}{{ pkgs_repo_base_url }}{% endraw %}/{{ update_item.source.file_relative_url }}"
+    dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+{% endif %}
+    url_username: "{{ update_item.source.http_auth_username | default('{{ http_auth_username }}') }}"
+    url_password: "{{ update_item.source.http_auth_password | default('{{ http_auth_password }}') }}"
+    timeout: 60
+{% endif %}
+
+{# ︵‿︵‿ **Upload** files from Ansible Controller machine ︵‿︵‿ #}
+{% if update_item.source.upload_template is defined and update_item.source.upload_template is not none %}
+- name: "{{ label }} ({{ loop.index }}/{{ loop.length }}) Upload template '{{ file_name }}' to target host"
+  #win_copy:
+  win_template:
+    src: '{% raw %}{{ templates_dir }}{% endraw %}/{{ update_item.source.upload_template }}'
+    #dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
+    dest: '{{ update_item.destination }}'
+{% endif %}
+
+
+
+
+
+
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Move/Rename ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'move' %}
