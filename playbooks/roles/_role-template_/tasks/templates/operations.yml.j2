@@ -809,9 +809,6 @@
 {% endif %}
 
 
-
-
-
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Template ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'template' %}
 
@@ -869,7 +866,7 @@
             exit 0
         }
     } catch {
-        Write-Output "[KO_FAILURE] $_"
+        Write-Output "[KO_FAILURE] ERROR: $_.Exception.Message"
         exit 1
     }
   register: move_op_result
@@ -937,6 +934,49 @@
   win_file:
     path: '{% raw %}{{ expand_item_path.stdout_lines[0] }}{% endraw %}'
     state: absent
+
+
+{# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Remove ︵‿︵‿︵‿︵‿ #}
+{% elif update_item.operation_type == 'remove_bypattern' %}
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Remove items in "{{ update_item.base_directory }}" matching given pattern'
+  win_shell: |
+    try {
+        $filesToDelete = Get-ChildItem -Path '{{ update_item.base_directory }}' -File{% if update_item.recursive is defined and update_item.recursive %} -Recurse{% endif %} |
+                        Where-Object { $_.FullName {% if update_item.isregex is defined and update_item.isregex %}-match{% else %}-like{% endif %} '{{ update_item.pattern }}' }
+
+        $allDeletedFiles = ''
+        if ($filesToDelete.Count -gt 0) {
+            foreach ($fileToDelete in $filesToDelete) {
+                {% if update_item.show_removed_items is not defined or update_item.show_removed_items %}Remove-Item $fileToDelete.FullName -Force; $allDeletedFiles += $fileToDelete.FullName + "`n"{% else %}Remove-Item $fileToDelete.FullName -Force{% endif %}
+
+            }
+            Write-Output "[OK_CHANGED] Matching files deleted successfully."
+            {% if update_item.show_removed_items is not defined or update_item.show_removed_items %}Write-Output $allDeletedFiles{% endif %}
+
+        } else {
+            Write-Output "[OK_NO_CHANGE] No matching files found."
+        }
+    } catch {
+        Write-Output "[KO_FAILURE] ERROR: $_.Exception.Message"
+        Write-Output "Items deleted so far:`n$allDeletedFiles"
+        exit 1
+    }
+  register: remove_bypattern_op_result
+  changed_when: remove_bypattern_op_result.rc == 0 and 'OK_CHANGE' in remove_bypattern_op_result.stdout
+  failed_when: remove_bypattern_op_result.rc != 0 or 'KO_FAILURE' in remove_bypattern_op_result.stdout
+
+{% if update_item.show_removed_items is not defined or update_item.show_removed_items %}
+- name: '{{ label }} ({{ loop.index }}/{{ loop.length }}) Show deleted items'
+  debug:
+    msg: '{% raw %}{{ stdout_line }}{% endraw %}'
+  loop: '{% raw %}{{ remove_bypattern_op_result.stdout_lines }}{% endraw %}'
+  loop_control:
+    loop_var: stdout_line
+    label: ""
+
+
+  when: remove_bypattern_op_result.rc == 0 and 'OK_CHANGE' in remove_bypattern_op_result.stdout
+{% endif %}
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Append ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'append' %}
@@ -1034,10 +1074,6 @@
 
 
 {# ....
-
-- create
-  - source
-    - template
 
 - modify
   - type

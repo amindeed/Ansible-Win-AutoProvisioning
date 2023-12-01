@@ -1,1 +1,8 @@
 # .....
+
+# - Patches: 
+#   - https://docs.ansible.com/ansible/latest/collections/community/windows/win_pagefile_module.html
+
+# - Messages to logged in users:
+#   - https://docs.ansible.com/ansible/latest/collections/community/windows/win_msg_module.html
+#   - https://docs.ansible.com/ansible/latest/collections/community/windows/win_toast_module.html
