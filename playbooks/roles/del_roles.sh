@@ -10,4 +10,18 @@
 #
 #cd "$original_dir"
 
-find /home/amine/Ansible_Windows_Auto_Provisioning/main/playbooks/roles/ans-win-auto-prov/temp -mindepth 1 -delete
+#find /home/amine/Ansible_Windows_Auto_Provisioning/main/playbooks/roles/ans-win-auto-prov/temp -mindepth 1 -delete
+
+
+directory="/home/amine/Ansible_Windows_Auto_Provisioning/main/playbooks/roles/ans-win-auto-prov/temp"
+
+# Check if .gitignore exists directly in the directory
+gitignore_path="$directory/.gitignore"
+if [ -e "$gitignore_path" ]; then
+    # Remove all files and subdirectories except .gitignore
+    find "$directory" -mindepth 1 ! -name '.gitignore' -exec rm -r {} \;
+else
+    # .gitignore does not exist directly in the directory
+    echo "The .gitignore file is not found directly in the directory."
+fi
+
