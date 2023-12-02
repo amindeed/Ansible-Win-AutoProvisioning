@@ -10,8 +10,9 @@
   gather_facts: no
   tags: nodejs
   roles:
-    - role: setup-nodejs
+    - role: ans-win-auto-prov
       vars:
+        shortname: nodejs
         setup:
           - installations:
             - software_components:
@@ -71,8 +72,9 @@
   gather_facts: no
   tags: eclipseide
   roles:
-    - role: setup-eclipseide
+    - role: ans-win-auto-prov
       vars:
+        shortname: eclipseide
         setup:
           - installations:
             - software_components:
@@ -155,31 +157,34 @@
   gather_facts: no
   tags: cygwin
   roles:
-    - role: setup-cygwin
-      setup:
-        - configurations:
-          - update_resource:  
-            - resource_type: file_system
-              operation_type: transfer
-              source:
-                file_relative_url: cygwin/cygwin64install_cyg_v3_4_9.zip
-              destination: D:\AppServ\Cygwin\
-              unzip: yes # Default: 'no'
-              force_overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
-        - installations:
-          - software_components:
-            - software_fullname: Cygwin
-              file_relative_url: cygwin/cygwin_v3_4_9_setup-x86_64.exe
-              type: exe
-              arguments: --quiet-mode --local-install --local-package-dir D:\AppServ\Cygwin\cygwin64install --root D:\AppServ\Cygwin\cygwin64 --no-shortcuts --packages libpopt-common,terminfo,tzdata,cygwin-devel,w32api-headers,windows-default-manifest,libsource-highlight-common,publicsuffix-list-dafsa,libgsasl-common,gsettings-desktop-schemas,cygwin,libiconv2,libintl8,w32api-runtime,libintl-devel,libncursesw10,libreadline7,bash,libzstd1,crypto-policies,base-cygwin,zlib0,libpng16,libgpg-error0,libpcre1,libidn12,libjbig2,libdeflate0,libXdmcp6,libXau6,libwebp7,liblcms2_2,libbrotlicommon1,libnghttp2_14,libidn2_0,libntlm0,libkrb5support0,libedit0,cygrunsrv,libpkgconf4,libsqlite3_0,m4,libatomic1,libiconv,gettext,libxxhash0,libexpat1,libcrypt2,libltdl7,libffi8,libunistring5,which,vim-minimal,tzcode,sed,run,ncurses,mintty,login,libtasn1_6,libsmartcols1,libsigsegv2,libpopt0,libpipeline1,libpcre2_8_0,liblzma5,liblz4_1,libgmp10,libgcc1,libffi6,libbz2_1,libattr1,libargp,ipc-utils,hostname,gzip,editrights,diffutils,dash,binutils,alternatives,libgcrypt20,libxcb1,libwebpmux3,libwebpdemux2,libbrotlidec1,libk5crypto3,pkgconf,libtool,libpsl5,cygutils,less,grep,libxml2,xz,libisl23,libjpeg8,libcom_err2,libquadmath0,libgomp1,perl_base,libgc1,libuuid1,libstdc++6,libmpfr6,libgdbm6,libp11-kit0,file,bzip2,coreutils,getent,rebase,info,_autorebase,libfreetype6,pkg-config,libglib2.0_0,desktop-file-utils,libkrb5_3,libimagequant0,libguile3.0_1,libblkid1,libgraphite2_3,libtiff6,libdb5.3,libicu61,libncurses++w10,zstd,libuchardet0,libmpc3,gawk,libgdbm_compat4,p11-kit-trust,p11-kit,findutils,gamin,libfam0,libgssapi_krb5_2,make,libfdisk1,libboost_regex1.66,libncurses-devel,tar,groff,gcc-core,csih,perl,ca-certificates,base-files,shared-mime-info,libgsasl18,util-linux,libsource-highlight4,gcc-g++,autoconf2.1,perl-JSON-PP,libssl3,libssl1.1,libharfbuzz0,libfribidi0,man-db,perl_autorebase,openssl,libsasl2_3,libssh2_1,libfido2,python39,python39-platformdirs,python39-setuptools,rsync,libraqm0,autoconf2.7,autoconf2.5,texinfo,perl-TermReadKey,perl-Error,libopenldap2,openssh,python39-iniconfig,python39-six,python39-idna,python39-toml,python39-pluggy,python39-babel,python39-markupsafe,python39-snowballstemmer,python39-imagesize,python39-olefile,python39-chardet,autoconf,libopenldap2_4_2,libcurl4,python39-urllib3,python39-jinja2,automake1.9,automake1.16,automake1.13,automake1.12,automake1.11,automake1.10,automake1.14,automake1.15,git,python39-requests,python39-pyparsing,automake,python39-packaging,python39-pytest,python39-imaging,python39-pygments,python39-docutils,python39-sphinx,python39-pip,python39-sphinxcontrib-serializinghtml,python3,gdb,gettext-devel,libsodium-common,xxd,libsodium23,vim-common,vim
-              manual_registration:
-                root_install_dir: D:\AppServ
-                main_app_launcher: cygwin64\bin\mintty.exe
-                desktop_shortcut: yes
-                startmenu_shortcut: yes
-                shortcut_arguments: '-i /Cygwin-Terminal.ico -'
-                shortcut_icon: D:\AppServ\Cygwin\cygwin64\Cygwin.ico  # Provide full path, optionnally followed with icon index, e.g. 'filpath,12'
-              #abort_on_aftercheck_failure: no # Temporarilly...
+  roles:
+    - role: ans-win-auto-prov
+      vars:
+        shortname: cygwin
+        setup:
+          - configurations:
+            - update_resource:  
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  file_relative_url: cygwin/cygwin64install_cyg_v3_4_9.zip
+                destination: D:\AppServ\Cygwin\
+                unzip: yes # Default: 'no'
+                force_overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
+          - installations:
+            - software_components:
+              - software_fullname: Cygwin
+                file_relative_url: cygwin/cygwin_v3_4_9_setup-x86_64.exe
+                type: exe
+                arguments: --quiet-mode --local-install --local-package-dir D:\AppServ\Cygwin\cygwin64install --root D:\AppServ\Cygwin\cygwin64 --no-shortcuts --packages libpopt-common,terminfo,tzdata,cygwin-devel,w32api-headers,windows-default-manifest,libsource-highlight-common,publicsuffix-list-dafsa,libgsasl-common,gsettings-desktop-schemas,cygwin,libiconv2,libintl8,w32api-runtime,libintl-devel,libncursesw10,libreadline7,bash,libzstd1,crypto-policies,base-cygwin,zlib0,libpng16,libgpg-error0,libpcre1,libidn12,libjbig2,libdeflate0,libXdmcp6,libXau6,libwebp7,liblcms2_2,libbrotlicommon1,libnghttp2_14,libidn2_0,libntlm0,libkrb5support0,libedit0,cygrunsrv,libpkgconf4,libsqlite3_0,m4,libatomic1,libiconv,gettext,libxxhash0,libexpat1,libcrypt2,libltdl7,libffi8,libunistring5,which,vim-minimal,tzcode,sed,run,ncurses,mintty,login,libtasn1_6,libsmartcols1,libsigsegv2,libpopt0,libpipeline1,libpcre2_8_0,liblzma5,liblz4_1,libgmp10,libgcc1,libffi6,libbz2_1,libattr1,libargp,ipc-utils,hostname,gzip,editrights,diffutils,dash,binutils,alternatives,libgcrypt20,libxcb1,libwebpmux3,libwebpdemux2,libbrotlidec1,libk5crypto3,pkgconf,libtool,libpsl5,cygutils,less,grep,libxml2,xz,libisl23,libjpeg8,libcom_err2,libquadmath0,libgomp1,perl_base,libgc1,libuuid1,libstdc++6,libmpfr6,libgdbm6,libp11-kit0,file,bzip2,coreutils,getent,rebase,info,_autorebase,libfreetype6,pkg-config,libglib2.0_0,desktop-file-utils,libkrb5_3,libimagequant0,libguile3.0_1,libblkid1,libgraphite2_3,libtiff6,libdb5.3,libicu61,libncurses++w10,zstd,libuchardet0,libmpc3,gawk,libgdbm_compat4,p11-kit-trust,p11-kit,findutils,gamin,libfam0,libgssapi_krb5_2,make,libfdisk1,libboost_regex1.66,libncurses-devel,tar,groff,gcc-core,csih,perl,ca-certificates,base-files,shared-mime-info,libgsasl18,util-linux,libsource-highlight4,gcc-g++,autoconf2.1,perl-JSON-PP,libssl3,libssl1.1,libharfbuzz0,libfribidi0,man-db,perl_autorebase,openssl,libsasl2_3,libssh2_1,libfido2,python39,python39-platformdirs,python39-setuptools,rsync,libraqm0,autoconf2.7,autoconf2.5,texinfo,perl-TermReadKey,perl-Error,libopenldap2,openssh,python39-iniconfig,python39-six,python39-idna,python39-toml,python39-pluggy,python39-babel,python39-markupsafe,python39-snowballstemmer,python39-imagesize,python39-olefile,python39-chardet,autoconf,libopenldap2_4_2,libcurl4,python39-urllib3,python39-jinja2,automake1.9,automake1.16,automake1.13,automake1.12,automake1.11,automake1.10,automake1.14,automake1.15,git,python39-requests,python39-pyparsing,automake,python39-packaging,python39-pytest,python39-imaging,python39-pygments,python39-docutils,python39-sphinx,python39-pip,python39-sphinxcontrib-serializinghtml,python3,gdb,gettext-devel,libsodium-common,xxd,libsodium23,vim-common,vim
+                manual_registration:
+                  root_install_dir: D:\AppServ
+                  main_app_launcher: cygwin64\bin\mintty.exe
+                  desktop_shortcut: yes
+                  startmenu_shortcut: yes
+                  shortcut_arguments: '-i /Cygwin-Terminal.ico -'
+                  shortcut_icon: D:\AppServ\Cygwin\cygwin64\Cygwin.ico  # Provide full path, optionnally followed with icon index, e.g. 'filpath,12'
+                #abort_on_aftercheck_failure: no # Temporarilly...
 
 
 - name: "Setup DBeaver"
@@ -187,8 +192,9 @@
   gather_facts: no
   tags: dbeaver
   roles:
-    - role: setup-dbeaver
+    - role: ans-win-auto-prov
       vars:
+        shortname: dbeaver
         setup:
           - installations:
             - software_components:
@@ -203,8 +209,9 @@
   gather_facts: no
   tags: gitextensions
   roles:
-    - role: setup-gitextensions
+    - role: ans-win-auto-prov
       vars:
+        shortname: gitextensions
         pre_setup:
           - installations:
             - software_components:
@@ -234,8 +241,9 @@
   gather_facts: no
   tags: umldesigner
   roles:
-    - role: setup-umldesigner
+    - role: ans-win-auto-prov
       vars:
+        shortname: umldesigner
         setup:
           - installations:
             - software_components:
@@ -254,8 +262,9 @@
   gather_facts: no
   tags: maven
   roles:
-    - role: setup-maven
+    - role: ans-win-auto-prov
       vars:
+        shortname: maven
         setup:
           - installations:
             - software_components:
@@ -280,8 +289,9 @@
   gather_facts: no
   tags: python2
   roles:
-    - role: setup-python2
+    - role: ans-win-auto-prov
       vars:
+        shortname: python2
         pre_setup:
           - configurations:
             - update_resource:
@@ -310,8 +320,9 @@
   gather_facts: no
   tags: python312
   roles:
-    - role: setup-python312
+    - role: ans-win-auto-prov
       vars:
+        shortname: python312
         pre_setup:
           - configurations:
             - update_resource:

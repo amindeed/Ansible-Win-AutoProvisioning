@@ -1,11 +1,18 @@
 ---
-- name: 'Generate "PRE-SETUP" tasks file from template'
+- name: 'Generate "PRE-SETUP" tasks file from template (1/2)'
   template:
     src: "{{ role_path }}/tasks/templates/operations.yml.j2"
-    dest: "{{ role_path }}/temp/01_{{ role_name }}__pre-setup.yml"
+    dest: "{{ role_path }}/temp/01_{{ shortname | default('') }}__pre-setup.yml"
   vars:
     label: "[PRE-SETUP]"
     setup_phase: pre_setup
+    short_name: "{{ shortname | default('') }}"
     setup_phase_operations: "{{ pre_setup | default([]) }}"
   delegate_to: localhost
   changed_when: false
+  #register: presetup_template_output
+
+#- name: 'Generate "PRE-SETUP" tasks file from template (2/2)'
+#  ansible.builtin.copy:
+#    content: "{{ presetup_template_output.stdout }}"
+#    dest: "{{ role_path }}/temp/01_{{ shortname | default('') }}__pre-setup.yml"

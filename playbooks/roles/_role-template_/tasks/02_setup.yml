@@ -1,11 +1,18 @@
 ---
-- name: 'Generate "SETUP" tasks file from template'
+- name: 'Generate "SETUP" tasks file from template (1/2)'
   template:
     src: "{{ role_path }}/tasks/templates/operations.yml.j2"
-    dest: "{{ role_path }}/temp/02_{{ role_name }}__setup.yml"
+    dest: "{{ role_path }}/temp/02_{{ shortname | default('') }}__setup.yml"
   vars:
     label: "[SETUP]"
     setup_phase: setup
+    short_name: "{{ shortname | default('') }}"
     setup_phase_operations: "{{ setup | default([]) }}"
   delegate_to: localhost
   changed_when: false
+  #register: setup_template_output
+
+#- name: 'Generate "SETUP" tasks file from template (2/2)'
+#  ansible.builtin.copy:
+#    content: "{{ setup_template_output.stdout }}"
+#    dest: "{{ role_path }}/temp/01_{{ shortname | default('') }}__setup.yml"

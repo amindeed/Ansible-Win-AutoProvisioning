@@ -6,3 +6,5 @@
 # - Messages to logged in users:
 #   - https://docs.ansible.com/ansible/latest/collections/community/windows/win_msg_module.html
 #   - https://docs.ansible.com/ansible/latest/collections/community/windows/win_toast_module.html
+
+# - For 'Find & Replace' and 'Insert': https://docs.ansible.com/ansible/latest/collections/community/windows/win_lineinfile_module.html

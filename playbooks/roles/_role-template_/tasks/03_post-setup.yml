@@ -1,11 +1,18 @@
 ---
-- name: 'Generate "POST-SETUP" tasks file from template'
+- name: 'Generate "POST-SETUP" tasks file from template (1/2)'
   template:
     src: "{{ role_path }}/tasks/templates/operations.yml.j2"
-    dest: "{{ role_path }}/temp/03_{{ role_name }}__post-setup.yml"
+    dest: "{{ role_path }}/temp/03_{{ shortname | default('') }}__post-setup.yml"
   vars:
     label: "[POST-SETUP]"
     setup_phase: post_setup
+    short_name: "{{ shortname | default('') }}"
     setup_phase_operations: "{{ post_setup | default([]) }}"
   delegate_to: localhost
   changed_when: false
+  #register: postsetup_template_output
+
+#- name: 'Generate "POST-SETUP" tasks file from template (2/2)'
+#  ansible.builtin.copy:
+#    content: "{{ postsetup_template_output.stdout }}"
+#    dest: "{{ role_path }}/temp/01_{{ shortname | default('') }}__setup.yml"

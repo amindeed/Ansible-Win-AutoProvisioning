@@ -6,7 +6,7 @@
 #  gather_facts: no
 #  tags: test
 #  roles:
-#    - role: test
+#    - role: ans-win-auto-prov
 #      vars:
 #        setup:
 #          - executions:
@@ -22,7 +22,7 @@
 #  gather_facts: no
 #  tags: test
 #  roles:
-#    - role: test
+#    - role: ans-win-auto-prov
 #      vars:
 #        pre_setup:
 #          - checks:
@@ -36,7 +36,7 @@
 #  gather_facts: no
 #  tags: test
 #  roles:
-#    - role: test
+#    - role: ans-win-auto-prov
 #      vars:
 #        pre_setup:
 #          - checks:
@@ -53,7 +53,7 @@
 #  gather_facts: no
 #  tags: test
 #  roles:
-#    - role: test
+#    - role: ans-win-auto-prov
 #      vars:
 #        post_setup:
 #          - checks:
@@ -79,16 +79,16 @@
 #
 
 
-- name: "TEST"
-  hosts: all
-  gather_facts: no
-  tags: test
-  roles:
-    - role: test
-      vars:
-        pre_setup:
-          - configurations:
-            - update_resource:
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: ans-win-auto-prov
+#      vars:
+#        pre_setup:
+#          - configurations:
+#            - update_resource:
               #- resource_type: registry
               #  operation_type: set     # Other choices: `remove_value`, `remove_key`, `merge`
               #  items_to_update:
@@ -159,6 +159,7 @@
               #  #file_relative_url: test/test_reg.reg          # Priority (4)
               #  #http_auth_username: wrong_username
               #  #http_auth_password: wrong_password
+              #
               #- resource_type: file_system
               #  operation_type: remove_bypattern
               #  base_directory: D:\data
@@ -167,14 +168,34 @@
               #  recursive: yes # Default: 'no'
               #  show_removed_items: yes # Default: 'yes'
               #  #Regex here would match: "D:\data\mydata_sql_full\2023_files\january-allreports\ACCOUNTINGreports001.xlsx"
+              #
+              #- resource_type: file_system
+              #  operation_type: create
+              #  source:
+              #    # You have to put at least one non-blank character
+              #    file_content: |
+              #      .
+              #  # For files, parent directory should exist already
+              #  destination: D:\foo.txt
+              #
+              #- resource_type: file_system
+              #  operation_type: prepend
+              #  source:
+              #    file_content: |
+              #      AAAAAAAAAAAAAA
+              #      BBBBBBBBBBBBBB
+              #      CCCCCCCCCCCCCC
+              #  destination: D:\foo.txt
+
 
 - name: "Initialize the system"
   hosts: all
   gather_facts: no
   tags: initsys
   roles:
-    - role: init-system
+    - role: ans-win-auto-prov
       vars:
+        shortname: initsys
         pre_setup:
           - configurations:
             - update_resource:
@@ -214,8 +235,9 @@
   gather_facts: no
   tags: openjdk
   roles:
-    - role: setup-openjdk
+    - role: ans-win-auto-prov
       vars:
+        shortname: openjdk
         setup:
           - installations:
             - software_components:
@@ -268,8 +290,9 @@
   gather_facts: no
   tags: notepadpp
   roles:
-    - role: setup-notepadpp
+    - role: ans-win-auto-prov
       vars:
+        shortname: notepadpp
         setup:
           - installations:
             - software_components:
@@ -396,8 +419,9 @@
   gather_facts: no
   tags: 7zip
   roles:
-    - role: setup-7zip
+    - role: ans-win-auto-prov
       vars:
+        shortname: 7zip
         setup:
           - installations:
             - software_components:
@@ -427,8 +451,9 @@
   gather_facts: no
   tags: openssl
   roles:
-    - role: setup-openssl
+    - role: ans-win-auto-prov
       vars:
+        shortname: openssl
         pre_setup:
           - installations:
             - software_components:
@@ -457,8 +482,9 @@
   gather_facts: no
   tags: keepass
   roles:
-    - role: setup-keepass
+    - role: ans-win-auto-prov
       vars:
+        shortname: keepass
         setup:
           - installations:
             - software_components:
@@ -473,8 +499,9 @@
   gather_facts: no
   tags: firefox
   roles:
-    - role: setup-firefox
+    - role: ans-win-auto-prov
       vars:
+        shortname: firefox
         setup:
           - installations:
             - software_components:
@@ -489,8 +516,9 @@
   gather_facts: no
   tags: drawio
   roles:
-    - role: setup-drawio
+    - role: ans-win-auto-prov
       vars:
+        shortname: drawio
         setup:
           - installations:
             - software_components:
@@ -505,8 +533,9 @@
   gather_facts: no
   tags: pandoc
   roles:
-    - role: setup-pandoc
+    - role: ans-win-auto-prov
       vars:
+        shortname: pandoc
         setup:
           - installations:
             - software_components:
@@ -521,8 +550,9 @@
   gather_facts: no
   tags: beyondcompare
   roles:
-    - role: setup-beyondcompare
+    - role: ans-win-auto-prov
       vars:
+        shortname: beyondcompare
         setup:
           - installations:
             - software_components:
@@ -537,8 +567,9 @@
   gather_facts: no
   tags: adobereader
   roles:
-    - role: setup-adobereader
+    - role: ans-win-auto-prov
       vars:
+        shortname: adobereader
         setup:
           - installations:
             - software_components:
@@ -553,8 +584,9 @@
   gather_facts: no
   tags: greenshot
   roles:
-    - role: setup-greenshot
+    - role: ans-win-auto-prov
       vars:
+        shortname: greenshot
         setup:
           - installations:
             - software_components:
@@ -571,8 +603,9 @@
   gather_facts: no
   tags: keystoreexplorer
   roles:
-    - role: setup-keystoreexplorer
+    - role: ans-win-auto-prov
       vars:
+        shortname: keystoreexplorer
         setup:
           - installations:
             - software_components:
@@ -588,8 +621,9 @@
   gather_facts: no
   tags: marktext
   roles:
-    - role: setup-marktext
+    - role: ans-win-auto-prov
       vars:
+        shortname: marktext
         setup:
           - installations:
             - software_components:
@@ -610,8 +644,9 @@
   gather_facts: no
   tags: vscode
   roles:
-    - role: setup-vscode
+    - role: ans-win-auto-prov
       vars:
+        shortname: vscode
         pre_setup:
           - configurations:
             - update_resource:
@@ -652,8 +687,9 @@
   gather_facts: no
   tags: msoffice
   roles:
-    - role: setup-msoffice
+    - role: ans-win-auto-prov
       vars:
+        shortname: msoffice
         pre_setup:
           - checks:
             - check_net_flows:
@@ -687,8 +723,9 @@
   gather_facts: no
   tags: sysinternals
   roles:
-    - role: setup-sysinternals
+    - role: ans-win-auto-prov
       vars:
+        shortname: sysinternals
         setup:
           - installations:
             - software_components:
@@ -706,8 +743,9 @@
   gather_facts: no
   tags: regshot
   roles:
-    - role: setup-regshot
+    - role: ans-win-auto-prov
       vars:
+        shortname: regshot
         setup:
           - installations:
             - software_components:
@@ -725,8 +763,9 @@
   gather_facts: no
   tags: dependencywalker
   roles:
-    - role: setup-dependencywalker
+    - role: ans-win-auto-prov
       vars:
+        shortname: dependencywalker
         setup:
           - installations:
             - software_components:
@@ -744,8 +783,9 @@
   gather_facts: no
   tags: treesize
   roles:
-    - role: setup-treesize
+    - role: ans-win-auto-prov
       vars:
+        shortname: treesize
         setup:
           - installations:
             - software_components:
