@@ -97,13 +97,13 @@
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set JAVA HOME.lnk'
                 icon: D:\AppServ\Java\Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)\bin\java.exe,0
 
-  tasks:
-    - name: '[POST-SETUP] {OPENJDK} Notify logged in users with a message'
-      community.windows.win_msg:
-        display_seconds: 259200
-        msg: "** SYSTEM ADMIN ** \n\nJAVA configuration updated. Please, save your work and log off to enable them."
-      changed_when: false
-      no_log: yes
+  #tasks:
+  #  - name: '[POST-SETUP] {OPENJDK} Notify logged in users with a message'
+  #    community.windows.win_msg:
+  #      display_seconds: 259200
+  #      msg: "** SYSTEM ADMIN ** \n\nJAVA configurations updated. Please, save your work and log off (sign out) to enable them."
+  #    changed_when: false
+  #    no_log: yes
 
 
 - name: "Setup Notepad++"

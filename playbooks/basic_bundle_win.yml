@@ -54,13 +54,13 @@
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set NodeJs Version.lnk'
                 icon: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64\node.exe,0
 
-  tasks:
-    - name: '[POST-SETUP] {NODEJS} Notify logged in users with a message'
-      community.windows.win_msg:
-        display_seconds: 259200
-        msg: "** SYSTEM ADMIN ** \n\nNode.JS configurations updated. Please, save your work and log off to enable them."
-      changed_when: false
-      no_log: yes
+  #tasks:
+  #  - name: '[POST-SETUP] {NODEJS} Notify logged in users with a message'
+  #    community.windows.win_msg:
+  #      display_seconds: 259200
+  #      msg: "** SYSTEM ADMIN ** \n\nNode.JS configurations updated. Please, save your work and log off (sign out) to enable them."
+  #    changed_when: false
+  #    no_log: yes
 
 
 - name: "Setup Eclipse IDE for JEE: 2022-12, 2020-06, Oxygen (2017-06) and Neon 3 (2016-06)"
@@ -371,10 +371,10 @@
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set Python Version.lnk'
                 icon: D:\AppServ\Python2\python.exe,0
 
-  tasks:
-    - name: '[POST-SETUP] {PYTHON312} Notify logged in users with a message'
-      community.windows.win_msg:
-        display_seconds: 259200
-        msg: "** SYSTEM ADMIN ** \n\nSystem configurations updated. Please, save your work and log off to enable them."
-      changed_when: false
-      no_log: yes
+  #tasks:
+  #  - name: '[POST-SETUP] {PYTHON312} Notify logged in users with a message'
+  #    community.windows.win_msg:
+  #      display_seconds: 259200
+  #      msg: "** SYSTEM ADMIN ** \n\nPython configurations updated. Please, save your work and log off (sign out) to enable them."
+  #    changed_when: false
+  #    no_log: yes

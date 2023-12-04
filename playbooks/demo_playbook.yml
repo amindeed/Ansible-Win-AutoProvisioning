@@ -8,7 +8,7 @@
     - name: Notify logged in users by a message
       community.windows.win_msg:
         display_seconds: 259200
-        msg: "** SYSTEM ADMIN ** \n\nSystem configurations updated. \nPlease, save your work and log off to enable them."
+        msg: "** SYSTEM ADMIN ** \n\nSystem configurations updated. \nPlease, save your work and log off (sign out) to enable them."
       changed_when: false
       no_log: yes
 
