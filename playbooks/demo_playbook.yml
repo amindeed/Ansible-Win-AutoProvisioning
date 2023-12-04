@@ -1,10 +1,254 @@
+---
 # .....
+
+- name: Test msg
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Notify logged in users by a message
+      community.windows.win_msg:
+        display_seconds: 259200
+        msg: "** SYSTEM ADMIN ** \n\nSystem configurations updated. \nPlease, save your work and log off to enable them."
+      changed_when: false
+      no_log: yes
 
 # - Patches: 
 #   - https://docs.ansible.com/ansible/latest/collections/community/windows/win_pagefile_module.html
 
 # - Messages to logged in users:
 #   - https://docs.ansible.com/ansible/latest/collections/community/windows/win_msg_module.html
-#   - https://docs.ansible.com/ansible/latest/collections/community/windows/win_toast_module.html
+#   - ~~https://docs.ansible.com/ansible/latest/collections/community/windows/win_toast_module.html~~
 
 # - For 'Find & Replace' and 'Insert': https://docs.ansible.com/ansible/latest/collections/community/windows/win_lineinfile_module.html
+
+# - check if registry key exist
+
+
+#- name: Setup Node.JS v14, v16 and v18
+#  hosts: all
+#  gather_facts: no
+#  tags: nodejs
+#  roles:
+#    - role: ans-win-auto-prov
+#      vars:
+#        shortname: nodejs
+#        post_setup:
+#          - configurations:
+#            - resource_type: file_system
+#              operation_type: create
+#              source:
+#                file_content: |
+#                  TEST TEST TEST TEST TEST
+#                  TEST TEST TEST TEST TEST
+#              destination: D:\AppServ\NodeJS\test.txt
+
+
+
+#- name: "Setup Greenshot"
+#  hosts: all
+#  gather_facts: no
+#  tags: greenshot
+#  roles:
+#    - role: ans-win-auto-prov
+#      vars:
+#        shortname: greenshot
+#        setup:
+#          - installations:
+#            - software_components:
+#              - software_fullname: "Greenshot"
+#                file_relative_url: greenshot/Greenshot-INSTALLER-1.2.10.6-RELEASE.exe
+#                #http_auth_username: john          # These override (only for this 'software_components' item) 
+#                #http_auth_password: p@ssw0rd      # any globally-defined HTTP auth. credentials
+#                type: exe
+#                arguments: /DIR=D:\AppServ\Greenshot /VERYSILENT /NORESTART
+
+
+# ---------------- From 'core' playbook ---------------------
+
+
+
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: ans-win-auto-prov
+#      vars:
+#        setup:
+#          - executions:
+#            - run_executable:
+#              - exec_full_path: D:\AppServ\Python312\python.exe
+#                # /!\ For `arguments`, you have to escape special characters and enclose strings with spaces in [double] quotes /!\
+#                #arguments: '"D:\xxx yyy\test.py" --first_name "Mateusz" --last_name "Kowalczyk" --output_file "test_output.txt"'
+#                arguments: '"C:\Users\nader\Desktop\aaa bbb\test.py"'
+#                working_directory: D:\
+
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: ans-win-auto-prov
+#      vars:
+#        pre_setup:
+#          - checks:
+#            - check_http_status:
+#              - target_url: http://192.168.66.1:3000/amine/ansible-windows-auto-provisioning/commits/branch/main
+#                #follow_redirects: yes # Default: 'no'
+#                #abort_on_failure: yes # Default: 
+
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: ans-win-auto-prov
+#      vars:
+#        pre_setup:
+#          - checks:
+#            - check_service_status:
+#              #- service_name_pattern: WinRM
+#              - service_name_pattern: '"*winrm*"'  # /!\ For patterns, note the double quotes enclosure: '" ... "'
+#                gather_info:
+#                  - state
+#                  #- start_mode
+#                  #- path
+
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: ans-win-auto-prov
+#      vars:
+#        post_setup:
+#          - checks:
+#            - check_ports:
+#              - protocol: udp
+#                ports_to_check:
+#                  - 49669
+#                  - 49668
+#                  - 49667
+#              - protocol: udp
+#                ports_to_check:
+#                  - 5355
+#                  - 5353
+#              - protocol: tcp
+#                ports_to_check:
+#                  - 445
+#                  - 135
+#                  - 49669
+#              - protocol: tcp
+#                ports_to_check:
+#                  - 5355
+#                  - 5353
+#
+
+
+#- name: "TEST"
+#  hosts: all
+#  gather_facts: no
+#  tags: test
+#  roles:
+#    - role: ans-win-auto-prov
+#      vars:
+#        pre_setup:
+#          - configurations:
+#            - update_resource:
+              #- resource_type: registry
+              #  operation_type: set     # Other choices: `remove_value`, `remove_key`, `merge`
+              #  items_to_update:
+              #    - key_path: HKLM:\Software\MyTestKeyA
+              #      value_name: MyTestValueA01     # <=> key property/entry name
+              #      value_data: 'test "data for ""MyTestValueA01""" %PATH%'     # <=> key property/entry value
+              #      value_type: expandstring     # Default: string / Other choices: none, binary, dword, expandstring, multistring, qword
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyB
+              #      value_name: MyTestValueB01 
+              #      value_data: test data for MyTestValueB01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyC
+              #      value_name: MyTestValueC01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyD
+              #      value_data: test data for MyTestValueB01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyE
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyX
+              #      value_name: MyTestValueX01 
+              #      value_data: test data for MyTestValueX01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyX
+              #      value_name: MyTestValueX02 
+              #      value_data: test data for MyTestValueX02
+              #      value_type: expandstring
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyY
+              #      value_name: MyTestValueY01 
+              #      value_data: test data for MyTestValueY01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyY
+              #      value_name: MyTestValueY02 
+              #      value_data: test data for MyTestValueY02
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyZ
+              #      value_name: MyTestValueZ01 
+              #      value_data: test data for MyTestValueZ01
+              #      #
+              #    - key_path: HKLM:\Software\MyTestKeyZ
+              #      value_name: MyTestValueZ02 
+              #      value_data: test data for MyTestValueZ02
+
+              #- resource_type: registry
+              #  operation_type: remove_value
+              #  items_to_update:
+              #    - key_path: HKLM:\Software\MyTestKeyX
+              #      value_name: MyTestValueX02
+              #
+              #- resource_type: registry
+              #  operation_type: remove_key
+              #  items_to_update:
+              #    - key_path: HKLM:\Software\MyTestKeyZ
+              #
+              #- resource_type: registry
+              #  operation_type: merge
+              #  file_path: '{{ win_temp_dir_path }}\set_7zip_settings.reg'       # Priority (0)
+              #  file_content: |                                     # Priority (1)
+              #    Windows Registry Editor Version 5.00
+              #    
+              #    [HKEY_LOCAL_MACHINE\Software\MyTestKeyE]
+              #    "MyTestValueE99"="Test Data for MyTestKeyE 99"  
+              #    "MyTestValueE88"="Test Data for MyTestKeyE 88"  
+              #  #upload_file: test/test_reg_uploaded.reg       # Priority (2)
+              #  #file_full_url: https://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts/test_reg_full_url.reg       # Priority (3)
+              #  #file_relative_url: test/test_reg.reg          # Priority (4)
+              #  #http_auth_username: wrong_username
+              #  #http_auth_password: wrong_password
+              #
+              #- resource_type: file_system
+              #  operation_type: remove_bypattern
+              #  base_directory: D:\data
+              #  pattern: '.*sql.*\\2023.*\\january.*\\.*reports.*\.xls.*'
+              #  isregex: yes # Default: 'no'
+              #  recursive: yes # Default: 'no'
+              #  show_removed_items: yes # Default: 'yes'
+              #  #Regex here would match: "D:\data\mydata_sql_full\2023_files\january-allreports\ACCOUNTINGreports001.xlsx"
+              #
+              #- resource_type: file_system
+              #  operation_type: create
+              #  source:
+              #    # You have to put at least one non-blank character
+              #    file_content: |
+              #      .
+              #  # For files, parent directory should exist already
+              #  destination: D:\foo.txt
+              #
+              #- resource_type: file_system
+              #  operation_type: prepend
+              #  source:
+              #    file_content: |
+              #      AAAAAAAAAAAAAA
+              #      BBBBBBBBBBBBBB
+              #      CCCCCCCCCCCCCC
+              #  destination: D:\foo.txt

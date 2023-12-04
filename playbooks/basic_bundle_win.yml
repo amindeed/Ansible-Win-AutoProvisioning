@@ -1,9 +1,4 @@
 ---
-# ansible-playbook main.yml -i ../inventories/environments/dev.yml
-# ....
-# ....
-# ....
-
 
 - name: Setup Node.JS v14, v16 and v18
   hosts: all
@@ -39,24 +34,17 @@
 
         post_setup:
           - configurations:
-            #- resource_type: file_system
-            #  operation_type: create
-            #  source:
-            #    file_content: |
-            #      TEST TEST TEST TEST TEST
-            #      TEST TEST TEST TEST TEST
-            #  destination: D:\AppServ\NodeJS\test.txt
             - update_resource:
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/basic/setup-nodejs/check_NODEJS_HOME.ps1
+                  upload_file: bundles/basic_win/setup-nodejs/check_NODEJS_HOME.ps1
                 destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/basic/setup-nodejs/set_NODEJS_HOME.ps1
+                  upload_file: bundles/basic_win/setup-nodejs/set_NODEJS_HOME.ps1
                 destination: D:\AppServ\NodeJS\
 
               - resource_type: file_system
@@ -65,6 +53,14 @@
                 arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\nodejs\set_NODEJS_HOME.ps1"'
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set NodeJs Version.lnk'
                 icon: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64\node.exe,0
+
+  tasks:
+    - name: '[POST-SETUP] {NODEJS} Notify logged in users with a message'
+      community.windows.win_msg:
+        display_seconds: 259200
+        msg: "** SYSTEM ADMIN ** \n\nNode.JS configurations updated. Please, save your work and log off to enable them."
+      changed_when: false
+      no_log: yes
 
 
 - name: "Setup Eclipse IDE for JEE: 2022-12, 2020-06, Oxygen (2017-06) and Neon 3 (2016-06)"
@@ -84,72 +80,35 @@
                 root_install_dir: D:\AppServ
                 main_app_launcher: eclipse\eclipse.exe
                 desktop_shortcut: yes # Default: no
+                shortcut_name: 'Eclipse IDEs\Eclipse 2020-06' # Default shortcut name == 'software_fullname'
                 startmenu_shortcut: yes # Default: yes
-          #- configurations:
-          #  - update_resource:  
-          #    - resource_type: file_system
-          #      operation_type: transfer
-          #      source:
-          #        file_relative_url: eclipse_jee_ide/eclipse-jee-2020-06-R-win32-x86_64.zip
-          #      destination: D:\AppServ
-          #      unzip: yes
-          #      skip_if_path_exists: 'D:\AppServ\Eclipse IDE 2020-06'
-          #    - resource_type: file_system
-          #      operation_type: move
-          #      source: D:\AppServ\eclipse
-          #      destination: 'D:\AppServ\Eclipse IDE 2020-06'
-          #    - resource_type: file_system
-          #      operation_type: shortcut
-          #      source: 'D:\AppServ\Eclipse IDE 2020-06\eclipse.exe'
-          #      destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE 2020-06.lnk'
-#
-          #    - resource_type: file_system
-          #      operation_type: transfer
-          #      source:
-          #        file_relative_url: eclipse_jee_ide/eclipse-jee-2022-12-R-win32-x86_64.zip
-          #      destination: D:\AppServ
-          #      unzip: yes
-          #      skip_if_path_exists: 'D:\AppServ\Eclipse IDE 2022-12'
-          #    - resource_type: file_system
-          #      operation_type: move
-          #      source: D:\AppServ\eclipse
-          #      destination: 'D:\AppServ\Eclipse IDE 2022-12'
-          #    - resource_type: file_system
-          #      operation_type: shortcut
-          #      source: 'D:\AppServ\Eclipse IDE 2022-12\eclipse.exe'
-          #      destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE 2022-12.lnk'
-#
-          #    - resource_type: file_system
-          #      operation_type: transfer
-          #      source:
-          #        file_relative_url: eclipse_jee_ide/eclipse-jee-neon-3-win32-x86_64.zip
-          #      destination: D:\AppServ
-          #      unzip: yes
-          #      skip_if_path_exists: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)'
-          #    - resource_type: file_system
-          #      operation_type: move
-          #      source: D:\AppServ\eclipse
-          #      destination: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)'
-          #    - resource_type: file_system
-          #      operation_type: shortcut
-          #      source: 'D:\AppServ\Eclipse IDE Neon 3 (2016-06)\eclipse.exe'
-          #      destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE Neon 3 (2016-06).lnk'
-#
-          #    - resource_type: file_system
-          #      operation_type: transfer
-          #      source:
-          #        file_relative_url: eclipse_jee_ide/eclipse-jee-oxygen-R-win32-x86_64.zip
-          #      destination: D:\AppServ
-          #      unzip: yes
-          #      skip_if_path_exists: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)'
-          #    - resource_type: file_system
-          #      operation_type: move
-          #      source: D:\AppServ\eclipse
-          #      destination: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)'
-          #    - resource_type: file_system
-          #      operation_type: shortcut
-          #      source: 'D:\AppServ\Eclipse IDE Oxygen (2017-06)\eclipse.exe'
-          #      destination: '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Eclipse IDE Oxygen (2017-06).lnk'
+                #
+              - software_fullname: "Eclipse IDE 2022-12" 
+                file_relative_url: eclipse_jee_ide/eclipse-jee-2022-12-R-win32-x86_64.zip
+                type: zip
+                root_install_dir: D:\AppServ
+                main_app_launcher: eclipse\eclipse.exe
+                desktop_shortcut: yes # Default: no
+                shortcut_name: 'Eclipse IDEs\Eclipse IDE 2022-12'
+                startmenu_shortcut: yes # Default: yes
+                #
+              - software_fullname: "Eclipse IDE Neon 3 (2016-06)" 
+                file_relative_url: eclipse_jee_ide/eclipse-jee-neon-3-win32-x86_64.zip
+                type: zip
+                root_install_dir: D:\AppServ
+                main_app_launcher: eclipse\eclipse.exe
+                desktop_shortcut: yes # Default: no
+                shortcut_name: 'Eclipse IDEs\Eclipse IDE Neon 3 (2016-06)'
+                startmenu_shortcut: yes # Default: yes
+                #
+              - software_fullname: "Eclipse IDE Oxygen (2017-06)" 
+                file_relative_url: eclipse_jee_ide/eclipse-jee-oxygen-R-win32-x86_64.zip
+                type: zip
+                root_install_dir: D:\AppServ
+                main_app_launcher: eclipse\eclipse.exe
+                desktop_shortcut: yes # Default: no
+                shortcut_name: 'Eclipse IDEs\Eclipse IDE Oxygen (2017-06)'
+                startmenu_shortcut: yes # Default: yes
               
 
 - name: Setup Cygwin x64
@@ -184,7 +143,7 @@
                   startmenu_shortcut: yes
                   shortcut_arguments: '-i /Cygwin-Terminal.ico -'
                   shortcut_icon: D:\AppServ\Cygwin\cygwin64\Cygwin.ico  # Provide full path, optionnally followed with icon index, e.g. 'filpath,12'
-                #abort_on_aftercheck_failure: no # Temporarilly...
+                #abort_on_aftercheck_failure: no # Default: yes
 
 
 - name: "Setup DBeaver"
@@ -312,7 +271,7 @@
                 install_directory_name: python2
                 #additional_arguments: ALLUSERS=1 ADDLOCAL=ALL
                 additional_arguments: ALLUSERS=1 ADDLOCAL=DefaultFeature,TclTk,Documentation,Tools,pip_feature,Testsuite
-                #abort_on_aftercheck_failure: no # Temporarilly...
+                #abort_on_aftercheck_failure: no # Default: yes
 
 
 - name: "Setup Python 3.12"
@@ -396,13 +355,13 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/basic/setup-python312/check_PYTHON_paths.ps1
+                  upload_file: bundles/basic_win/setup-python312/check_PYTHON_paths.ps1
                 destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/basic/setup-python312/set_PYTHON_paths.ps1
+                  upload_file: bundles/basic_win/setup-python312/set_PYTHON_paths.ps1
                 destination: D:\AppServ\Python312\
 
               - resource_type: file_system
@@ -411,3 +370,11 @@
                 arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Python312\set_PYTHON_paths.ps1"'
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set Python Version.lnk'
                 icon: D:\AppServ\Python2\python.exe,0
+
+  tasks:
+    - name: '[POST-SETUP] {PYTHON312} Notify logged in users with a message'
+      community.windows.win_msg:
+        display_seconds: 259200
+        msg: "** SYSTEM ADMIN ** \n\nSystem configurations updated. Please, save your work and log off to enable them."
+      changed_when: false
+      no_log: yes
