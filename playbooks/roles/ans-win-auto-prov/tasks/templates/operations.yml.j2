@@ -143,9 +143,30 @@
   changed_when: false
   no_log: true
 
+{% if software_item.upload_file is defined %}
+  {% set file_name = software_item.upload_file.split('/')[-1] | default(software_item.upload_file) %}
+{% elif software_item.file_full_url is defined %}
+  {% set file_name = software_item.file_full_url.split('/')[-1] %}
+{% elif software_item.file_relative_url is defined %}
+  {% set file_name = software_item.file_relative_url.split('/')[-1] %}
+{% endif %}
+
+{% if software_item.clean_downloads is not defined or software_item.clean_downloads %}
+- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Clean previously downloaded/uploaded files (1/2)"
+  win_file:
+    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+    state: absent
+
+- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Clean previously downloaded/uploaded files (2/2)"
+  win_file:
+    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name.split(".")[0] }}'
+    state: absent
+{% endif %}
+
 {# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
 
 {% if software_item.upload_file is not defined and (software_item.file_full_url is defined or software_item.file_relative_url is defined) %}
+
 - name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ software_item.software_fullname }}' files"
   win_get_url:
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
@@ -171,14 +192,6 @@
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.upload_file }}'
     backup: yes
   when: "'Not Installed' in initial_software_status.stdout"
-{% endif %}
-
-{% if software_item.upload_file is defined %}
-  {% set file_name = software_item.upload_file.split('/')[-1] | default(software_item.upload_file) %}
-{% elif software_item.file_full_url is defined %}
-  {% set file_name = software_item.file_full_url.split('/')[-1] %}
-{% elif software_item.file_relative_url is defined %}
-  {% set file_name = software_item.file_relative_url.split('/')[-1] %}
 {% endif %}
 
 {% if software_item.type == 'bundle' %}
@@ -488,9 +501,23 @@
   ignore_errors: {% if software_item.abort_on_aftercheck_failure is defined and not software_item.abort_on_aftercheck_failure %}yes{% else %}no{% endif %}
   
   when: "'Not Installed' in initial_software_status.stdout"
+
+{% if software_item.clean_downloads is not defined or software_item.clean_downloads %}
+- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Clean downloaded/uploaded files (1/2)"
+  win_file:
+    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
+    state: absent
+
+- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Clean downloaded/uploaded files (2/2)"
+  win_file:
+    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name.split(".")[0] }}'
+    state: absent
+{% endif %}
+
         {% endfor %}
       {% endif %}
     {% endfor %}
+
 
 {# ▰▰▰▰▰▰▰▰▰▰▰▰ Configurations ▰▰▰▰▰▰▰▰▰▰▰▰ #}
 
