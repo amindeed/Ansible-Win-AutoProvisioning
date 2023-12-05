@@ -485,6 +485,7 @@
                 file_relative_url: vscode/VSCodeSetup-x64-1.80.2.exe
                 type: exe
                 arguments: /DIR=D:\AppServ\VSCode /VERYSILENT /NORESTART /MERGETASKS=!runcode,desktopicon,addcontextmenufiles,addcontextmenufolders
+                clean_downloads: false
         post_setup:
           - executions:
             - run_ps1_script:
@@ -525,6 +526,8 @@
                 success_exit_codes: # Default: "[0]"
                   - 0
                   - 3010
+                clean_downloads: true
+
         post_setup:
           - executions:
             - run_ps1_script:

@@ -584,12 +584,17 @@
 
 {% endif %}
 
+{# 
+> Removed as it caused the following PowerShell error on some setups:
+> "Unhandled exception while executing module: Error sending message to session Console : Error 1008 "
+
 - name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Notify logged in users with a message'
   community.windows.win_msg:
     display_seconds: 259200
     msg: "** SYSTEM ADMIN ** \n\nSystem configurations updated. Please, save your work and log off (sign out) to enable them."
   changed_when: false
-  no_log: yes
+  #no_log: yes
+#}
 
 {# ︵‿︵‿︵‿︵‿ Handle Registry Keys & Properties ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.resource_type == 'registry' %}
