@@ -19,7 +19,7 @@
       {% if 'check_net_flows' in check_item %}
         {% for flow_item in check_item.check_net_flows %}
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Check TCP Network flow status"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Check TCP Network flow status"
   win_shell: |
     $net_test = Test-NetConnection -ComputerName {{ flow_item.target_host }} -Port {{ flow_item.target_port }}
     if($net_test.TcpTestSucceeded) {
@@ -30,7 +30,7 @@
   register: netflow_check_result
   changed_when: false
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Results of TCP Network flow status check"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Results of TCP Network flow status check"
   assert:
     that:
       - "'success' in netflow_check_result.stdout"
@@ -46,7 +46,7 @@
       {% elif 'check_http_status' in check_item %}
         {% for http_check_item in check_item.check_http_status %}
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Check HTTP connection to user-provided target URL"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Check HTTP connection to user-provided target URL"
   win_shell: |
     $responseStatusCode = $(try { Invoke-WebRequest -Uri "{{ http_check_item.target_url }}" {% if http_check_item.follow_redirects is not defined or not http_check_item.follow_redirects %}-MaximumRedirection 0{% endif %} | % {$_.StatusCode} } catch {$_.Exception.Response.StatusCode.Value__})
 
@@ -58,7 +58,7 @@
   register: http_check_result
   changed_when: false
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Results of HTTP connection check"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Results of HTTP connection check"
   assert:
     that:
       - "'KO_FAILURE' not in http_check_result.stdout"
@@ -73,13 +73,13 @@
       {% elif 'check_service_status' in check_item %}
         {% for service_check_item in check_item.check_service_status %}
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Get info for services matching "{{ service_check_item.service_name_pattern }}"'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Get info for services matching "{{ service_check_item.service_name_pattern }}"'
   ansible.windows.win_service_info:
     name: {{ service_check_item.service_name_pattern }}
   register: service_info
   changed_when: false
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Show info for services matching "{{ service_check_item.service_name_pattern }}"'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Show info for services matching "{{ service_check_item.service_name_pattern }}"'
   debug:
     msg: '{% raw %}{{ item.display_name }} [{{ item.name }}]{% endraw %}: { {{ service_check_item.gather_info[0] }}: {% raw %}{{ item.{% endraw %}{{ service_check_item.gather_info[0] }}{% raw %}}}{% endraw %} }{% for gathered_item in service_check_item.gather_info[1:] %}, { {{ gathered_item }}: {% raw %}{{ item.{% endraw %}{{ gathered_item }}{% raw %}}}{% endraw %} }{% endfor %}'
   loop: "{% raw %}{{ service_info.services }}{% endraw %}"
@@ -92,21 +92,21 @@
 {# ︵‿︵‿ Check TCP/UDP port status ︵‿︵‿ #}
       {% elif 'check_ports' in check_item %}
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} (1/3) Get listening ports (all info)"
+- name: "{{ label }} # {{ short_name }} # (1/3) Get listening ports (all info)"
   community.windows.win_listen_ports_facts:
   register: all_listening_ports
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} (2/3) Get listening ports (TCP)"
+- name: "{{ label }} # {{ short_name }} # (2/3) Get listening ports (TCP)"
   set_fact:
     listening_tcp_ports: "{% raw %}{{ all_listening_ports.ansible_facts.tcp_listen | map(attribute='port') | list }}{% endraw %}"
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} (3/3) Get listening ports (UDP)"
+- name: "{{ label }} # {{ short_name }} # (3/3) Get listening ports (UDP)"
   set_fact:
     listening_udp_ports: "{% raw %}{{ all_listening_ports.ansible_facts.udp_listen | map(attribute='port') | list }}{% endraw %}"
 
         {% for ports_check_item in check_item.check_ports %}
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Display {{ ports_check_item.protocol | upper }} ports status"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Display {{ ports_check_item.protocol | upper }} ports status"
   debug:
     msg: "{% raw %}{{ port }}{% endraw %} {{ ports_check_item.protocol | upper }} port {% raw %}{% if port in listening_{% endraw %}{{ ports_check_item.protocol | lower }}{% raw %}_ports %}{% endraw %}is used.{% raw %}{% else %}{% endraw %}is not used.{% raw %}{% endif %}{% endraw %}"
   loop: "{% raw %}{{ {% endraw %}{{ setup_phase }}{% raw %}[{% endraw %}{{ l1_setup_phase_operations_loop.index0 }}{% raw %}].checks[{% endraw %}{{ l2_operation_checks_loop.index0 }}{% raw %}].check_ports[{% endraw %}{{ loop.index0 }}{% raw %}].ports_to_check }}{% endraw %}"
@@ -127,7 +127,7 @@
         {% for software_item in installation_item.software_components %}
 
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Check '{{ software_item.software_fullname }}' status *BEFORE* installation"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Check '{{ software_item.software_fullname }}' status *BEFORE* installation"
   win_shell: |
     $appName = "{{ software_item.software_fullname }}"
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
@@ -143,31 +143,10 @@
   changed_when: false
   no_log: true
 
-{% if software_item.upload_file is defined %}
-  {% set file_name = software_item.upload_file.split('/')[-1] | default(software_item.upload_file) %}
-{% elif software_item.file_full_url is defined %}
-  {% set file_name = software_item.file_full_url.split('/')[-1] %}
-{% elif software_item.file_relative_url is defined %}
-  {% set file_name = software_item.file_relative_url.split('/')[-1] %}
-{% endif %}
-
-{% if software_item.clean_downloads is not defined or software_item.clean_downloads %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Clean previously downloaded/uploaded files (1/2)"
-  win_file:
-    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
-    state: absent
-
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Clean previously downloaded/uploaded files (2/2)"
-  win_file:
-    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name.split(".")[0] }}'
-    state: absent
-{% endif %}
-
 {# ︵‿︵‿ Download Packages from HTTP source ︵‿︵‿ #}
 
 {% if software_item.upload_file is not defined and (software_item.file_full_url is defined or software_item.file_relative_url is defined) %}
-
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ software_item.software_fullname }}' files"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Download '{{ software_item.software_fullname }}' files"
   win_get_url:
 {% if software_item.file_full_url is defined and software_item.file_full_url is not none %}
     url: "{{ software_item.file_full_url }}"
@@ -186,7 +165,7 @@
 
 {# ︵‿︵‿ Upload packages from Ansible Controller machine ︵‿︵‿ #}
 {% if software_item.upload_file is defined and software_item.upload_file is not none %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ software_item.software_fullname }}' files to target host"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ software_item.software_fullname }}' files to target host"
   win_copy:
     src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ software_item.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.upload_file }}'
@@ -194,8 +173,16 @@
   when: "'Not Installed' in initial_software_status.stdout"
 {% endif %}
 
+{% if software_item.upload_file is defined %}
+  {% set file_name = software_item.upload_file.split('/')[-1] | default(software_item.upload_file) %}
+{% elif software_item.file_full_url is defined %}
+  {% set file_name = software_item.file_full_url.split('/')[-1] %}
+{% elif software_item.file_relative_url is defined %}
+  {% set file_name = software_item.file_relative_url.split('/')[-1] %}
+{% endif %}
+
 {% if software_item.type == 'bundle' %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}'"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}'"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name.split(".")[0] }}'
@@ -205,7 +192,7 @@
 {# end: Uploads #}
 
 {% if software_item.root_install_dir is defined or root_install_dir is defined %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Check custom target installation directory"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Check custom target installation directory"
   win_file:
     path: '{{ software_item.root_install_dir | default(root_install_dir) }}'
     state: directory
@@ -213,7 +200,7 @@
 {% endif %}
 
 {% if software_item.type == 'zip' %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}'"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}'"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ software_item.root_install_dir | default("C:\\Program Files") }}\{% if software_item.create_directory is not defined or software_item.create_directory %}{{ software_item.software_fullname }}{% endif %}'
@@ -221,26 +208,7 @@
   when: "'Not Installed' in initial_software_status.stdout"
 {% endif %}
 
-{% if (software_item.desktop_shortcut is defined and software_item.desktop_shortcut) or (software_item.manual_registration.desktop_shortcut is defined and software_item.manual_registration.desktop_shortcut) %}
-
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure Desktop shortcut's parent directory is present <1/2>"
-  raw: |
-{% if software_item.desktop_shortcut is defined and software_item.desktop_shortcut %}
-    [System.Environment]::ExpandEnvironmentVariables("%PUBLIC%\Desktop\{{ software_item.shortcut_name | default(software_item.software_fullname) }}.lnk")
-{% elif software_item.manual_registration.desktop_shortcut is defined and software_item.manual_registration.desktop_shortcut %}
-    [System.Environment]::ExpandEnvironmentVariables("%PUBLIC%\Desktop\{{ software_item.manual_registration.shortcut_name | default(software_item.software_fullname) }}.lnk")
-{% endif %}
-  register: expand_shortcut_path
-  changed_when: false
-
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure Desktop shortcut's parent directory is present <2/2>"
-  win_file:
-    path: '{% raw %}{{ expand_shortcut_path.stdout_lines[0] | win_dirname }}{% endraw %}'
-    state: directory
-
-{% endif %}
-
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Install '{{ software_item.software_fullname }}'"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Install '{{ software_item.software_fullname }}'"
   win_shell: |
     $installResult = $null
     $installSuccess = $false
@@ -298,7 +266,7 @@
 
 {% if software_item.manual_registration.desktop_shortcut is defined and software_item.manual_registration.desktop_shortcut %}
       $WshShell = New-Object -ComObject WScript.Shell
-      $Shortcut = $WshShell.CreateShortcut("$env:PUBLIC\Desktop\{{ software_item.manual_registration.shortcut_name | default(software_item.software_fullname) }}.lnk")
+      $Shortcut = $WshShell.CreateShortcut("$env:PUBLIC\Desktop\{{ software_item.software_fullname }}.lnk")
       $desktopTargetPath = '{{ software_item.manual_registration.root_install_dir | default("C:\\Program Files") }}'
       $desktopTargetPath += '\'
       $desktopTargetPath += '{{ software_item.software_fullname }}'
@@ -402,7 +370,7 @@
 
 {% if software_item.desktop_shortcut is defined and software_item.desktop_shortcut %}
       $WshShell = New-Object -ComObject WScript.Shell
-      $Shortcut = $WshShell.CreateShortcut("$env:PUBLIC\Desktop\{{ software_item.shortcut_name | default(software_item.software_fullname) }}.lnk")
+      $Shortcut = $WshShell.CreateShortcut("$env:PUBLIC\Desktop\{{ software_item.software_fullname }}.lnk")
       $desktopTargetPath = '{{ software_item.root_install_dir | default("C:\\Program Files") }}'
       $desktopTargetPath += '\'
       $desktopTargetPath += '{{ software_item.software_fullname }}'
@@ -483,7 +451,7 @@
   failed_when: component_install_result.rc != 0 or 'installation failed' in component_install_result.stdout
   when: "'Not Installed' in initial_software_status.stdout"
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Check '{{ software_item.software_fullname }}' status *AFTER* installation"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Check '{{ software_item.software_fullname }}' status *AFTER* installation"
   win_shell: |
     $appName = "{{ software_item.software_fullname }}"
     $wmiQuery = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*$appName*" }
@@ -501,23 +469,9 @@
   ignore_errors: {% if software_item.abort_on_aftercheck_failure is defined and not software_item.abort_on_aftercheck_failure %}yes{% else %}no{% endif %}
   
   when: "'Not Installed' in initial_software_status.stdout"
-
-{% if software_item.clean_downloads is not defined or software_item.clean_downloads %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Clean downloaded/uploaded files (1/2)"
-  win_file:
-    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
-    state: absent
-
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Clean downloaded/uploaded files (2/2)"
-  win_file:
-    path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name.split(".")[0] }}'
-    state: absent
-{% endif %}
-
         {% endfor %}
       {% endif %}
     {% endfor %}
-
 
 {# ▰▰▰▰▰▰▰▰▰▰▰▰ Configurations ▰▰▰▰▰▰▰▰▰▰▰▰ #}
 
@@ -529,20 +483,20 @@
 {# ︵‿︵‿︵‿︵‿ Handle System Environment Variables ︵‿︵‿︵‿︵‿ #}
 {% if update_item.resource_type == 'env_var' %}
 {% if update_item.action|lower == 'append' %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Append "{{ update_item.value }}" to "{{ update_item.resource_name }}"'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Append "{{ update_item.value }}" to "{{ update_item.resource_name }}"'
   win_path:
     name: {{ update_item.resource_name }}
     elements: {{ update_item.value }}
     scope: machine
   register: envvar_result
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
   win_shell: Update-EnvironmentVariables
   changed_when: envvar_result.changed
   ignore_errors: yes
 
 {% elif update_item.action|lower == 'set' %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Set "{{ update_item.resource_name }}" system environment variable'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Set "{{ update_item.resource_name }}" system environment variable'
   win_environment:
     state: present
     name: {{ update_item.resource_name }}
@@ -550,13 +504,13 @@
     level: machine
   register: envvar_result
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
   win_shell: Update-EnvironmentVariables
   changed_when: envvar_result.changed
   ignore_errors: yes
 
 {% elif update_item.action|lower == 'remove' and update_item.resource_name|lower == 'path' %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure that "{{ update_item.value }}" is not on PATH'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Ensure that "{{ update_item.value }}" is not on PATH'
   win_path:
     name: PATH
     elements: {{ update_item.value }}
@@ -564,43 +518,31 @@
     state: absent
   register: envvar_result
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
   win_shell: Update-EnvironmentVariables
   changed_when: envvar_result.changed
   ignore_errors: yes
 
 {% elif update_item.action|lower == 'remove' and update_item.resource_name|lower != 'path' %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.resource_name }}" env. var.'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.resource_name }}" env. var.'
   win_environment:
     state: absent
     name: {{ update_item.resource_name }}
     level: machine
   register: envvar_result
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
   win_shell: Update-EnvironmentVariables
   changed_when: envvar_result.changed
   ignore_errors: yes
 
 {% endif %}
 
-{# 
-> Removed as it caused the following PowerShell error on some setups:
-> "Unhandled exception while executing module: Error sending message to session Console : Error 1008 "
-
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Notify logged in users with a message'
-  community.windows.win_msg:
-    display_seconds: 259200
-    msg: "** SYSTEM ADMIN ** \n\nSystem configurations updated. Please, save your work and log off (sign out) to enable them."
-  changed_when: false
-  #no_log: yes
-#}
-
 {# ︵‿︵‿︵‿︵‿ Handle Registry Keys & Properties ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.resource_type == 'registry' %}
 
 {% if update_item.operation_type != 'merge' %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Generate list of Windows registry items to update'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Generate list of Windows registry items to update'
   set_fact:
     reg_items_to_update:
 {{ ' ' * 6 }}{% for item in update_item.items_to_update %}{% for key,value in item.items() %}{{ '- ' if loop.first else '  ' }}{{ key }}: {{ value }}{{ '\n' ~ ' ' * 6 }}{% endfor %}{% endfor %}
@@ -609,7 +551,7 @@
 {# (1) Add/Update keys/properties #}
 {% if update_item.operation_type == 'set' %}
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Add or update registry item'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Add or update registry item'
   ansible.windows.win_regedit:
     path: '{% raw %}{{ reg_update_item.key_path }}{% endraw %}'
     name: '{% raw %}{{ reg_update_item.value_name | default(omit) }}{% endraw %}'
@@ -623,7 +565,7 @@
 {# (2) Delete values #}
 {% elif update_item.operation_type == 'remove_value' %}
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Remove entry from registry'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Remove entry from registry'
   ansible.windows.win_regedit:
     path: '{% raw %}{{ reg_update_item.key_path }}{% endraw %}'
     name: '{% raw %}{{ reg_update_item.value_name }}{% endraw %}'
@@ -635,7 +577,7 @@
 
 {# (3) Delete keys #}
 {% elif update_item.operation_type == 'remove_key' %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Remove given registry key (along with all its entries)'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Remove given registry key (along with all its entries)'
   ansible.windows.win_regedit:
     path: '{% raw %}{{ reg_update_item.key_path }}{% endraw %}'
     state: absent
@@ -650,20 +592,20 @@
 
 {##}{% if update_item.file_path is defined %}
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in .reg file'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Merge in .reg file'
   win_regmerge:
     path: '{{ update_item.file_path }}'
 
 {##}
 {% elif update_item.file_content is defined %}
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Create a temporary .reg file with user-provided content (1/2)'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Create a temporary .reg file with user-provided content (1/2)'
   win_tempfile:
     state: file
     suffix: ".reg"
   register: temp_file_result
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Create a temporary .reg file with user-provided content (2/2)'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Create a temporary .reg file with user-provided content (2/2)'
   win_shell: |
     try {
       $ErrorActionPreference = "Stop"
@@ -681,23 +623,23 @@
   register: file_create_result
   failed_when: file_create_result.rc != 0 or 'KO_FAILURE' in file_create_result.stdout
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in .reg file'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Merge in .reg file'
   win_regmerge:
     path: '{% raw %}{{ temp_file_result.path }}{% endraw %}'
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Delete the temporary .reg file'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Delete the temporary .reg file'
   win_shell: Remove-Item -Path "{% raw %}{{ temp_file_result.path }}{% endraw %}" -Force
 
 {##}
 {% elif update_item.upload_file is defined %}
   {% set file_name = update_item.upload_file.split('/')[-1] | default(update_item.upload_file) %}
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
   win_copy:
     src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in "{{ file_name }}" file'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Merge in "{{ file_name }}" file'
   win_regmerge:
     path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
 
@@ -706,7 +648,7 @@
   {% set file_url = update_item.file_full_url | default(update_item.file_relative_url) %}
   {% set file_name = file_url.split('/')[-1] if file_url is defined else '' %}
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
   win_get_url:
 {% if update_item.file_full_url is defined and update_item.file_full_url is not none %}
     url: "{{ update_item.file_full_url }}"
@@ -719,7 +661,7 @@
     url_password: "{{ update_item.http_auth_password | default('{{ http_auth_password }}') }}"
     timeout: 60
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Merge in "{{ file_name }}" file'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Merge in "{{ file_name }}" file'
   win_regmerge:
     path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
 
@@ -734,18 +676,18 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Shortcut ︵‿︵‿︵‿︵‿ #}
 {% if update_item.operation_type == 'shortcut' %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure shortcut's parent directory is present <1/2>"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Ensure shortcut's parent directory is present <1/2>"
   raw: |
     [System.Environment]::ExpandEnvironmentVariables("{{ update_item.destination }}")
   register: expand_shortcut_path
   changed_when: false
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure shortcut's parent directory is present <2/2>"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Ensure shortcut's parent directory is present <2/2>"
   win_file:
     path: '{% raw %}{{ expand_shortcut_path.stdout_lines[0] | win_dirname }}{% endraw %}'
     state: directory
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Create shortcut to "{{ update_item.source }}"'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Create shortcut to "{{ update_item.source }}"'
   win_shortcut:
     src: '{{ update_item.source }}'
 {% if update_item.arguments is defined %}
@@ -770,14 +712,14 @@
 {# ︵‿︵‿ **Download** files from HTTP source ︵‿︵‿ #}
 
 {# /!\ this is only used in case of 'zip' files to be processed after transfer #}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Ensure destination "{{ update_item.destination }}" exists'
   win_file: 
     path: '{{ update_item.destination }}'
     state: directory
   register: win_file_dest_check
 
 {% if update_item.source.upload_file is not defined and (update_item.source.file_full_url is defined or update_item.source.file_relative_url is defined) %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
   win_get_url:
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
     url: "{{ update_item.source.file_full_url }}"
@@ -796,25 +738,25 @@
 {# ︵‿︵‿ **Upload** files from Ansible Controller machine ︵‿︵‿ #}
 {% if update_item.source.upload_file is defined and update_item.source.upload_file is not none %}
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Register uploaded item type (file or directory)"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Register uploaded item type (file or directory)"
   stat:
     path: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
   register: item_type
   delegate_to: localhost
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (directory) to target host <1/2>"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (directory) to target host <1/2>"
   win_file:
     path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     state: absent
   when: item_type.stat.isdir
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (directory) to target host <2/2>"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (directory) to target host <2/2>"
   win_copy:
     src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
   when: item_type.stat.isdir
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
   win_copy:
     src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
@@ -823,7 +765,7 @@
 {% endif %}
 
 {% if update_item.unzip is defined and update_item.unzip %}{# if it's a zip file to extract content from #}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination (overwritten upon user-set configuration)"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination (overwritten upon user-set configuration)"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
@@ -831,7 +773,7 @@
 
   when: not (win_file_dest_check is defined and win_file_dest_check.changed | default(true) | bool)
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination (empty target dir.)"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Unzip '{{ file_name }}' to user-defined destination (empty target dir.)"
   win_unzip:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
@@ -840,7 +782,7 @@
 {% else %}{# case of regular file transfer #}
 
 {% if update_item.skip_if_path_exists is defined %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Check if user-provided path exists"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Check if user-provided path exists"
   win_stat:
     path: '{{ update_item.skip_if_path_exists }}'
   register: check_path
@@ -852,12 +794,12 @@
   inexplicably causing a vague Jinja2 template rendering error:
   "failed at splitting arguments, either an unbalanced jinja2 block or quotes"
  #}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Force copy '{{ file_name }}' to user-defined destination"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Force copy '{{ file_name }}' to user-defined destination"
   win_shell: Copy-Item -Path "{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}" -Destination "{{ update_item.destination | regex_replace('[\\\\/]$', '') }}" -Recurse -Force
   when: not check_path.stat.exists | default(false)
 
 {% else %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Copy '{{ file_name }}' to user-defined destination"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Copy '{{ file_name }}' to user-defined destination"
   win_copy:
     src: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }}'
     dest: '{{ update_item.destination }}'
@@ -880,7 +822,7 @@
 
 {# ︵‿︵‿ **Download** files from HTTP source ︵‿︵‿ #}
 {% if update_item.source.upload_template is not defined and (update_item.source.file_full_url is defined or update_item.source.file_relative_url is defined) %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Download template '{{ file_name }}'"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Download template '{{ file_name }}'"
   win_get_url:
 {% if update_item.source.file_full_url is defined and update_item.source.file_full_url is not none %}
     url: "{{ update_item.source.file_full_url }}"
@@ -896,7 +838,7 @@
 
 {# ︵‿︵‿ **Upload** files from Ansible Controller machine ︵‿︵‿ #}
 {% if update_item.source.upload_template is defined and update_item.source.upload_template is not none %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Upload template '{{ file_name }}' to target host"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload template '{{ file_name }}' to target host"
   #win_copy:
   win_template:
     src: '{% raw %}{{ templates_dir }}{% endraw %}/{{ update_item.source.upload_template }}'
@@ -907,7 +849,7 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Move/Rename ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'move' %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Move/Rename "{{ update_item.source }}"'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Move/Rename "{{ update_item.source }}"'
   win_shell: |
     try {
         if (Test-Path -Path "{{ update_item.source }}") {
@@ -930,13 +872,13 @@
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Create ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'create' %}
 {% if update_item.source is not defined and update_item.destination is defined %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Create directory "{{ update_item.destination }}"'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Create directory "{{ update_item.destination }}"'
   win_file:
     path: {{ update_item.destination }}
     state: directory
 
 {% else %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Create file "{{ update_item.destination }}"'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Create file "{{ update_item.destination }}"'
   win_shell: |
     try {
       $ErrorActionPreference = "Stop"
@@ -977,13 +919,13 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Remove ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'remove' %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}" <1/2>'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}" <1/2>'
   raw: |
     [System.Environment]::ExpandEnvironmentVariables("{{ update_item.destination }}")
   register: expand_item_path
   changed_when: false
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}" <2/2>'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.destination }}" <2/2>'
   win_file:
     path: '{% raw %}{{ expand_item_path.stdout_lines[0] }}{% endraw %}'
     state: absent
@@ -991,7 +933,7 @@
 
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Remove ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'remove_bypattern' %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Remove items in "{{ update_item.base_directory }}" matching given pattern'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Remove items in "{{ update_item.base_directory }}" matching given pattern'
   win_shell: |
     try {
         $filesToDelete = Get-ChildItem -Path '{{ update_item.base_directory }}' -File{% if update_item.recursive is defined and update_item.recursive %} -Recurse{% endif %} |
@@ -1019,7 +961,7 @@
   failed_when: remove_bypattern_op_result.rc != 0 or 'KO_FAILURE' in remove_bypattern_op_result.stdout
 
 {% if update_item.show_removed_items is not defined or update_item.show_removed_items %}
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Show deleted items'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Show deleted items'
   debug:
     msg: '{% raw %}{{ stdout_line }}{% endraw %}'
   loop: '{% raw %}{{ remove_bypattern_op_result.stdout_lines }}{% endraw %}'
@@ -1034,7 +976,7 @@
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Append ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'append' %}
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Append text content to "{{ update_item.destination }}"'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Append text content to "{{ update_item.destination }}"'
   win_shell: |
     try {
       $ErrorActionPreference = "Stop"
@@ -1127,7 +1069,7 @@
 {# ︵‿︵‿︵‿︵‿ Handle Files & Directories Operations: Prepend ︵‿︵‿︵‿︵‿ #}
 {% elif update_item.operation_type == 'prepend' %}
 
-- name: '{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Prepend text content to "{{ update_item.destination }}"'
+- name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Prepend text content to "{{ update_item.destination }}"'
   win_shell: |
     try {
       $ErrorActionPreference = "Stop"
@@ -1250,13 +1192,13 @@
 {% if job_item.script_content is not defined %}{# BEGIN #}
 
 {% if job_item.upload_file is defined and job_item.upload_file is not none %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
   win_copy:
     src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ job_item.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
 
 {% else %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Download '{{ file_name }}'"
   win_get_url:
 {% if job_item.file_full_url is defined and job_item.file_full_url is not none %}
     url: "{{ job_item.file_full_url }}"
@@ -1273,18 +1215,18 @@
 {% endif %}{# END: 'if job_item.script_content is not defined' #}
 
 {% if job_item.working_directory is defined and job_item.working_directory is not none %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Check provided working directory for script execution"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Check provided working directory for script execution"
   win_file:
     path: '{{ job_item.working_directory }}'
     state: directory
 {% endif %}
 
 {% if job_item.script_content is defined %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Run user-provided script ({{ job_item.description | default('') }})"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Run user-provided script ({{ job_item.description | default('') }})"
   win_shell: |
 {{ job_item.script_content | indent(width=4, first=True) }}
 {% else %}
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Run the script \"{{ file_name }}\""
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Run the script \"{{ file_name }}\""
   win_shell: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ file_name }} {{ job_item.arguments | default("") }}'
 {% if job_item.working_directory is defined and job_item.working_directory is not none %}
   args:
@@ -1303,7 +1245,7 @@
       {% elif 'run_executable' in exec_item %}
         {% for job_item in exec_item.run_executable %}
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} ({{ loop.index }}/{{ loop.length }}) Run program (executable)"
+- name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Run program (executable)"
   win_command: 
     cmd: '"{{ job_item.exec_full_path }}" {{ job_item.arguments | default("") }}'
 {% if job_item.working_directory is defined and job_item.working_directory is not none %}
@@ -1332,13 +1274,13 @@
   NtSetInformationFile() failed 0x00000001: Incorrect function"
 #}
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} Temp files cleanup <1/3>"
+- name: "{{ label }} # {{ short_name }} # Temp files cleanup <1/3>"
   raw: Write-Output "$ENV:LOCALAPPDATA\Temp"
   register: path_out
   changed_when: false
   no_log: yes
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} Temp files cleanup <2/3>"
+- name: "{{ label }} # {{ short_name }} # Temp files cleanup <2/3>"
   win_find:
     paths: "{% raw %}{{ path_out.stdout_lines[0] }}{% endraw %}"
     patterns: ^ansible-[A-Za-z0-9]*tmp-.+$
@@ -1348,7 +1290,7 @@
   changed_when: false
   no_log: yes
 
-- name: "{% raw %}{{% endraw %}{{ short_name|upper }}{% raw %}}{% endraw %} {{ label }} Temp files cleanup <3/3>"
+- name: "{{ label }} # {{ short_name }} # Temp files cleanup <3/3>"
   win_file:
     path: "{% raw %}{{ item.path }}{% endraw %}"
     state: absent

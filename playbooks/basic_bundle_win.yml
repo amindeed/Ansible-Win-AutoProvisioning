@@ -161,7 +161,7 @@
                 file_relative_url: dbeaver/dbeaver-ce-23.2.1-x86_64-setup.exe
                 type: exe
                 arguments: /allusers /S /D=D:\AppServ\DBeaver
-                clean_downloads: false
+                #clean_downloads: false
 
 
 - name: "Setup Git Extensions"
@@ -183,7 +183,7 @@
                 file_relative_url: git/Git-2.42.0.2-64-bit.exe
                 type: exe
                 arguments: /DIR=D:\AppServ\Git /VERYSILENT /NORESTART /COMPONENTS=icons,icons\desktop,ext,ext\shellhere,ext\guihere,gitlfs,assoc,assoc_sh
-                clean_downloads: false
+                #clean_downloads: false
               - software_fullname: "kdiff3"
                 file_relative_url: kdiff3/kdiff3-1.10.5-windows-x86_64.exe
                 type: exe
@@ -195,6 +195,7 @@
                 file_relative_url: gitextensions/GitExtensions-4.1.0.16698-1fe52a137.msi
                 type: msi
                 root_install_dir: D:\AppServ
+                #clean_downloads: true
 
 
 - name: "Setup UML Designer"
