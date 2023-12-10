@@ -1,17 +1,33 @@
+---
+
 all:
-  hosts:
-    192.168.66.12:
+  children:
+    # WinRM over HTTP (port 5985)
+    winrm_http:
+      hosts:
+        win2019-http:
+          ansible_host: 192.168.56.12
+          ansible_port: 5985
+          ansible_winrm_scheme: http
+
+    # WinRM over HTTPS (port 5986)
+    winrm_https:
+      hosts:
+        win2019-https:
+          ansible_host: 192.168.56.12
+          ansible_port: 5986
+          ansible_winrm_scheme: https
+
   vars:
     ansible_user: Administrator
-    ansible_password: pwdAdmin2023
+    ansible_password: aminetest
     ansible_connection: winrm
     ansible_winrm_transport: ntlm
     ansible_winrm_server_cert_validation: ignore
-    ansible_port: 5985
-    pkgs_repo_base_url: "https://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts"
-    http_auth_username: "artifactuser"
-    http_auth_password: "pwdUsr23"
+    pkgs_repo_base_url: "http://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts"
+    http_auth_username: "repouser"
+    http_auth_password: "repopassword"
     win_temp_dir_path: 'C:\AWAP_Temp'
-    uploads_dir: '../uploads' # Path either full or related to where playbook's main file is located
+    uploads_dir: '../uploads'
     templates_dir: '../templates'
-    root_install_dir: D:\AppServ
+    root_install_dir: 'D:\AppServ'
