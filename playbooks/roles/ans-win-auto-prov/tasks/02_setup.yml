@@ -10,6 +10,7 @@
     setup_phase_operations: "{{ setup | default([]) }}"
   delegate_to: localhost
   changed_when: false
+  check_mode: no
   #register: setup_template_output
 
 #- name: 'Generate "SETUP" tasks file from template (2/2)'

@@ -10,6 +10,7 @@
     setup_phase_operations: "{{ pre_setup | default([]) }}"
   delegate_to: localhost
   changed_when: false
+  check_mode: no
   #register: presetup_template_output
 
 #- name: 'Generate "PRE-SETUP" tasks file from template (2/2)'

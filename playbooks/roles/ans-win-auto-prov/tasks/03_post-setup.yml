@@ -10,6 +10,7 @@
     setup_phase_operations: "{{ post_setup | default([]) }}"
   delegate_to: localhost
   changed_when: false
+  check_mode: no
   #register: postsetup_template_output
 
 #- name: 'Generate "POST-SETUP" tasks file from template (2/2)'
