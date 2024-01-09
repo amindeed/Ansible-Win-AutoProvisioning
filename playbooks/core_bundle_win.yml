@@ -217,22 +217,6 @@
                 destination: D:\AppServ\Notepad++\plugins\NppFTP\
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
-
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: notepadpp/plugins/Python_Indent_x64_v1.0.0.5.zip
-                destination: 'D:\AppServ\Notepad++\plugins\Python Indent\'
-                unzip: yes
-                force_overwrite_dest: no # Default: yes
-
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: notepadpp/plugins/XMLTools-3.1.1.13-x64.zip
-                destination: D:\AppServ\Notepad++\plugins\XMLTools\
-                unzip: yes
-                force_overwrite_dest: no # Default: yes
               
 
 - name: "Setup 7-Zip"

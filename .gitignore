@@ -1,1 +1,3 @@
 tmp_notes.txt
+playbooks/roles/ans-win-auto-prov/temp/*
+!playbooks/roles/ans-win-auto-prov/temp/.gitkeep
