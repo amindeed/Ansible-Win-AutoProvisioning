@@ -116,7 +116,6 @@
   gather_facts: no
   tags: cygwin
   roles:
-  roles:
     - role: ans-win-auto-prov
       vars:
         shortname: cygwin

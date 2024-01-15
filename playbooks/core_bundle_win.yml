@@ -205,14 +205,6 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/JSToolNPP.1.2308.0.uni.64.zip
-                destination: D:\AppServ\Notepad++\plugins\JSMinNPP\
-                unzip: yes
-                force_overwrite_dest: no # Default: yes
-
-              - resource_type: file_system
-                operation_type: transfer
-                source:
                   file_relative_url: notepadpp/plugins/NppFTP-x64.zip
                 destination: D:\AppServ\Notepad++\plugins\NppFTP\
                 unzip: yes
@@ -503,7 +495,8 @@
           - installations:
             - software_components:
               - software_fullname: "Microsoft Office Standard 2016"
-                file_relative_url: ms-office-16/MS_Office_2016_32Bit_En_VL.zip
+                #file_relative_url: ms-office-16/MS_Office_2016_32Bit_En_VL.zip
+                file_relative_url: ms-office-16/MS_Office_2016_64Bit_En_VL.zip
                 type: bundle
                 installer_file_path: setup.exe
                 arguments: '/config .\Config.xml' # /!\ Consider escaping special characters with "`" (for PowerShell)
