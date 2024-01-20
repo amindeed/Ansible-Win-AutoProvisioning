@@ -1,9 +1,10 @@
 # On artifacts server (e.g. generic Artifactory repository), this file should be placed
-# under the same directory as 'Microsoft Office 2016 x86' installer bundle file;
+# under the same directory as 'Microsoft Office 2016 x64' installer bundle file;
 # (`ms-office-16/scripts/ms-office-kms-activate.ps1`)
 # kms.server.local
 
-$msOfficeInstallPath = "C:\Program Files (x86)\Microsoft Office\Office16"
+#$msOfficeInstallPath = "C:\Program Files (x86)\Microsoft Office\Office16"
+$msOfficeInstallPath = "C:\Program Files\Microsoft Office\Office16"
 $kmsserver = $args[0]
 
 try {

@@ -1,5 +1,14 @@
 # Work Log
 
+## 2024-01-20
+
+- Successfully switched to MS Office 2016 x64 (installation + activation)
+- Debugging environment variables broadcast mecanism (still requires user's logoff/logon in some cases). 
+- Revised the logic of automatic/default environment variables setting for applying to Java, Python and NodeJS (no more setting at startup).
+- `initsys` tag/play is now always executed (as a prerequisite), unless explicitely excluded with `--skip-tags "initsys"`. 
+- Added backup host to DEV inventory.
+
+
 ## 2024-01-15
 
 - Update `worklog.md` with older entries.

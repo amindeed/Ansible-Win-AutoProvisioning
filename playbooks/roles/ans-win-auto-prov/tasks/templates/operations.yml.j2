@@ -491,9 +491,18 @@
   register: envvar_result
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
-  win_shell: Update-EnvironmentVariables
+  win_shell: |
+    try {
+        Update-EnvironmentVariables
+        Write-Host "Environment broadcast successful"
+        exit 0
+    } catch {
+        Write-Warning "Broadcast failed: $($_.Exception.Message)"
+        Write-Warning "PATH is set in registry. Open NEW terminal to see changes."
+        exit 0
+    }
   changed_when: envvar_result.changed
-  ignore_errors: yes
+  register: broadcast_result
 
 {% elif update_item.action|lower == 'set' %}
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Set "{{ update_item.resource_name }}" system environment variable'
@@ -505,9 +514,18 @@
   register: envvar_result
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
-  win_shell: Update-EnvironmentVariables
+  win_shell: |
+    try {
+        Update-EnvironmentVariables
+        Write-Host "Environment broadcast successful"
+        exit 0
+    } catch {
+        Write-Warning "Broadcast failed: $($_.Exception.Message)"
+        Write-Warning "PATH is set in registry. Open NEW terminal to see changes."
+        exit 0
+    }
   changed_when: envvar_result.changed
-  ignore_errors: yes
+  register: broadcast_result
 
 {% elif update_item.action|lower == 'remove' and update_item.resource_name|lower == 'path' %}
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Ensure that "{{ update_item.value }}" is not on PATH'
@@ -519,9 +537,18 @@
   register: envvar_result
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
-  win_shell: Update-EnvironmentVariables
+  win_shell: |
+    try {
+        Update-EnvironmentVariables
+        Write-Host "Environment broadcast successful"
+        exit 0
+    } catch {
+        Write-Warning "Broadcast failed: $($_.Exception.Message)"
+        Write-Warning "PATH is set in registry. Open NEW terminal to see changes."
+        exit 0
+    }
   changed_when: envvar_result.changed
-  ignore_errors: yes
+  register: broadcast_result
 
 {% elif update_item.action|lower == 'remove' and update_item.resource_name|lower != 'path' %}
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.resource_name }}" env. var.'
@@ -532,9 +559,18 @@
   register: envvar_result
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
-  win_shell: Update-EnvironmentVariables
+  win_shell: |
+    try {
+        Update-EnvironmentVariables
+        Write-Host "Environment broadcast successful"
+        exit 0
+    } catch {
+        Write-Warning "Broadcast failed: $($_.Exception.Message)"
+        Write-Warning "PATH is set in registry. Open NEW terminal to see changes."
+        exit 0
+    }
   changed_when: envvar_result.changed
-  ignore_errors: yes
+  register: broadcast_result
 
 {% endif %}
 

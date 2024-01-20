@@ -1,5 +1,48 @@
 ---
 
+- name: "Initialize the system"
+  hosts: all
+  gather_facts: no
+  tags: [initsys, always]
+  roles:
+    - role: ans-win-auto-prov
+      vars:
+        shortname: initsys
+        pre_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: bundles/core_win/init-system/AWAP.PSModules
+                destination: C:\Program Files\WindowsPowerShell\Modules\
+                #force_overwrite_dest: no # By default, Files are only replaced if different, and folders are always forced
+                #skip_if_path_exists: C:\Program Files\WindowsPowerShell\Modules\AWAP.PSModules\
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: bundles/core_win/init-system/starter.ps1
+                destination: C:\opt\ScriptPS\Starter\
+              
+              - resource_type: file_system
+                operation_type: shortcut
+                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\opt\ScriptPS\Starter\starter.ps1"'
+                destination: '%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup\starter.ps1.lnk'
+              
+              - resource_type: file_system
+                operation_type: create
+                destination: C:\opt\ScriptPS\Starter\startup_scripts
+
+              # ---- TODO ------
+              #- resource_type: file_system
+              #  operation_type: transfer
+              #  source:
+              #    file_full_url: URL_to_cert_bundle
+              #  destination: C:\ProgramData\AWAP\Certificates 
+
+
 - name: Setup Node.JS v14, v16 and v18
   hosts: all
   gather_facts: no
@@ -35,11 +78,24 @@
         post_setup:
           - configurations:
             - update_resource:
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  upload_file: bundles/basic_win/setup-nodejs/check_NODEJS_HOME.ps1
-                destination: C:\opt\ScriptPS\Starter\startup_scripts\
+              ## [Optional] Set default NodeJS version in the environment at user session logon
+              #- resource_type: file_system
+              #  operation_type: transfer
+              #  source:
+              #    upload_file: bundles/basic_win/setup-nodejs/check_NODEJS_HOME.ps1
+              #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
+
+              # Set default NODEJS_HOME (v18.18.0)
+              - resource_type: env_var
+                resource_name: NODEJS_HOME
+                value: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64
+                action: set
+              
+              # Add NodeJS to PATH (v18.18.0)
+              - resource_type: env_var
+                resource_name: PATH
+                value: '"%NODEJS_HOME%"'
+                action: append
 
               - resource_type: file_system
                 operation_type: transfer
@@ -248,7 +304,7 @@
 - name: "Setup Python 2"
   hosts: all
   gather_facts: no
-  tags: python2
+  tags: [python, python2]
   roles:
     - role: ans-win-auto-prov
       vars:
@@ -274,12 +330,45 @@
                 #additional_arguments: ALLUSERS=1 ADDLOCAL=ALL
                 additional_arguments: ALLUSERS=1 ADDLOCAL=DefaultFeature,TclTk,Documentation,Tools,pip_feature,Testsuite
                 #abort_on_aftercheck_failure: no # Default: yes
+        post_setup:
+          - configurations:
+            - update_resource:
+              ## [Optional] Set default Python version in the environment at user session logon
+              #- resource_type: file_system
+              #  operation_type: transfer
+              #  source:
+              #    upload_file: bundles/basic_win/setup-python2/check_PYTHON_paths.ps1
+              #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
+
+              # Set default PYTHON_HOME
+              - resource_type: env_var
+                resource_name: PYTHON_HOME
+                value: D:\AppServ\Python2
+                action: set
+              
+              # Add PYTHON_HOME to PATH
+              - resource_type: env_var
+                resource_name: PATH
+                value: '"%PYTHON_HOME%"'
+                action: append
+
+              # Set default PYTHON_SCRIPTS
+              - resource_type: env_var
+                resource_name: PYTHON_SCRIPTS
+                value: D:\AppServ\Python2\Scripts
+                action: set
+              
+              # Add PYTHON_SCRIPTS to PATH
+              - resource_type: env_var
+                resource_name: PATH
+                value: '"%PYTHON_SCRIPTS%"'
+                action: append
 
 
 - name: "Setup Python 3.12"
   hosts: all
   gather_facts: no
-  tags: python312
+  tags: [python, python312]
   roles:
     - role: ans-win-auto-prov
       vars:
@@ -354,11 +443,36 @@
         post_setup:
           - configurations:
             - update_resource:
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  upload_file: bundles/basic_win/setup-python312/check_PYTHON_paths.ps1
-                destination: C:\opt\ScriptPS\Starter\startup_scripts\
+              ## [Optional] Set default Python version in the environment at user session logon
+              #- resource_type: file_system
+              #  operation_type: transfer
+              #  source:
+              #    upload_file: bundles/basic_win/setup-python312/check_PYTHON_paths.ps1
+              #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
+
+              # Set default PYTHON_HOME
+              - resource_type: env_var
+                resource_name: PYTHON_HOME
+                value: D:\AppServ\Python312
+                action: set
+              
+              # Add PYTHON_HOME to PATH
+              - resource_type: env_var
+                resource_name: PATH
+                value: '"%PYTHON_HOME%"'
+                action: append
+
+              # Set default PYTHON_SCRIPTS
+              - resource_type: env_var
+                resource_name: PYTHON_SCRIPTS
+                value: D:\AppServ\Python312\Scripts
+                action: set
+              
+              # Add PYTHON_SCRIPTS to PATH
+              - resource_type: env_var
+                resource_name: PATH
+                value: '"%PYTHON_SCRIPTS%"'
+                action: append
 
               - resource_type: file_system
                 operation_type: transfer

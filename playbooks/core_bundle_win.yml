@@ -3,7 +3,7 @@
 - name: "Initialize the system"
   hosts: all
   gather_facts: no
-  tags: initsys
+  tags: [initsys, always]
   roles:
     - role: ans-win-auto-prov
       vars:
@@ -78,11 +78,24 @@
         post_setup:
           - configurations:
             - update_resource:
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  upload_file: bundles/core_win/setup-openjdk/check_JAVA_HOME.ps1
-                destination: C:\opt\ScriptPS\Starter\startup_scripts\
+              ### [Optional] Set default Java version in the environment at user session logon
+              #- resource_type: file_system
+              #  operation_type: transfer
+              #  source:
+              #    upload_file: bundles/core_win/setup-openjdk/check_JAVA_HOME.ps1
+              #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
+
+              # Set default JAVA_HOME (Java 11)
+              - resource_type: env_var
+                resource_name: JAVA_HOME
+                value: D:\AppServ\Java\Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)
+                action: set
+              
+              # Add Java Home to PATH
+              - resource_type: env_var
+                resource_name: PATH
+                value: '"%JAVA_HOME%"'
+                action: append
 
               - resource_type: file_system
                 operation_type: transfer
@@ -477,7 +490,7 @@
                 description: Install 'Prettier' and 'Material Icons' extensions
 
 
-- name: "Setup Microsoft Office Standard 2016"
+- name: "Setup Microsoft Office Standard 2016 (x64)"
   hosts: all
   gather_facts: no
   tags: msoffice
@@ -583,6 +596,6 @@
           - installations:
             - software_components:
               - software_fullname: "TreeSize"
-                file_relative_url: treesize/TreeSizeFreeSetup_v4_7.exe
+                file_relative_url: treesize/TreeSize_v4.7.2.exe
                 type: exe
-                arguments: /DIR=D:\AppServ\TreeSize /VERYSILENT /NORESTART
+                arguments: /DIR=D:\AppServ\TreeSize /VERYSILENT /NORESTART /ALLUSERS
