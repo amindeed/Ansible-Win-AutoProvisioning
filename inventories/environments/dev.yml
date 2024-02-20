@@ -29,15 +29,55 @@ all:
           #ansible_password: aminetest
 
   vars:
+    ############################################################################
+    # CONNECTION SETTINGS
+    ############################################################################
+    # Applies to all hosts, unless overridden for specific ones.
+    # Customize these for your environment
     ansible_user: Administrator
     ansible_password: aminetest
     ansible_connection: winrm
     ansible_winrm_transport: ntlm
     ansible_winrm_server_cert_validation: ignore
+
+    ############################################################################
+    # REPOSITORY SETTINGS
+    ############################################################################
+    # Configure your artifact repository (e.g., Artifactory, Nexus, file server)
+    # IMPORTANT: Update these URLs and credentials for your environment
     pkgs_repo_base_url: "http://simulated-artifactory.local/artifactory/ansible-win-auto-prov-artifacts"
     http_auth_username: "repouser"
     http_auth_password: "repopassword"
+
+    ############################################################################
+    # FRAMEWORK PATH VARIABLES - REQUIRED
+    ############################################################################
+    # These variables define paths used by the framework.
+    # Safe to customize, but follow the conventions below:
+    
+    # Temporary directory on Windows target (framework uses this for staging files)
+    # Convention: Use a dedicated directory outside Program Files
+    # Default: C:\AWAP_Temp
     win_temp_dir_path: 'C:\AWAP_Temp'
-    uploads_dir: '../uploads'
+    
+    # Path to resources directory (relative to playbooks directory)
+    # Convention: Keep as '../resources' unless you restructure the project
+    # Default: ../resources
+    # WARNING: Changing this may require updating all playbook upload_file paths
+    resources_dir: '../resources'
+    
+    # Path to templates directory (relative to playbooks directory)
+    # Convention: Keep as '../templates' unless you restructure the project
+    # Default: ../templates
+    # WARNING: Changing this may require updating all playbook upload_template paths
     templates_dir: '../templates'
+    
+    ############################################################################
+    # SOFTWARE INSTALLATION DEFAULTS
+    ############################################################################
+    # Default root installation directory for software on Windows targets
+    # Convention: Use a dedicated drive/directory outside C:\
+    # Common options: D:\AppServ, C:\Apps, E:\Software
+    # Default: 'C:\Program Files'
+    # This can be overridden in individual playbooks
     root_install_dir: 'D:\AppServ'

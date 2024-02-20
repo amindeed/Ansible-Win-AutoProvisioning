@@ -1,4 +1,16 @@
 ---
+################################################################################
+# SYSTEM INITIALIZATION - REQUIRED
+################################################################################
+# This play sets up the base system framework and must run before any software
+# setups. It creates:
+#   - PowerShell helper modules (AWAP.PSModules)
+#   - Startup script framework (starter.ps1)
+#   - Environment variable management functions
+#
+# Safe to modify:
+#   - Add play-level variables if needed
+################################################################################
 
 - name: "Initialize the system"
   hosts: all
@@ -14,7 +26,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/core_win/init-system/AWAP.PSModules
+                  upload_file: /init-system/AWAP.PSModules
                 destination: C:\Program Files\WindowsPowerShell\Modules\
                 #force_overwrite_dest: no # By default, Files are only replaced if different, and folders are always forced
                 #skip_if_path_exists: C:\Program Files\WindowsPowerShell\Modules\AWAP.PSModules\
@@ -22,7 +34,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/core_win/init-system/starter.ps1
+                  upload_file: /init-system/starter.ps1
                 destination: C:\opt\ScriptPS\Starter\
               
               - resource_type: file_system
@@ -36,12 +48,33 @@
                 destination: C:\opt\ScriptPS\Starter\startup_scripts
 
               # ---- TODO ------
+              # Optional: Enterprise CA certificates
+              # Uncomment and configure if your organization requires custom CA certs
               #- resource_type: file_system
               #  operation_type: transfer
               #  source:
               #    file_full_url: URL_to_cert_bundle
               #  destination: C:\ProgramData\AWAP\Certificates 
                 
+################################################################################
+# SOFTWARE SETUPS
+################################################################################
+# Add your application setup plays below.
+# Each play should have a unique tag for selective execution.
+#
+# Examples:
+#   --tags "openjdk"            # Setup Java (initsys runs automatically)
+#   --tags "openssl,openjdk"     # Setup multiple applications
+#   --tags "all"                # Setup everything
+#
+# Advanced:
+#   --skip-tags "initsys"       # Skip system initialization
+#                               # Use ONLY if initsys already run successfully
+#                               # on the target machine (saves time on re-runs)
+#
+# Note: 'initsys' is tagged with 'always' and runs automatically unless
+#       explicitly skipped. It is idempotent (safe to run multiple times).
+################################################################################
 
 - name: "Setup OpenJDK: Eclipse Temurin JDK 8, 11 and 17"
   hosts: all
@@ -82,25 +115,44 @@
               #- resource_type: file_system
               #  operation_type: transfer
               #  source:
-              #    upload_file: bundles/core_win/setup-openjdk/check_JAVA_HOME.ps1
+              #    upload_file: core_win/setup-openjdk/check_JAVA_HOME.ps1
               #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               # Set default JAVA_HOME (Java 11)
+              # /!\ To be removed. Temporarily kept for testing
               - resource_type: env_var
                 resource_name: JAVA_HOME
                 value: D:\AppServ\Java\Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)
                 action: set
               
               # Add Java Home to PATH
+              # /!\ To be removed. Temporarily kept for testing
               - resource_type: env_var
                 resource_name: PATH
-                value: '"%JAVA_HOME%"'
+                value: '%JAVA_HOME%\bin' # /!\ '\' should be escaped
                 action: append
+            
+              # ---------------------------------------------------------
+
+              # /!\ To be removed. Temporarily added for testing
+              # Remove value from PATH
+              - resource_type: env_var
+                resource_name: PATH
+                value: 'D:'
+                action: remove
+
+              # /!\ To be removed. Temporarily added for testing
+              # Remove env var
+              - resource_type: env_var
+                resource_name: FAKE_ENV_VAR
+                action: remove
+
+              # ---------------------------------------------------------
 
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/core_win/setup-openjdk/set_JAVA_HOME.ps1
+                  upload_file: core_win/setup-openjdk/set_JAVA_HOME.ps1
                 destination: D:\AppServ\Java\
 
               - resource_type: file_system
@@ -245,7 +297,7 @@
               - resource_type: file_system
                 operation_type: template
                 source:
-                  upload_template: bundles/core_win/setup-7zip/set_7zip_settings.reg.j2
+                  upload_template: core_win/setup-7zip/set_7zip_settings.reg.j2
                 destination: '{{ win_temp_dir_path }}\set_7zip_settings.reg'
           - configurations:
             - update_resource:
@@ -521,7 +573,7 @@
         post_setup:
           - executions:
             - run_ps1_script:
-              - upload_file: bundles/core_win/setup-msoffice/ms-office-kms-activate.ps1
+              - upload_file: core_win/setup-msoffice/ms-office-kms-activate.ps1
                 arguments: "kms.server.local"
                 #working_directory: C:\temp\my office stuff\misc
                 abort_on_failure: yes # Default: 'no'

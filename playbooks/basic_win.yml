@@ -1,4 +1,16 @@
 ---
+################################################################################
+# SYSTEM INITIALIZATION - REQUIRED
+################################################################################
+# This play sets up the base system framework and must run before any software
+# setups. It creates:
+#   - PowerShell helper modules (AWAP.PSModules)
+#   - Startup script framework (starter.ps1)
+#   - Environment variable management functions
+#
+# Safe to modify:
+#   - Add play-level variables if needed
+################################################################################
 
 - name: "Initialize the system"
   hosts: all
@@ -14,7 +26,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/core_win/init-system/AWAP.PSModules
+                  upload_file: init-system/AWAP.PSModules
                 destination: C:\Program Files\WindowsPowerShell\Modules\
                 #force_overwrite_dest: no # By default, Files are only replaced if different, and folders are always forced
                 #skip_if_path_exists: C:\Program Files\WindowsPowerShell\Modules\AWAP.PSModules\
@@ -22,7 +34,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/core_win/init-system/starter.ps1
+                  upload_file: init-system/starter.ps1
                 destination: C:\opt\ScriptPS\Starter\
               
               - resource_type: file_system
@@ -42,6 +54,25 @@
               #    file_full_url: URL_to_cert_bundle
               #  destination: C:\ProgramData\AWAP\Certificates 
 
+################################################################################
+# SOFTWARE SETUPS
+################################################################################
+# Add your application setup plays below.
+# Each play should have a unique tag for selective execution.
+#
+# Examples:
+#   --tags "openjdk"            # Setup Java (initsys runs automatically)
+#   --tags "openssl,openjdk"     # Setup multiple applications
+#   --tags "all"                # Setup everything
+#
+# Advanced:
+#   --skip-tags "initsys"       # Skip system initialization
+#                               # Use ONLY if initsys already run successfully
+#                               # on the target machine (saves time on re-runs)
+#
+# Note: 'initsys' is tagged with 'always' and runs automatically unless
+#       explicitly skipped. It is idempotent (safe to run multiple times).
+################################################################################
 
 - name: Setup Node.JS v14, v16 and v18
   hosts: all
@@ -82,7 +113,7 @@
               #- resource_type: file_system
               #  operation_type: transfer
               #  source:
-              #    upload_file: bundles/basic_win/setup-nodejs/check_NODEJS_HOME.ps1
+              #    upload_file: basic_win/setup-nodejs/check_NODEJS_HOME.ps1
               #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               # Set default NODEJS_HOME (v18.18.0)
@@ -100,7 +131,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/basic_win/setup-nodejs/set_NODEJS_HOME.ps1
+                  upload_file: basic_win/setup-nodejs/set_NODEJS_HOME.ps1
                 destination: D:\AppServ\NodeJS\
 
               - resource_type: file_system
@@ -337,7 +368,7 @@
               #- resource_type: file_system
               #  operation_type: transfer
               #  source:
-              #    upload_file: bundles/basic_win/setup-python2/check_PYTHON_paths.ps1
+              #    upload_file: basic_win/setup-python2/check_PYTHON_paths.ps1
               #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               # Set default PYTHON_HOME
@@ -447,7 +478,7 @@
               #- resource_type: file_system
               #  operation_type: transfer
               #  source:
-              #    upload_file: bundles/basic_win/setup-python312/check_PYTHON_paths.ps1
+              #    upload_file: basic_win/setup-python312/check_PYTHON_paths.ps1
               #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
               # Set default PYTHON_HOME
@@ -477,7 +508,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: bundles/basic_win/setup-python312/set_PYTHON_paths.ps1
+                  upload_file: basic_win/setup-python312/set_PYTHON_paths.ps1
                 destination: D:\AppServ\Python312\
 
               - resource_type: file_system

@@ -167,7 +167,7 @@
 {% if software_item.upload_file is defined and software_item.upload_file is not none %}
 - name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ software_item.software_fullname }}' files to target host"
   win_copy:
-    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ software_item.upload_file }}'
+    src: '{% raw %}{{ resources_dir }}{% endraw %}/{{ software_item.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\{{ software_item.upload_file }}'
     backup: yes
   when: "'Not Installed' in initial_software_status.stdout"
@@ -531,7 +531,7 @@
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Ensure that "{{ update_item.value }}" is not on PATH'
   win_path:
     name: PATH
-    elements: {{ update_item.value }}
+    elements: "{{ update_item.value }}"
     scope: machine
     state: absent
   register: envvar_result
@@ -672,7 +672,7 @@
 
 - name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
   win_copy:
-    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.upload_file }}'
+    src: '{% raw %}{{ resources_dir }}{% endraw %}/{{ update_item.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Merge in "{{ file_name }}" file'
@@ -776,7 +776,7 @@
 
 - name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Register uploaded item type (file or directory)"
   stat:
-    path: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
+    path: '{% raw %}{{ resources_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
   register: item_type
   delegate_to: localhost
 
@@ -788,13 +788,13 @@
 
 - name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (directory) to target host <2/2>"
   win_copy:
-    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
+    src: '{% raw %}{{ resources_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
   when: item_type.stat.isdir
 
 - name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
   win_copy:
-    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
+    src: '{% raw %}{{ resources_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
   when: item_type.stat.isreg
 
@@ -1230,7 +1230,7 @@
 {% if job_item.upload_file is defined and job_item.upload_file is not none %}
 - name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (file) to target host"
   win_copy:
-    src: '{% raw %}{{ uploads_dir }}{% endraw %}/{{ job_item.upload_file }}'
+    src: '{% raw %}{{ resources_dir }}{% endraw %}/{{ job_item.upload_file }}'
     dest: '{% raw %}{{ win_temp_dir_path }}{% endraw %}\'
 
 {% else %}
