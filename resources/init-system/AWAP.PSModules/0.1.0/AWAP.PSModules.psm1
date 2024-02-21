@@ -1,7 +1,34 @@
 ###
-#
 # Helper functions for Windows Server 2019 systems
 ###
+
+<#
+    Checks whether a given PATH entry already exists as a distinct, normalized segment
+    within a PATH value (semicolon-delimited, case-insensitive, ignoring trailing '\').
+#>
+function Test-PathEntryExists {
+    param(
+        [Parameter(Mandatory)]
+        [string]$PathValue,
+
+        [Parameter(Mandatory)]
+        [string]$EntryToCheck
+    )
+
+    # Split PATH safely
+    $entries = $PathValue -split ';' | Where-Object { $_ }
+
+    # Normalize entry to check
+    $normalizedCheck = $EntryToCheck.TrimEnd('\')
+
+    foreach ($entry in $entries) {
+        if ($entry.TrimEnd('\').Equals($normalizedCheck, 'InvariantCultureIgnoreCase')) {
+            return $true
+        }
+    }
+
+    return $false
+}
 
 
 <#
@@ -117,7 +144,7 @@ function Add-NewEnvValueToPath {
 
 	if ( $nopercents ) {
 		# Append '$newValue' to user's "PATH" if it does not exist
-		if ($CurrentPATHValue -notlike "*$newValue*") {
+		if (-not (Test-PathEntryExists -PathValue $CurrentPATHValue -EntryToCheck $newValue)) {
 
 			$FullNewPATHValue = "$CurrentPATHValue$newValue;"
 			New-ItemProperty -Path "HKCU:\Environment" -Name "Path" -Value $FullNewPATHValue -PropertyType ExpandString -Force
@@ -126,7 +153,7 @@ function Add-NewEnvValueToPath {
 	} else {
 
 		# Append '%$newValue%' to user's "PATH" if it does not exist
-		if ($CurrentPATHValue -notlike "*%$newValue%*") {
+		if (-not (Test-PathEntryExists -PathValue $CurrentPATHValue -EntryToCheck "%$newValue%")) {
 
 			$FullNewPATHValue = "$CurrentPATHValue%$newValue%;"
 			New-ItemProperty -Path "HKCU:\Environment" -Name "Path" -Value $FullNewPATHValue -PropertyType ExpandString -Force

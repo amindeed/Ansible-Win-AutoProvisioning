@@ -116,18 +116,18 @@
               #    upload_file: basic_win/setup-nodejs/check_NODEJS_HOME.ps1
               #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
 
-              # Set default NODEJS_HOME (v18.18.0)
-              - resource_type: env_var
-                resource_name: NODEJS_HOME
-                value: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64
-                action: set
+              ## Set default NODEJS_HOME (v18.18.0)
+              #- resource_type: env_var
+              #  resource_name: NODEJS_HOME
+              #  value: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64
+              #  action: set
+              #
+              ## Add NodeJS to PATH (v18.18.0)
+              #- resource_type: env_var
+              #  resource_name: PATH
+              #  value: '"%NODEJS_HOME%"'
+              #  action: append
               
-              # Add NodeJS to PATH (v18.18.0)
-              - resource_type: env_var
-                resource_name: PATH
-                value: '"%NODEJS_HOME%"'
-                action: append
-
               - resource_type: file_system
                 operation_type: transfer
                 source:
@@ -347,53 +347,35 @@
                 operation_type: transfer
                 source:
                   file_relative_url: python2/python-2.7.18.amd64-pdb.zip
-                destination: D:\AppServ\python2\Symbols
+                destination: D:\AppServ\Python\Python2\Symbols
                 unzip: yes
-                skip_if_path_exists: D:\AppServ\python2\Symbols
+                skip_if_path_exists: D:\AppServ\Python\Python2\Symbols
         setup:
           - installations:
             - software_components:
               - software_fullname: Python 2.7.18 (64-bit)
                 file_relative_url: python2/python-2.7.18.amd64.msi
                 type: msi
-                root_install_dir: D:\AppServ
-                install_directory_name: python2
+                root_install_dir: D:\AppServ\Python
+                install_directory_name: Python2
                 #additional_arguments: ALLUSERS=1 ADDLOCAL=ALL
                 additional_arguments: ALLUSERS=1 ADDLOCAL=DefaultFeature,TclTk,Documentation,Tools,pip_feature,Testsuite
                 #abort_on_aftercheck_failure: no # Default: yes
         post_setup:
           - configurations:
             - update_resource:
-              ## [Optional] Set default Python version in the environment at user session logon
-              #- resource_type: file_system
-              #  operation_type: transfer
-              #  source:
-              #    upload_file: basic_win/setup-python2/check_PYTHON_paths.ps1
-              #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: basic_win/setup-python/set_PYTHON_paths.ps1
+                destination: D:\AppServ\Python\
 
-              # Set default PYTHON_HOME
-              - resource_type: env_var
-                resource_name: PYTHON_HOME
-                value: D:\AppServ\Python2
-                action: set
-              
-              # Add PYTHON_HOME to PATH
-              - resource_type: env_var
-                resource_name: PATH
-                value: '"%PYTHON_HOME%"'
-                action: append
-
-              # Set default PYTHON_SCRIPTS
-              - resource_type: env_var
-                resource_name: PYTHON_SCRIPTS
-                value: D:\AppServ\Python2\Scripts
-                action: set
-              
-              # Add PYTHON_SCRIPTS to PATH
-              - resource_type: env_var
-                resource_name: PATH
-                value: '"%PYTHON_SCRIPTS%"'
-                action: append
+              - resource_type: file_system
+                operation_type: shortcut
+                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Python\set_PYTHON_paths.ps1"'
+                destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set Python Version.lnk'
+                #icon: D:\AppServ\Python\Python2\python.exe,0
 
 
 - name: "Setup Python 3.12"
@@ -468,55 +450,24 @@
               - software_fullname: "Python 3.12.0"
                 file_relative_url: python312/python-3.12.0-amd64.exe
                 type: exe
-                arguments: /quiet InstallAllUsers=1 TargetDir=D:\AppServ\Python312 PrependPath=0 AppendPath=0 AssociateFiles=0 Include_symbols=1 Include_debug=1
-                root_install_dir: D:\AppServ\Python312
+                arguments: /quiet InstallAllUsers=1 TargetDir=D:\AppServ\Python\Python312 PrependPath=0 AppendPath=0 AssociateFiles=0 Include_symbols=1 Include_debug=1
+                root_install_dir: D:\AppServ\Python\Python312
 
         post_setup:
           - configurations:
             - update_resource:
-              ## [Optional] Set default Python version in the environment at user session logon
-              #- resource_type: file_system
-              #  operation_type: transfer
-              #  source:
-              #    upload_file: basic_win/setup-python312/check_PYTHON_paths.ps1
-              #  destination: C:\opt\ScriptPS\Starter\startup_scripts\
-
-              # Set default PYTHON_HOME
-              - resource_type: env_var
-                resource_name: PYTHON_HOME
-                value: D:\AppServ\Python312
-                action: set
-              
-              # Add PYTHON_HOME to PATH
-              - resource_type: env_var
-                resource_name: PATH
-                value: '"%PYTHON_HOME%"'
-                action: append
-
-              # Set default PYTHON_SCRIPTS
-              - resource_type: env_var
-                resource_name: PYTHON_SCRIPTS
-                value: D:\AppServ\Python312\Scripts
-                action: set
-              
-              # Add PYTHON_SCRIPTS to PATH
-              - resource_type: env_var
-                resource_name: PATH
-                value: '"%PYTHON_SCRIPTS%"'
-                action: append
-
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  upload_file: basic_win/setup-python312/set_PYTHON_paths.ps1
-                destination: D:\AppServ\Python312\
+                  upload_file: basic_win/setup-python/set_PYTHON_paths.ps1
+                destination: D:\AppServ\Python\
 
               - resource_type: file_system
                 operation_type: shortcut
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
-                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Python312\set_PYTHON_paths.ps1"'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Python\set_PYTHON_paths.ps1"'
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set Python Version.lnk'
-                icon: D:\AppServ\Python2\python.exe,0
+                #icon: D:\AppServ\Python\Python2\python.exe,0
 
   #tasks:
   #  - name: '[POST-SETUP] {PYTHON312} Notify logged in users with a message'

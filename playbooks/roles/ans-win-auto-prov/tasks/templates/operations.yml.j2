@@ -486,7 +486,7 @@
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Append "{{ update_item.value }}" to "{{ update_item.resource_name }}"'
   win_path:
     name: {{ update_item.resource_name }}
-    elements: {{ update_item.value }}
+    elements: '{{ update_item.value }}'
     scope: machine
   register: envvar_result
 
@@ -509,7 +509,7 @@
   win_environment:
     state: present
     name: {{ update_item.resource_name }}
-    value: {{ update_item.value }}
+    value: '{{ update_item.value }}'
     level: machine
   register: envvar_result
 
@@ -531,7 +531,7 @@
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Ensure that "{{ update_item.value }}" is not on PATH'
   win_path:
     name: PATH
-    elements: "{{ update_item.value }}"
+    elements: '{{ update_item.value }}'
     scope: machine
     state: absent
   register: envvar_result

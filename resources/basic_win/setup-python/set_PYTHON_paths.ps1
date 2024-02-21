@@ -1,4 +1,4 @@
-$exePath = "D:\AppServ\python2\python.exe"  # Executable to extract shortcut icon from
+$exePath = "D:\AppServ\Python\Python2\python.exe"  # Executable to extract shortcut icon from
 $iconIndex = 0
 
 $items = @(
@@ -7,11 +7,11 @@ $items = @(
         EnvVars = @(
             @{
                 Name = "PYTHON_HOME"
-                Value = "D:\AppServ\python2"
+                Value = "D:\AppServ\Python\Python2"
             },
             @{
                 Name = "PYTHON_SCRIPTS"
-                Value = "D:\AppServ\python2\Scripts"
+                Value = "D:\AppServ\Python\Python2\Scripts"
             }
         )
     },
@@ -20,11 +20,11 @@ $items = @(
         EnvVars = @(
             @{
                 Name = "PYTHON_HOME"
-                Value = "D:\AppServ\python312"
+                Value = "D:\AppServ\Python\Python312"
             },
             @{
                 Name = "PYTHON_SCRIPTS"
-                Value = "D:\AppServ\python312\Scripts"
+                Value = "D:\AppServ\Python\Python312\Scripts"
             }
         )
     }
@@ -37,9 +37,8 @@ $postMsgBoxTitle = "Selected PYTHON version"
 $postMsgText = "Relaunch any running console app (e.g. CMD, Git Bash). `n`nSelected:"
 
 
-
-
-
+# Optional
+#$script:PathSuffix = '\bin'
 
 # -------------------- DO NOT CHANGE CODE BELOW --------------------
 
@@ -49,6 +48,10 @@ function execAction($AllItems, $SelectedLabel) {
     foreach ($envVar in $MatchingItem['EnvVars']) {
         # /!\ Requires AWAP Modules to be already installed
         Set-EnvironmentVariable -envVarName $envVar.Name -envVarValue $envVar.Value
+        
+        # e.g. append '%JAVA_HOME%\bin' to current user's PATH
+        $suffix = if ($script:PathSuffix) { $script:PathSuffix } else { '' }
+        Add-NewEnvValueToPath "%$($envVar.Name)%$suffix" -nopercents
     }
 }
 
