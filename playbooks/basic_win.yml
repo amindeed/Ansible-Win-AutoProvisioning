@@ -88,21 +88,21 @@
               - software_fullname: "NodeJS v14.17.3" 
                 file_relative_url: nodejs/node-v14.17.3-win-x64.zip
                 type: zip
-                root_install_dir: D:\AppServ\nodejs
+                root_install_dir: '{{ root_install_dir }}\nodejs'
                 desktop_shortcut: no # Default: no
                 startmenu_shortcut: no # Default: yes
 
               - software_fullname: "NodeJS v16.16.0" 
                 file_relative_url: nodejs/node-v16.16.0-win-x64.zip
                 type: zip
-                root_install_dir: D:\AppServ\nodejs
+                root_install_dir: '{{ root_install_dir }}\nodejs'
                 desktop_shortcut: no # Default: no
                 startmenu_shortcut: no # Default: yes
 
               - software_fullname: "NodeJS v18.18.0" 
                 file_relative_url: nodejs/node-v18.18.0-win-x64.zip
                 type: zip
-                root_install_dir: D:\AppServ\nodejs
+                root_install_dir: '{{ root_install_dir }}\nodejs'
                 desktop_shortcut: no # Default: no
                 startmenu_shortcut: no # Default: yes
 
@@ -119,7 +119,7 @@
               ## Set default NODEJS_HOME (v18.18.0)
               #- resource_type: env_var
               #  resource_name: NODEJS_HOME
-              #  value: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64
+              #  value: {{ root_install_dir }}\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64
               #  action: set
               #
               ## Add NodeJS to PATH (v18.18.0)
@@ -132,14 +132,14 @@
                 operation_type: transfer
                 source:
                   upload_file: basic_win/setup-nodejs/set_NODEJS_HOME.ps1
-                destination: D:\AppServ\NodeJS\
+                destination: '{{ root_install_dir }}\NodeJS\'
 
               - resource_type: file_system
                 operation_type: shortcut
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
-                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\nodejs\set_NODEJS_HOME.ps1"'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "{{ root_install_dir }}\nodejs\set_NODEJS_HOME.ps1"'
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set NodeJs Version.lnk'
-                icon: D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64\node.exe,0
+                icon: '{{ root_install_dir }}\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64\node.exe,0'
 
   #tasks:
   #  - name: '[POST-SETUP] {NODEJS} Notify logged in users with a message'
@@ -164,7 +164,7 @@
               - software_fullname: "Eclipse IDE 2020-06" 
                 file_relative_url: eclipse_jee_ide/eclipse-jee-2020-06-R-win32-x86_64.zip
                 type: zip
-                root_install_dir: D:\AppServ
+                root_install_dir: '{{ root_install_dir }}'
                 main_app_launcher: eclipse\eclipse.exe
                 desktop_shortcut: yes # Default: no
                 shortcut_name: 'Eclipse IDEs\Eclipse 2020-06' # Default shortcut name == 'software_fullname'
@@ -173,7 +173,7 @@
               - software_fullname: "Eclipse IDE 2022-12" 
                 file_relative_url: eclipse_jee_ide/eclipse-jee-2022-12-R-win32-x86_64.zip
                 type: zip
-                root_install_dir: D:\AppServ
+                root_install_dir: '{{ root_install_dir }}'
                 main_app_launcher: eclipse\eclipse.exe
                 desktop_shortcut: yes # Default: no
                 shortcut_name: 'Eclipse IDEs\Eclipse IDE 2022-12'
@@ -182,7 +182,7 @@
               - software_fullname: "Eclipse IDE Neon 3 (2016-06)" 
                 file_relative_url: eclipse_jee_ide/eclipse-jee-neon-3-win32-x86_64.zip
                 type: zip
-                root_install_dir: D:\AppServ
+                root_install_dir: '{{ root_install_dir }}'
                 main_app_launcher: eclipse\eclipse.exe
                 desktop_shortcut: yes # Default: no
                 shortcut_name: 'Eclipse IDEs\Eclipse IDE Neon 3 (2016-06)'
@@ -191,7 +191,7 @@
               - software_fullname: "Eclipse IDE Oxygen (2017-06)" 
                 file_relative_url: eclipse_jee_ide/eclipse-jee-oxygen-R-win32-x86_64.zip
                 type: zip
-                root_install_dir: D:\AppServ
+                root_install_dir: '{{ root_install_dir }}'
                 main_app_launcher: eclipse\eclipse.exe
                 desktop_shortcut: yes # Default: no
                 shortcut_name: 'Eclipse IDEs\Eclipse IDE Oxygen (2017-06)'
@@ -207,28 +207,20 @@
       vars:
         shortname: cygwin
         setup:
-          - configurations:
-            - update_resource:  
-              - resource_type: file_system
-                operation_type: transfer
-                source:
-                  file_relative_url: cygwin/cygwin64install_cyg_v3_4_9.zip
-                destination: D:\AppServ\Cygwin\
-                unzip: yes # Default: 'no'
-                force_overwrite_dest: no # Default: yes # Ignored when unzip == 'no'
           - installations:
             - software_components:
               - software_fullname: Cygwin
                 file_relative_url: cygwin/cygwin_v3_4_9_setup-x86_64.exe
                 type: exe
-                arguments: --quiet-mode --local-install --local-package-dir D:\AppServ\Cygwin\cygwin64install --root D:\AppServ\Cygwin\cygwin64 --no-shortcuts --packages libpopt-common,terminfo,tzdata,cygwin-devel,w32api-headers,windows-default-manifest,libsource-highlight-common,publicsuffix-list-dafsa,libgsasl-common,gsettings-desktop-schemas,cygwin,libiconv2,libintl8,w32api-runtime,libintl-devel,libncursesw10,libreadline7,bash,libzstd1,crypto-policies,base-cygwin,zlib0,libpng16,libgpg-error0,libpcre1,libidn12,libjbig2,libdeflate0,libXdmcp6,libXau6,libwebp7,liblcms2_2,libbrotlicommon1,libnghttp2_14,libidn2_0,libntlm0,libkrb5support0,libedit0,cygrunsrv,libpkgconf4,libsqlite3_0,m4,libatomic1,libiconv,gettext,libxxhash0,libexpat1,libcrypt2,libltdl7,libffi8,libunistring5,which,vim-minimal,tzcode,sed,run,ncurses,mintty,login,libtasn1_6,libsmartcols1,libsigsegv2,libpopt0,libpipeline1,libpcre2_8_0,liblzma5,liblz4_1,libgmp10,libgcc1,libffi6,libbz2_1,libattr1,libargp,ipc-utils,hostname,gzip,editrights,diffutils,dash,binutils,alternatives,libgcrypt20,libxcb1,libwebpmux3,libwebpdemux2,libbrotlidec1,libk5crypto3,pkgconf,libtool,libpsl5,cygutils,less,grep,libxml2,xz,libisl23,libjpeg8,libcom_err2,libquadmath0,libgomp1,perl_base,libgc1,libuuid1,libstdc++6,libmpfr6,libgdbm6,libp11-kit0,file,bzip2,coreutils,getent,rebase,info,_autorebase,libfreetype6,pkg-config,libglib2.0_0,desktop-file-utils,libkrb5_3,libimagequant0,libguile3.0_1,libblkid1,libgraphite2_3,libtiff6,libdb5.3,libicu61,libncurses++w10,zstd,libuchardet0,libmpc3,gawk,libgdbm_compat4,p11-kit-trust,p11-kit,findutils,gamin,libfam0,libgssapi_krb5_2,make,libfdisk1,libboost_regex1.66,libncurses-devel,tar,groff,gcc-core,csih,perl,ca-certificates,base-files,shared-mime-info,libgsasl18,util-linux,libsource-highlight4,gcc-g++,autoconf2.1,perl-JSON-PP,libssl3,libssl1.1,libharfbuzz0,libfribidi0,man-db,perl_autorebase,openssl,libsasl2_3,libssh2_1,libfido2,python39,python39-platformdirs,python39-setuptools,rsync,libraqm0,autoconf2.7,autoconf2.5,texinfo,perl-TermReadKey,perl-Error,libopenldap2,openssh,python39-iniconfig,python39-six,python39-idna,python39-toml,python39-pluggy,python39-babel,python39-markupsafe,python39-snowballstemmer,python39-imagesize,python39-olefile,python39-chardet,autoconf,libopenldap2_4_2,libcurl4,python39-urllib3,python39-jinja2,automake1.9,automake1.16,automake1.13,automake1.12,automake1.11,automake1.10,automake1.14,automake1.15,git,python39-requests,python39-pyparsing,automake,python39-packaging,python39-pytest,python39-imaging,python39-pygments,python39-docutils,python39-sphinx,python39-pip,python39-sphinxcontrib-serializinghtml,python3,gdb,gettext-devel,libsodium-common,xxd,libsodium23,vim-common,vim
+                # /!\ Intall packages from the public internet
+                arguments: --quiet-mode --wait --site https://mirrors.kernel.org/sourceware/cygwin/ --site https://mirrors.filigrane-technologie.fr/cygwin/ --root {{ root_install_dir }}\Cygwin\cygwin64 --no-shortcuts --packages gcc-core,make,binutils,gdb,cygwin-devel,pkg-config,libncurses-devel,gettext-devel
                 manual_registration:
-                  root_install_dir: D:\AppServ
+                  root_install_dir: '{{ root_install_dir }}'
                   main_app_launcher: cygwin64\bin\mintty.exe
                   desktop_shortcut: yes
                   startmenu_shortcut: yes
                   shortcut_arguments: '-i /Cygwin-Terminal.ico -'
-                  shortcut_icon: D:\AppServ\Cygwin\cygwin64\Cygwin.ico  # Provide full path, optionnally followed with icon index, e.g. 'filpath,12'
+                  shortcut_icon: '{{ root_install_dir }}\Cygwin\cygwin64\Cygwin.ico'  # Provide full path, optionnally followed with icon index, e.g. 'filpath,12'
                 #abort_on_aftercheck_failure: no # Default: yes
 
 
@@ -246,7 +238,7 @@
               - software_fullname: "DBeaver"
                 file_relative_url: dbeaver/dbeaver-ce-23.2.1-x86_64-setup.exe
                 type: exe
-                arguments: /allusers /S /D=D:\AppServ\DBeaver
+                arguments: /allusers /S /D={{ root_install_dir }}\DBeaver
                 #clean_downloads: false
 
 
@@ -268,19 +260,19 @@
               - software_fullname: Git
                 file_relative_url: git/Git-2.42.0.2-64-bit.exe
                 type: exe
-                arguments: /DIR=D:\AppServ\Git /VERYSILENT /NORESTART /COMPONENTS=icons,icons\desktop,ext,ext\shellhere,ext\guihere,gitlfs,assoc,assoc_sh
+                arguments: /DIR={{ root_install_dir }}\Git /VERYSILENT /NORESTART /COMPONENTS=icons,icons\desktop,ext,ext\shellhere,ext\guihere,gitlfs,assoc,assoc_sh
                 #clean_downloads: false
               - software_fullname: "kdiff3"
                 file_relative_url: kdiff3/kdiff3-1.10.5-windows-x86_64.exe
                 type: exe
-                arguments: /S /D=D:\AppServ\KDiff3
+                arguments: /S /D={{ root_install_dir }}\KDiff3
         setup:
           - installations:
             - software_components:
               - software_fullname: Git Extensions
                 file_relative_url: gitextensions/GitExtensions-4.1.0.16698-1fe52a137.msi
                 type: msi
-                root_install_dir: D:\AppServ
+                root_install_dir: '{{ root_install_dir }}'
                 #clean_downloads: true
 
 
@@ -298,7 +290,7 @@
               - software_fullname: "UMLDesigner" # /!\ Attention when 'create_directory' is set to 'no' /!\
                 file_relative_url: umldesigner/UMLDesigner_v9-win32.win32.x86_64.zip
                 type: zip
-                root_install_dir: D:\AppServ
+                root_install_dir: '{{ root_install_dir }}'
                 create_directory: no # Default: yes
                 main_app_launcher: UMLDesigner.exe
                 desktop_shortcut: yes # Default: no
@@ -319,7 +311,7 @@
               - software_fullname: "apache-maven-3.9.4" # /!\ Attention when 'create_directory' is set to 'no' /!\
                 file_relative_url: maven/apache-maven-3.9.4-bin.zip
                 type: zip
-                root_install_dir: D:\AppServ
+                root_install_dir: '{{ root_install_dir }}'
                 create_directory: no # Default: yes
                 desktop_shortcut: no # Default: no
                 startmenu_shortcut: no # Default: yes
@@ -328,7 +320,7 @@
             - update_resource:
               - resource_type: env_var
                 resource_name: PATH
-                value: D:\AppServ\apache-maven-3.9.4\bin
+                value: '{{ root_install_dir }}\apache-maven-3.9.4\bin'
                 action: append
 
 
@@ -347,16 +339,16 @@
                 operation_type: transfer
                 source:
                   file_relative_url: python2/python-2.7.18.amd64-pdb.zip
-                destination: D:\AppServ\Python\Python2\Symbols
+                destination: '{{ root_install_dir }}\Python\Python2\Symbols'
                 unzip: yes
-                skip_if_path_exists: D:\AppServ\Python\Python2\Symbols
+                skip_if_path_exists: '{{ root_install_dir }}\Python\Python2\Symbols'
         setup:
           - installations:
             - software_components:
               - software_fullname: Python 2.7.18 (64-bit)
                 file_relative_url: python2/python-2.7.18.amd64.msi
                 type: msi
-                root_install_dir: D:\AppServ\Python
+                root_install_dir: '{{ root_install_dir }}\Python'
                 install_directory_name: Python2
                 #additional_arguments: ALLUSERS=1 ADDLOCAL=ALL
                 additional_arguments: ALLUSERS=1 ADDLOCAL=DefaultFeature,TclTk,Documentation,Tools,pip_feature,Testsuite
@@ -368,14 +360,14 @@
                 operation_type: transfer
                 source:
                   upload_file: basic_win/setup-python/set_PYTHON_paths.ps1
-                destination: D:\AppServ\Python\
+                destination: '{{ root_install_dir }}\Python\'
 
               - resource_type: file_system
                 operation_type: shortcut
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
-                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Python\set_PYTHON_paths.ps1"'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "{{ root_install_dir }}\Python\set_PYTHON_paths.ps1"'
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set Python Version.lnk'
-                #icon: D:\AppServ\Python\Python2\python.exe,0
+                #icon: '{{ root_install_dir }}\Python\Python2\python.exe,0'
 
 
 - name: "Setup Python 3.12"
@@ -450,8 +442,8 @@
               - software_fullname: "Python 3.12.0"
                 file_relative_url: python312/python-3.12.0-amd64.exe
                 type: exe
-                arguments: /quiet InstallAllUsers=1 TargetDir=D:\AppServ\Python\Python312 PrependPath=0 AppendPath=0 AssociateFiles=0 Include_symbols=1 Include_debug=1
-                root_install_dir: D:\AppServ\Python\Python312
+                arguments: /quiet InstallAllUsers=1 TargetDir={{ root_install_dir }}\Python\Python312 PrependPath=0 AppendPath=0 AssociateFiles=0 Include_symbols=1 Include_debug=1
+                root_install_dir: '{{ root_install_dir }}\Python\Python312'
 
         post_setup:
           - configurations:
@@ -460,14 +452,14 @@
                 operation_type: transfer
                 source:
                   upload_file: basic_win/setup-python/set_PYTHON_paths.ps1
-                destination: D:\AppServ\Python\
+                destination: '{{ root_install_dir }}\Python\'
 
               - resource_type: file_system
                 operation_type: shortcut
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
-                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "D:\AppServ\Python\set_PYTHON_paths.ps1"'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "{{ root_install_dir }}\Python\set_PYTHON_paths.ps1"'
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set Python Version.lnk'
-                #icon: D:\AppServ\Python\Python2\python.exe,0
+                #icon: {{ root_install_dir }}\Python\Python2\python.exe,0
 
   #tasks:
   #  - name: '[POST-SETUP] {PYTHON312} Notify logged in users with a message'

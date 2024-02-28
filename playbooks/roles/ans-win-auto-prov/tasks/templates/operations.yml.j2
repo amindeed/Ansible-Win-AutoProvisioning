@@ -492,14 +492,44 @@
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
   win_shell: |
+    # Update environment
     try {
         Update-EnvironmentVariables
-        Write-Host "Environment broadcast successful"
-        exit 0
+        Write-Host "Environment variables updated in registry"
     } catch {
-        Write-Warning "Broadcast failed: $($_.Exception.Message)"
-        Write-Warning "PATH is set in registry. Open NEW terminal to see changes."
-        exit 0
+        Write-Warning "Registry update warning: $($_.Exception.Message)"
+    }
+    
+    # Notify users
+    try {
+        $sessionIDs = @()
+        query session 2>$null | Select-String "Active|Disc" | ForEach-Object {
+            if ($_ -match '\s+(\d+)\s+') {
+                $id = [int]$matches[1]
+                if ($id -ne 0) { $sessionIDs += $id }
+            }
+        }
+        
+        if ($sessionIDs.Count -gt 0) {
+            # Single-line message (msg.exe limitation)
+            $message = "SYSTEM ADMIN: Environment variables updated. Log off and log back on to apply changes."
+            
+            $successCount = 0
+            foreach ($sessionID in $sessionIDs) {
+                # Properly quote the message
+                msg $sessionID /TIME:0 $message 2>$null
+                
+                if ($LASTEXITCODE -eq 0) {
+                    $successCount++
+                }
+            }
+            
+            Write-Host "Messages sent: $successCount succeeded (of $($sessionIDs.Count) sessions)"
+        } else {
+            Write-Host "No active user sessions to notify"
+        }
+    } catch {
+        Write-Warning "Could not notify users: $($_.Exception.Message)"
     }
   changed_when: envvar_result.changed
   register: broadcast_result
@@ -515,14 +545,44 @@
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
   win_shell: |
+    # Update environment
     try {
         Update-EnvironmentVariables
-        Write-Host "Environment broadcast successful"
-        exit 0
+        Write-Host "Environment variables updated in registry"
     } catch {
-        Write-Warning "Broadcast failed: $($_.Exception.Message)"
-        Write-Warning "PATH is set in registry. Open NEW terminal to see changes."
-        exit 0
+        Write-Warning "Registry update warning: $($_.Exception.Message)"
+    }
+    
+    # Notify users
+    try {
+        $sessionIDs = @()
+        query session 2>$null | Select-String "Active|Disc" | ForEach-Object {
+            if ($_ -match '\s+(\d+)\s+') {
+                $id = [int]$matches[1]
+                if ($id -ne 0) { $sessionIDs += $id }
+            }
+        }
+        
+        if ($sessionIDs.Count -gt 0) {
+            # Single-line message (msg.exe limitation)
+            $message = "SYSTEM ADMIN: Environment variables updated. Log off and log back on to apply changes."
+            
+            $successCount = 0
+            foreach ($sessionID in $sessionIDs) {
+                # Properly quote the message
+                msg $sessionID /TIME:0 $message 2>$null
+                
+                if ($LASTEXITCODE -eq 0) {
+                    $successCount++
+                }
+            }
+            
+            Write-Host "Messages sent: $successCount succeeded (of $($sessionIDs.Count) sessions)"
+        } else {
+            Write-Host "No active user sessions to notify"
+        }
+    } catch {
+        Write-Warning "Could not notify users: $($_.Exception.Message)"
     }
   changed_when: envvar_result.changed
   register: broadcast_result
@@ -538,14 +598,44 @@
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
   win_shell: |
+    # Update environment
     try {
         Update-EnvironmentVariables
-        Write-Host "Environment broadcast successful"
-        exit 0
+        Write-Host "Environment variables updated in registry"
     } catch {
-        Write-Warning "Broadcast failed: $($_.Exception.Message)"
-        Write-Warning "PATH is set in registry. Open NEW terminal to see changes."
-        exit 0
+        Write-Warning "Registry update warning: $($_.Exception.Message)"
+    }
+    
+    # Notify users
+    try {
+        $sessionIDs = @()
+        query session 2>$null | Select-String "Active|Disc" | ForEach-Object {
+            if ($_ -match '\s+(\d+)\s+') {
+                $id = [int]$matches[1]
+                if ($id -ne 0) { $sessionIDs += $id }
+            }
+        }
+        
+        if ($sessionIDs.Count -gt 0) {
+            # Single-line message (msg.exe limitation)
+            $message = "SYSTEM ADMIN: Environment variables updated. Log off and log back on to apply changes."
+            
+            $successCount = 0
+            foreach ($sessionID in $sessionIDs) {
+                # Properly quote the message
+                msg $sessionID /TIME:0 $message 2>$null
+                
+                if ($LASTEXITCODE -eq 0) {
+                    $successCount++
+                }
+            }
+            
+            Write-Host "Messages sent: $successCount succeeded (of $($sessionIDs.Count) sessions)"
+        } else {
+            Write-Host "No active user sessions to notify"
+        }
+    } catch {
+        Write-Warning "Could not notify users: $($_.Exception.Message)"
     }
   changed_when: envvar_result.changed
   register: broadcast_result
@@ -560,14 +650,44 @@
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
   win_shell: |
+    # Update environment
     try {
         Update-EnvironmentVariables
-        Write-Host "Environment broadcast successful"
-        exit 0
+        Write-Host "Environment variables updated in registry"
     } catch {
-        Write-Warning "Broadcast failed: $($_.Exception.Message)"
-        Write-Warning "PATH is set in registry. Open NEW terminal to see changes."
-        exit 0
+        Write-Warning "Registry update warning: $($_.Exception.Message)"
+    }
+    
+    # Notify users
+    try {
+        $sessionIDs = @()
+        query session 2>$null | Select-String "Active|Disc" | ForEach-Object {
+            if ($_ -match '\s+(\d+)\s+') {
+                $id = [int]$matches[1]
+                if ($id -ne 0) { $sessionIDs += $id }
+            }
+        }
+        
+        if ($sessionIDs.Count -gt 0) {
+            # Single-line message (msg.exe limitation)
+            $message = "SYSTEM ADMIN: Environment variables updated. Log off and log back on to apply changes."
+            
+            $successCount = 0
+            foreach ($sessionID in $sessionIDs) {
+                # Properly quote the message
+                msg $sessionID /TIME:0 $message 2>$null
+                
+                if ($LASTEXITCODE -eq 0) {
+                    $successCount++
+                }
+            }
+            
+            Write-Host "Messages sent: $successCount succeeded (of $($sessionIDs.Count) sessions)"
+        } else {
+            Write-Host "No active user sessions to notify"
+        }
+    } catch {
+        Write-Warning "Could not notify users: $($_.Exception.Message)"
     }
   changed_when: envvar_result.changed
   register: broadcast_result

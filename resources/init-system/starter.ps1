@@ -3,11 +3,10 @@
 # To be stored as "C:\opt\ScriptPS\Starter\starter.ps1"
 
 # Prevent execution when run by an Admin user:
-if (
-    ([Security.Principal.WindowsPrincipal]
-     [Security.Principal.WindowsIdentity]::GetCurrent()
-    ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-) {
+$principal = New-Object Security.Principal.WindowsPrincipal `
+    ([Security.Principal.WindowsIdentity]::GetCurrent())
+
+if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Error "This script must NOT be run with Administrator privileges."
     exit 1
 }

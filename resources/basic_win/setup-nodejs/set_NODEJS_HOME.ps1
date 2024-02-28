@@ -1,3 +1,12 @@
+# Prevent execution when run by an Admin user:
+$principal = New-Object Security.Principal.WindowsPrincipal `
+    ([Security.Principal.WindowsIdentity]::GetCurrent())
+
+if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Error "This script must NOT be run with Administrator privileges."
+    exit 1
+}
+
 $exePath = "D:\AppServ\nodejs\NodeJS v18.18.0\node-v18.18.0-win-x64\node.exe"  # Executable to extract shortcut icon from
 $iconIndex = 0
 
