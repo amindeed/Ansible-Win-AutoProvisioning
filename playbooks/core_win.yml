@@ -121,7 +121,7 @@
                 operation_type: shortcut
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
                 arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "{{ root_install_dir }}\Java\set_JAVA_HOME.ps1"'
-                destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set JAVA HOME.lnk'
+                destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set JAVA Version.lnk'
                 icon: '{{ root_install_dir }}\Java\Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)\bin\java.exe,0'
 
   #tasks:

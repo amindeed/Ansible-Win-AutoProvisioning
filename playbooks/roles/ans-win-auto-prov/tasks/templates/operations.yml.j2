@@ -4,7 +4,7 @@
 
 {% for operation in setup_phase_operations %}
 {% set l1_setup_phase_operations_loop = loop %}
-- name: "Initialization.."
+- name: ">>> Initializing {{ setup_phase| upper }} phase"
   win_file:
     path: '{% raw %}{{ win_temp_dir_path }}{% endraw %}'
     state: directory
@@ -491,48 +491,9 @@
   register: envvar_result
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
-  win_shell: |
-    # Update environment
-    try {
-        Update-EnvironmentVariables
-        Write-Host "Environment variables updated in registry"
-    } catch {
-        Write-Warning "Registry update warning: $($_.Exception.Message)"
-    }
-    
-    # Notify users
-    try {
-        $sessionIDs = @()
-        query session 2>$null | Select-String "Active|Disc" | ForEach-Object {
-            if ($_ -match '\s+(\d+)\s+') {
-                $id = [int]$matches[1]
-                if ($id -ne 0) { $sessionIDs += $id }
-            }
-        }
-        
-        if ($sessionIDs.Count -gt 0) {
-            # Single-line message (msg.exe limitation)
-            $message = "SYSTEM ADMIN: Environment variables updated. Log off and log back on to apply changes."
-            
-            $successCount = 0
-            foreach ($sessionID in $sessionIDs) {
-                # Properly quote the message
-                msg $sessionID /TIME:0 $message 2>$null
-                
-                if ($LASTEXITCODE -eq 0) {
-                    $successCount++
-                }
-            }
-            
-            Write-Host "Messages sent: $successCount succeeded (of $($sessionIDs.Count) sessions)"
-        } else {
-            Write-Host "No active user sessions to notify"
-        }
-    } catch {
-        Write-Warning "Could not notify users: $($_.Exception.Message)"
-    }
+  win_shell: Update-EnvironmentVariables
   changed_when: envvar_result.changed
-  register: broadcast_result
+  ignore_errors: yes
 
 {% elif update_item.action|lower == 'set' %}
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Set "{{ update_item.resource_name }}" system environment variable'
@@ -544,48 +505,9 @@
   register: envvar_result
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
-  win_shell: |
-    # Update environment
-    try {
-        Update-EnvironmentVariables
-        Write-Host "Environment variables updated in registry"
-    } catch {
-        Write-Warning "Registry update warning: $($_.Exception.Message)"
-    }
-    
-    # Notify users
-    try {
-        $sessionIDs = @()
-        query session 2>$null | Select-String "Active|Disc" | ForEach-Object {
-            if ($_ -match '\s+(\d+)\s+') {
-                $id = [int]$matches[1]
-                if ($id -ne 0) { $sessionIDs += $id }
-            }
-        }
-        
-        if ($sessionIDs.Count -gt 0) {
-            # Single-line message (msg.exe limitation)
-            $message = "SYSTEM ADMIN: Environment variables updated. Log off and log back on to apply changes."
-            
-            $successCount = 0
-            foreach ($sessionID in $sessionIDs) {
-                # Properly quote the message
-                msg $sessionID /TIME:0 $message 2>$null
-                
-                if ($LASTEXITCODE -eq 0) {
-                    $successCount++
-                }
-            }
-            
-            Write-Host "Messages sent: $successCount succeeded (of $($sessionIDs.Count) sessions)"
-        } else {
-            Write-Host "No active user sessions to notify"
-        }
-    } catch {
-        Write-Warning "Could not notify users: $($_.Exception.Message)"
-    }
+  win_shell: Update-EnvironmentVariables
   changed_when: envvar_result.changed
-  register: broadcast_result
+  ignore_errors: yes
 
 {% elif update_item.action|lower == 'remove' and update_item.resource_name|lower == 'path' %}
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Ensure that "{{ update_item.value }}" is not on PATH'
@@ -597,48 +519,9 @@
   register: envvar_result
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
-  win_shell: |
-    # Update environment
-    try {
-        Update-EnvironmentVariables
-        Write-Host "Environment variables updated in registry"
-    } catch {
-        Write-Warning "Registry update warning: $($_.Exception.Message)"
-    }
-    
-    # Notify users
-    try {
-        $sessionIDs = @()
-        query session 2>$null | Select-String "Active|Disc" | ForEach-Object {
-            if ($_ -match '\s+(\d+)\s+') {
-                $id = [int]$matches[1]
-                if ($id -ne 0) { $sessionIDs += $id }
-            }
-        }
-        
-        if ($sessionIDs.Count -gt 0) {
-            # Single-line message (msg.exe limitation)
-            $message = "SYSTEM ADMIN: Environment variables updated. Log off and log back on to apply changes."
-            
-            $successCount = 0
-            foreach ($sessionID in $sessionIDs) {
-                # Properly quote the message
-                msg $sessionID /TIME:0 $message 2>$null
-                
-                if ($LASTEXITCODE -eq 0) {
-                    $successCount++
-                }
-            }
-            
-            Write-Host "Messages sent: $successCount succeeded (of $($sessionIDs.Count) sessions)"
-        } else {
-            Write-Host "No active user sessions to notify"
-        }
-    } catch {
-        Write-Warning "Could not notify users: $($_.Exception.Message)"
-    }
+  win_shell: Update-EnvironmentVariables
   changed_when: envvar_result.changed
-  register: broadcast_result
+  ignore_errors: yes
 
 {% elif update_item.action|lower == 'remove' and update_item.resource_name|lower != 'path' %}
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Remove "{{ update_item.resource_name }}" env. var.'
@@ -649,48 +532,9 @@
   register: envvar_result
 
 - name: '{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Update System Environment Variables (propagate to all users)'
-  win_shell: |
-    # Update environment
-    try {
-        Update-EnvironmentVariables
-        Write-Host "Environment variables updated in registry"
-    } catch {
-        Write-Warning "Registry update warning: $($_.Exception.Message)"
-    }
-    
-    # Notify users
-    try {
-        $sessionIDs = @()
-        query session 2>$null | Select-String "Active|Disc" | ForEach-Object {
-            if ($_ -match '\s+(\d+)\s+') {
-                $id = [int]$matches[1]
-                if ($id -ne 0) { $sessionIDs += $id }
-            }
-        }
-        
-        if ($sessionIDs.Count -gt 0) {
-            # Single-line message (msg.exe limitation)
-            $message = "SYSTEM ADMIN: Environment variables updated. Log off and log back on to apply changes."
-            
-            $successCount = 0
-            foreach ($sessionID in $sessionIDs) {
-                # Properly quote the message
-                msg $sessionID /TIME:0 $message 2>$null
-                
-                if ($LASTEXITCODE -eq 0) {
-                    $successCount++
-                }
-            }
-            
-            Write-Host "Messages sent: $successCount succeeded (of $($sessionIDs.Count) sessions)"
-        } else {
-            Write-Host "No active user sessions to notify"
-        }
-    } catch {
-        Write-Warning "Could not notify users: $($_.Exception.Message)"
-    }
+  win_shell: Update-EnvironmentVariables
   changed_when: envvar_result.changed
-  register: broadcast_result
+  ignore_errors: yes
 
 {% endif %}
 

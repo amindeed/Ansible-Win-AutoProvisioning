@@ -367,7 +367,7 @@
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
                 arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "{{ root_install_dir }}\Python\set_PYTHON_paths.ps1"'
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set Python Version.lnk'
-                #icon: '{{ root_install_dir }}\Python\Python2\python.exe,0'
+                icon: '{{ root_install_dir }}\Python\Python2\python.exe,0'
 
 
 - name: "Setup Python 3.12"
@@ -459,7 +459,7 @@
                 source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
                 arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "{{ root_install_dir }}\Python\set_PYTHON_paths.ps1"'
                 destination: '%PUBLIC%\Desktop\Set Runtime Versions\Set Python Version.lnk'
-                #icon: {{ root_install_dir }}\Python\Python2\python.exe,0
+                icon: '{{ root_install_dir }}\Python\Python2\python.exe,0'
 
   #tasks:
   #  - name: '[POST-SETUP] {PYTHON312} Notify logged in users with a message'
