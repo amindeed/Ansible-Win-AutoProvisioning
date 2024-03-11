@@ -1,6 +1,11 @@
 # Work Log
 
-## 2024-03-03
+## 2024-03-07
+
+- Added architecture diagrams (check `README.md` and `assets/`). Updated README.
+- Completed updating `worklog.md` with older entries.
+
+## 2024-03-03 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/4e04e416ffb417bc54a7a4deb149d61a76bbc037)
 
 - Reverted back to simple environment variables propagation/update task (in `operations.yml.j2`)
 - Significant update of `worklog.md` (added old entries. Still in progress, but almost complete: particularly highlighting how project's architecture has evolved.
@@ -8,17 +13,27 @@
 
 ## 2024-02-28 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/6ad961ccc680fdc3215aed49118bc84a6a9214e0)
 
-...
+- Replaced hard-coded paths values with variables in playbooks files.
+- `base_win.yml`: simplified Cygwin setup (⚠️ requires public internet connection)
+- `operations.yml.j2`:
+    - Revised environment variables broadcast/propagation: handling possible errors/failures, as variables are not set right away (still needs to logoff/re-login).
+- Starter and runtime selection scripts: updated with better code to prevent execution by Admins.
 
 
 ## 2024-02-21 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/95aae5e1037d7f5f5690ae270000c264e3b75eeb)
 
-...
+- Simplified runtimes setups (Java, Python, NodeJS) across playbooks.
+- Minor updates to `operations.yml.j2` and playbooks to better handle problematic variable values: `D:` ➔ `D:\`, unintentional invalid escapes, values containing `%`...
+- Enhanced runtime selection script tools with improved handling of appending to the current user's PATH variable.
+- Added helper function to test if paths exist, to Init. System's PowerShell module (`AWAP.PSModules.psm1`)
+- Added code to Init. System's starter script to prevent execution by Admins (this mitigates the risk of accidentally setting system-wide environment variables like `%JAVA_HOME%`).
 
 
 ## 2024-02-20 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/23850bae218f63def2542b549ed49810e0a04b9f)
 
-...
+- Cleaned up repository's content and structure.
+- Add explanations/instructions as comments to playbook files.
+- Minor updates to `operations.yml.j2` to reflect changes applied to repository's structure: `{{ uploads_dir }}` ➔ `{{ resources_dir }}`
 
 
 ## 2024-01-20 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/4d881e3d1b551674468e0c82b312d1ad19a80e00)
