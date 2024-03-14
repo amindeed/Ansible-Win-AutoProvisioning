@@ -1,23 +1,93 @@
-Automate the provisioning, configuration, and management of Windows environments using Ansible.
+# Ansible Windows Auto-Provisioning (AWAP)
 
-This repository provides a minimalist solution to streamline software installation, system configuration, and feature enablement for Windows systems. It deliberately avoids Chocolatey dependencies in favor of native toolings.
+![Ansible Core](https://img.shields.io/badge/Ansible--Core-2.16.1-blue?logo=ansible)
+[![Python](https://img.shields.io/badge/Python-v3.11.5-yellowgreen?logo=python&logoColor=ffffff)](https://www.python.org/downloads/release/python-3115/)
+![Windows Server](https://img.shields.io/badge/Windows%20Server-supported-blue?logo=windows)
 
-The repository features an opinionated Ansible Windows playbook structure, centralizing all configurable parameters at the playbook/inventory level, exposing settings for complete visibility and control.
-   
-**Check [`worklog.md`](worklog.md) for more details.**
+**Ansible Windows Auto-Provisioning (AWAP)** is a declarative Windows provisioning framework built on Ansible, designed primarily for enterprise environments, to streamline software installation, system configuration, and feature enablement for Windows systems. 
+AWAP abstracts complex Windows deployment tasks into a simple YAML-based configuration that handles software installations, system configurations, registry management, and more.
 
-## 1. Playbook Execution Flow
+
+## Overview
+
+AWAP is a template-driven Ansible role that transforms high-level YAML declarations into executable Windows provisioning tasks. Instead of writing individual Ansible tasks for each operation, you define *what* you want in a structured YAML format, and AWAP generates the appropriate tasks at runtime.
+
+**Philosophy:**
+- **No Chocolatey dependency**: uses native installers (MSI, EXE, ZIP)
+- **Centralized configuration**: all parameters defined in playbook variables
+- **Explicit over implicit**: every setting is visible and configurable
+- **Template-driven**: Jinja2 templates generate tasks dynamically
+
+
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Multi-format Installation** | MSI, EXE, ZIP archives, and installation bundles |
+| **Registry Management** | CRUD operations, .reg file merging, key/value manipulation |
+| **Environment Variables** | Set, append, remove system-level environment variables |
+| **File Operations** | Transfer, create, remove, move, template rendering, append/prepend |
+| **Desktop Shortcuts** | Create shortcuts with custom icons in desktop or Start Menu |
+| **PowerShell Execution** | Run inline scripts or uploaded .ps1 files |
+| **Pre-flight Checks** | Network flow, HTTP status, service status, port availability |
+| **Idempotent Operations** | Checks existing state before making changes |
+
+
+## Requirements
+
+### Ansible Control Node (Linux)
+
+- Rocky Linux 8.x / RHEL 8.x / AlmaLinux 8.x (or equivalent)
+- Python 3.6+ with `pywinrm>=0.4.3`
+- `ansible-core` 2.15+ (tested with 2.18.1)
+- Ansible collections: `ansible.windows:==2.2.0`, `community.windows:==2.1.0` and `ansible.posix:==1.5.4`
+
+### Target Windows Systems
+
+- Windows Server 2016, 2019, or 2022
+- PowerShell 5.1+
+- WinRM enabled (HTTP:5985 or HTTPS:5986)
+
+
+## Architecture
+
+### Directory Structure
+
+```
+.
+├── 📂inventories/📂environments/			# Target host definitions
+├── 📂playbooks/
+│   ├── basic_win.yml						# Basic software bundle setup (L2)
+│   ├── core_win.yml						# Core software bundle setup (L1)
+│   └── 📂roles/📂ans-win-auto-prov/		# The core role
+│       ├── 📂tasks/
+│       │   ├── main.yml					# Orchestrator
+│       │   ├── 01_pre-setup.yml			# Pre-setup phase
+│       │   ├── 02_setup.yml				# Main setup phase
+│       │   ├── 03_post-setup.yml			# Post-setup phase
+│       │   └── templates/operations.yml.j2	# Task generator
+│       └── 📂temp/							# Generated task files
+├── 📂resources/							# Files to deploy
+│   ├── init-system/						# System initialization (PS modules, starter)
+│   ├── core_win/							# Core bundle resources
+│   └── basic_win/							# Basic bundle resources
+├── 📂templates/							# Jinja2 templates of files to deploy
+├── 📂vaults/📂environments/				# Encrypted credentials
+└── 📂tools/								# Utility scripts (not called by playbooks)
+```
+
+### How It Works: *Execution Flow*
+
+```
+Playbook Variables ──► Phase Files ──► operations.yml.j2 ──► Generated Tasks ──► WinRM ──► Windows
+    (pre_setup)         (01_*.yml)      (Jinja2 template)     (temp/*.yml)               (target)
+    (setup)             (02_*.yml)
+    (post_setup)        (03_*.yml)
+```
 
 ![playbook_execution_flow.png](assets/playbook_execution_flow.png)
 
-## 2. Role Template (`operations.yml.j2`) Decision Tree
-
-![role_template_decision_tree.png](assets/role_template_decision_tree.png)
-
-## 3. Bundled Content Structure
-
-![bundled_content_structure.png](assets/bundled_content_structure.png)
-
-## 4. Bundled Content Naming Conventions
-
-![bundled_content_naming_conventions.png](assets/bundled_content_naming_conventions.png)
+1. You define operations in playbook variables (`pre_setup`, `setup`, `post_setup`)
+2. Phase files include `operations.yml.j2` with your operation list
+3. The Jinja2 template generates native Ansible tasks
+4. Generated tasks execute on Windows targets

@@ -1,6 +1,11 @@
 # Work Log
 
-## 2024-03-07
+## 2024-03-14
+
+- Started new README layout and content.
+- Uploaded updated version ofr the architecture diagram (Draw.io)
+
+## 2024-03-11 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/4847bd86e0a498df230ce3a150e95a945f2e8bfb)
 
 - Added architecture diagrams (check `README.md` and `assets/`). Updated README.
 - Completed updating `worklog.md` with older entries.

@@ -1,550 +1,378 @@
-<mxfile host="app.diagrams.net" modified="2025-12-28T00:00:00.000Z" agent="Claude" version="22.0.0" type="device">
-  <diagram name="AWAP Execution Flow" id="awap-flow">
-    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        
-        <!-- Title -->
-        <mxCell id="title" value="Ansible Windows Auto-Provisioning (AWAP) - Execution Flow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="200" y="20" width="700" height="30" as="geometry" />
-        </mxCell>
-        
-        <!-- Ansible Controller Box -->
-        <mxCell id="controller-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
-          <mxGeometry x="40" y="70" width="520" height="720" as="geometry" />
-        </mxCell>
-        <mxCell id="controller-label" value="Ansible Control Node (Linux)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12" vertex="1" parent="1">
-          <mxGeometry x="50" y="75" width="200" height="20" as="geometry" />
-        </mxCell>
-        
-        <!-- Windows Target Box -->
-        <mxCell id="windows-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
-          <mxGeometry x="600" y="70" width="460" height="720" as="geometry" />
-        </mxCell>
-        <mxCell id="windows-label" value="Windows Target Host" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12" vertex="1" parent="1">
-          <mxGeometry x="610" y="75" width="200" height="20" as="geometry" />
-        </mxCell>
-        
-        <!-- Playbook -->
-        <mxCell id="playbook" value="&lt;b&gt;Playbook&lt;/b&gt;&lt;br&gt;(basic_bundle_win.yml)&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• shortname&lt;br&gt;• pre_setup&lt;br&gt;• setup&lt;br&gt;• post_setup&lt;br&gt;• template_vars&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;align=left;spacingLeft=10;" vertex="1" parent="1">
-          <mxGeometry x="60" y="110" width="160" height="120" as="geometry" />
-        </mxCell>
-        
-        <!-- Inventory -->
-        <mxCell id="inventory" value="&lt;b&gt;Inventory&lt;/b&gt;&lt;br&gt;(dev.yml)&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• hosts&lt;br&gt;• credentials&lt;br&gt;• pkgs_repo_base_url&lt;br&gt;• win_temp_dir_path&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;align=left;spacingLeft=10;" vertex="1" parent="1">
-          <mxGeometry x="240" y="110" width="160" height="120" as="geometry" />
-        </mxCell>
-        
-        <!-- Role main.yml -->
-        <mxCell id="main-yml" value="&lt;b&gt;main.yml&lt;/b&gt;&lt;br&gt;(Orchestrator)&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;1. Clear temp/ dir&lt;br&gt;2. Include phase files&lt;br&gt;3. Execute generated tasks&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=10;" vertex="1" parent="1">
-          <mxGeometry x="140" y="270" width="180" height="90" as="geometry" />
-        </mxCell>
-        
-        <!-- Phase files -->
-        <mxCell id="phase-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="60" y="390" width="480" height="120" as="geometry" />
-        </mxCell>
-        <mxCell id="phase-label" value="Phase Task Files" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=10" vertex="1" parent="1">
-          <mxGeometry x="70" y="395" width="100" height="15" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="pre-setup" value="&lt;b&gt;01_pre-setup.yml&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;label: [PRE-SETUP]&lt;br&gt;setup_phase: pre_setup&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="70" y="420" width="140" height="70" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="setup" value="&lt;b&gt;02_setup.yml&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;label: [SETUP]&lt;br&gt;setup_phase: setup&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="225" y="420" width="140" height="70" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="post-setup" value="&lt;b&gt;03_post-setup.yml&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;label: [POST-SETUP]&lt;br&gt;setup_phase: post_setup&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="380" y="420" width="150" height="70" as="geometry" />
-        </mxCell>
-        
-        <!-- Template Engine -->
-        <mxCell id="template" value="&lt;b&gt;operations.yml.j2&lt;/b&gt;&lt;br&gt;(Jinja2 Template Engine)&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• Parses operation types&lt;br&gt;• Generates Ansible tasks&lt;br&gt;• Handles all logic branches&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacingLeft=10;" vertex="1" parent="1">
-          <mxGeometry x="180" y="540" width="200" height="90" as="geometry" />
-        </mxCell>
-        
-        <!-- Generated Tasks -->
-        <mxCell id="temp-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6e6e6;strokeColor=#999999;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="60" y="660" width="480" height="110" as="geometry" />
-        </mxCell>
-        <mxCell id="temp-label" value="temp/ (Generated Tasks)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=10" vertex="1" parent="1">
-          <mxGeometry x="70" y="665" width="150" height="15" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="gen-pre" value="01_*__pre-setup.yml" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="70" y="690" width="130" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="gen-setup" value="02_*__setup.yml" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="215" y="690" width="130" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="gen-post" value="03_*__post-setup.yml" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="360" y="690" width="130" height="30" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="tasks-desc" value="&lt;font size=&quot;1&quot;&gt;Contains fully rendered Ansible tasks ready for execution&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="120" y="735" width="300" height="20" as="geometry" />
-        </mxCell>
-        
-        <!-- Windows Components -->
-        <mxCell id="winrm" value="&lt;b&gt;WinRM&lt;/b&gt;&lt;br&gt;(Port 5985/5986)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
-          <mxGeometry x="620" y="110" width="100" height="50" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="operations-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6ffcc;strokeColor=#82b366;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="620" y="180" width="420" height="400" as="geometry" />
-        </mxCell>
-        <mxCell id="operations-label" value="Operation Types (Executed on Target)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=10" vertex="1" parent="1">
-          <mxGeometry x="630" y="185" width="250" height="15" as="geometry" />
-        </mxCell>
-        
-        <!-- Checks -->
-        <mxCell id="checks" value="&lt;b&gt;Checks&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• check_net_flows&lt;br&gt;• check_http_status&lt;br&gt;• check_service_status&lt;br&gt;• check_ports&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="640" y="210" width="120" height="80" as="geometry" />
-        </mxCell>
-        
-        <!-- Installations -->
-        <mxCell id="installations" value="&lt;b&gt;Installations&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• MSI packages&lt;br&gt;• EXE installers&lt;br&gt;• ZIP archives&lt;br&gt;• Bundles&lt;br&gt;• Manual registration&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="770" y="210" width="120" height="90" as="geometry" />
-        </mxCell>
-        
-        <!-- Configurations -->
-        <mxCell id="configurations" value="&lt;b&gt;Configurations&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• env_var (set/append/remove)&lt;br&gt;• registry (CRUD/merge)&lt;br&gt;• file_system ops&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="900" y="210" width="130" height="80" as="geometry" />
-        </mxCell>
-        
-        <!-- File System Ops -->
-        <mxCell id="filesystem" value="&lt;b&gt;File System Operations&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• transfer (upload/download)&lt;br&gt;• shortcut (desktop/start menu)&lt;br&gt;• template (Jinja2 rendering)&lt;br&gt;• create (file/directory)&lt;br&gt;• remove / remove_bypattern&lt;br&gt;• move&lt;br&gt;• append / prepend&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="640" y="310" width="180" height="110" as="geometry" />
-        </mxCell>
-        
-        <!-- Executions -->
-        <mxCell id="executions" value="&lt;b&gt;Executions&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• run_ps1_script&lt;br&gt;  - script_content (inline)&lt;br&gt;  - upload_file&lt;br&gt;  - file_relative_url&lt;br&gt;• run_executable&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="840" y="310" width="180" height="110" as="geometry" />
-        </mxCell>
-        
-        <!-- Target directories -->
-        <mxCell id="target-dirs" value="&lt;b&gt;Target Directories&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• C:\AWAP_Temp (temporary)&lt;br&gt;• D:\AppServ (installations)&lt;br&gt;• C:\Program Files\...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="640" y="440" width="180" height="70" as="geometry" />
-        </mxCell>
-        
-        <!-- Registry -->
-        <mxCell id="registry" value="&lt;b&gt;Registry&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• HKLM:\SOFTWARE\...&lt;br&gt;• Uninstall entries&lt;br&gt;• App settings&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="840" y="440" width="180" height="70" as="geometry" />
-        </mxCell>
-        
-        <!-- Result -->
-        <mxCell id="result" value="&lt;b&gt;Configured Windows System&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;✓ Software installed&lt;br&gt;✓ Registry configured&lt;br&gt;✓ Environment set&lt;br&gt;✓ Shortcuts created&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=10;" vertex="1" parent="1">
-          <mxGeometry x="720" y="620" width="200" height="90" as="geometry" />
-        </mxCell>
-        
-        <!-- Arrows -->
-        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="playbook" target="main-yml">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="arrow1b" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="inventory" target="main-yml">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="main-yml" target="phase-box">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="arrow3a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.25;entryY=0;" edge="1" parent="1" source="pre-setup" target="template">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="arrow3b" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="setup" target="template">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="arrow3c" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.75;entryY=0;" edge="1" parent="1" source="post-setup" target="template">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="template" target="temp-box">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="arrow5" value="WinRM" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeWidth=2;strokeColor=#0066CC;" edge="1" parent="1" source="temp-box" target="operations-box">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="operations-box" target="result">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- Legend -->
-        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="740" y="730" width="300" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="legend-title" value="&lt;b&gt;Legend&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="750" y="733" width="50" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="legend1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="750" y="752" width="15" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="legend1-text" value="Controller" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8" vertex="1" parent="1">
-          <mxGeometry x="768" y="752" width="50" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="legend2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="830" y="752" width="15" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="legend2-text" value="Target" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8" vertex="1" parent="1">
-          <mxGeometry x="848" y="752" width="40" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="legend3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="900" y="752" width="15" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="legend3-text" value="Template" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8" vertex="1" parent="1">
-          <mxGeometry x="918" y="752" width="50" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="legend4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="975" y="752" width="15" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="legend4-text" value="Output" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8" vertex="1" parent="1">
-          <mxGeometry x="993" y="752" width="40" height="15" as="geometry" />
-        </mxCell>
-        
-      </root>
-    </mxGraphModel>
-  </diagram>
-  
-  <diagram name="Template Decision Tree" id="template-tree">
-    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        
-        <!-- Title -->
-        <mxCell id="t2-title" value="operations.yml.j2 - Template Decision Tree" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="200" y="20" width="450" height="30" as="geometry" />
-        </mxCell>
-        
-        <!-- Start -->
-        <mxCell id="t2-start" value="setup_phase_operations&lt;br&gt;(pre_setup / setup / post_setup)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="330" y="70" width="180" height="60" as="geometry" />
-        </mxCell>
-        
-        <!-- For each operation -->
-        <mxCell id="t2-foreach" value="{% for operation in setup_phase_operations %}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=2;fontSize=10" vertex="1" parent="1">
-          <mxGeometry x="310" y="160" width="220" height="30" as="geometry" />
-        </mxCell>
-        
-        <!-- Main decision -->
-        <mxCell id="t2-decision" value="Operation&lt;br&gt;Type?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="360" y="220" width="120" height="80" as="geometry" />
-        </mxCell>
-        
-        <!-- Checks branch -->
-        <mxCell id="t2-checks" value="checks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="80" y="340" width="100" height="40" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="t2-checks-sub" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="400" width="180" height="180" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-c1" value="check_net_flows" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="55" y="415" width="100" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-c2" value="check_http_status" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="55" y="450" width="100" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-c3" value="check_service_status" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="55" y="485" width="110" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-c4" value="check_ports" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="55" y="520" width="100" height="25" as="geometry" />
-        </mxCell>
-        
-        <!-- Installations branch -->
-        <mxCell id="t2-install" value="installations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="280" y="340" width="100" height="40" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="t2-install-sub" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="240" y="400" width="180" height="180" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-i1" value="type: msi" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="260" y="415" width="80" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-i2" value="type: exe" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="260" y="450" width="80" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-i3" value="type: zip" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="260" y="485" width="80" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-i4" value="type: bundle" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="260" y="520" width="80" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-i5" value="+ manual_registration" style="rounded=0;whiteSpace=wrap;html=1;fontSize=8" vertex="1" parent="1">
-          <mxGeometry x="350" y="450" width="60" height="40" as="geometry" />
-        </mxCell>
-        
-        <!-- Configurations branch -->
-        <mxCell id="t2-config" value="configurations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="480" y="340" width="100" height="40" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="t2-config-sub" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="440" y="400" width="180" height="220" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-cfg1" value="env_var" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="460" y="415" width="70" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-cfg1a" value="set/append/remove" style="text;html=1;strokeColor=none;fillColor=none;fontSize=7" vertex="1" parent="1">
-          <mxGeometry x="535" y="418" width="70" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-cfg2" value="registry" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="460" y="450" width="70" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-cfg2a" value="set/remove_value/&lt;br&gt;remove_key/merge" style="text;html=1;strokeColor=none;fillColor=none;fontSize=7" vertex="1" parent="1">
-          <mxGeometry x="535" y="445" width="80" height="35" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-cfg3" value="file_system" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="460" y="490" width="70" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-cfg3a" value="transfer/shortcut/&lt;br&gt;template/create/&lt;br&gt;remove/move/&lt;br&gt;append/prepend/&lt;br&gt;remove_bypattern" style="text;html=1;strokeColor=none;fillColor=none;fontSize=7;align=left" vertex="1" parent="1">
-          <mxGeometry x="535" y="480" width="80" height="60" as="geometry" />
-        </mxCell>
-        
-        <!-- Executions branch -->
-        <mxCell id="t2-exec" value="executions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
-          <mxGeometry x="680" y="340" width="100" height="40" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="t2-exec-sub" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="640" y="400" width="180" height="120" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-e1" value="run_ps1_script" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="660" y="420" width="100" height="25" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-e1a" value="script_content / upload_file / file_url" style="text;html=1;strokeColor=none;fillColor=none;fontSize=7" vertex="1" parent="1">
-          <mxGeometry x="660" y="445" width="140" height="15" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-e2" value="run_executable" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="660" y="475" width="100" height="25" as="geometry" />
-        </mxCell>
-        
-        <!-- Cleanup -->
-        <mxCell id="t2-cleanup" value="Temp Cleanup&lt;br&gt;(after each operation)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9" vertex="1" parent="1">
-          <mxGeometry x="330" y="660" width="180" height="40" as="geometry" />
-        </mxCell>
-        
-        <!-- End loop -->
-        <mxCell id="t2-endfor" value="{% endfor %}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=2;fontSize=10" vertex="1" parent="1">
-          <mxGeometry x="360" y="730" width="120" height="25" as="geometry" />
-        </mxCell>
-        
-        <!-- Arrows -->
-        <mxCell id="t2-a1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;" edge="1" parent="1" source="t2-start" target="t2-foreach">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-a2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;" edge="1" parent="1" source="t2-foreach" target="t2-decision">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-a3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=0;exitY=0.5;entryX=0.5;entryY=0;" edge="1" parent="1" source="t2-decision" target="t2-checks">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-a4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=0.25;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="t2-decision" target="t2-install">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-a5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=0.75;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="t2-decision" target="t2-config">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-a6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=1;exitY=0.5;entryX=0.5;entryY=0;" edge="1" parent="1" source="t2-decision" target="t2-exec">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="t2-a7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="t2-checks-sub" target="t2-cleanup">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="130" y="640" />
-              <mxPoint x="420" y="640" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="t2-a8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;entryX=0.25;entryY=0;" edge="1" parent="1" source="t2-install-sub" target="t2-cleanup">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="330" y="640" />
-              <mxPoint x="375" y="640" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="t2-a9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;entryX=0.75;entryY=0;" edge="1" parent="1" source="t2-config-sub" target="t2-cleanup">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="530" y="640" />
-              <mxPoint x="465" y="640" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="t2-a10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;entryX=1;entryY=0.5;" edge="1" parent="1" source="t2-exec-sub" target="t2-cleanup">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="730" y="640" />
-              <mxPoint x="730" y="680" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="t2-a11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;" edge="1" parent="1" source="t2-cleanup" target="t2-endfor">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-      </root>
-    </mxGraphModel>
-  </diagram>
-  <diagram name="Bundled Content Structure" id="awap-bundles">
-    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        
-        <!-- Title -->
-        <mxCell id="b-title" value="AWAP - Bundled Content Structure" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="300" y="20" width="500" height="30" as="geometry" />
-        </mxCell>
-        
-        <!-- uploads/ directory -->
-        <mxCell id="b-uploads" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
-          <mxGeometry x="40" y="70" width="500" height="700" as="geometry" />
-        </mxCell>
-        <mxCell id="b-uploads-label" value="uploads/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=14" vertex="1" parent="1">
-          <mxGeometry x="50" y="75" width="100" height="25" as="geometry" />
-        </mxCell>
-        
-        <!-- bundles/ -->
-        <mxCell id="b-bundles" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="60" y="110" width="460" height="640" as="geometry" />
-        </mxCell>
-        <mxCell id="b-bundles-label" value="bundles/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12" vertex="1" parent="1">
-          <mxGeometry x="70" y="115" width="80" height="20" as="geometry" />
-        </mxCell>
-        
-        <!-- basic_win/ -->
-        <mxCell id="b-basic" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="80" y="145" width="200" height="280" as="geometry" />
-        </mxCell>
-        <mxCell id="b-basic-label" value="basic_win/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11" vertex="1" parent="1">
-          <mxGeometry x="90" y="150" width="80" height="20" as="geometry" />
-        </mxCell>
-        
-        <!-- setup-nodejs -->
-        <mxCell id="b-nodejs" value="&lt;b&gt;setup-nodejs/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• check_NODEJS_HOME.ps1&lt;br&gt;&amp;nbsp; (Validates env var)&lt;br&gt;• set_NODEJS_HOME.ps1&lt;br&gt;&amp;nbsp; (Version switcher)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="95" y="180" width="170" height="100" as="geometry" />
-        </mxCell>
-        
-        <!-- setup-python312 -->
-        <mxCell id="b-python" value="&lt;b&gt;setup-python312/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• check_PYTHON_paths.ps1&lt;br&gt;&amp;nbsp; (Validates env vars)&lt;br&gt;• set_PYTHON_paths.ps1&lt;br&gt;&amp;nbsp; (Version switcher)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="95" y="295" width="170" height="100" as="geometry" />
-        </mxCell>
-        
-        <!-- core_win/ -->
-        <mxCell id="b-core" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="300" y="145" width="200" height="480" as="geometry" />
-        </mxCell>
-        <mxCell id="b-core-label" value="core_win/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11" vertex="1" parent="1">
-          <mxGeometry x="310" y="150" width="80" height="20" as="geometry" />
-        </mxCell>
-        
-        <!-- init-system -->
-        <mxCell id="b-init" value="&lt;b&gt;init-system/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• AWAP.PSModules/&lt;br&gt;&amp;nbsp; └── 0.1.0/&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ├── AWAP.PSModules.psd1&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ├── AWAP.PSModules.psm1&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; └── README.md&lt;br&gt;• starter.ps1&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="315" y="180" width="170" height="130" as="geometry" />
-        </mxCell>
-        
-        <!-- setup-openjdk -->
-        <mxCell id="b-openjdk" value="&lt;b&gt;setup-openjdk/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• check_JAVA_HOME.ps1&lt;br&gt;&amp;nbsp; (Validates env var)&lt;br&gt;• set_JAVA_HOME.ps1&lt;br&gt;&amp;nbsp; (Version switcher)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="315" y="325" width="170" height="100" as="geometry" />
-        </mxCell>
-        
-        <!-- setup-msoffice -->
-        <mxCell id="b-msoffice" value="&lt;b&gt;setup-msoffice/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• ms-office-kms-activate.ps1&lt;br&gt;&amp;nbsp; (KMS activation)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="315" y="440" width="170" height="70" as="geometry" />
-        </mxCell>
-        
-        <!-- setup-7zip (note: uses template) -->
-        <mxCell id="b-7zip" value="&lt;b&gt;setup-7zip/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;(uses template from&lt;br&gt;templates/ directory)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;fontStyle=0" vertex="1" parent="1">
-          <mxGeometry x="315" y="525" width="170" height="60" as="geometry" />
-        </mxCell>
-        
-        <!-- templates/ directory -->
-        <mxCell id="b-templates" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
-          <mxGeometry x="580" y="70" width="470" height="280" as="geometry" />
-        </mxCell>
-        <mxCell id="b-templates-label" value="templates/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=14" vertex="1" parent="1">
-          <mxGeometry x="590" y="75" width="100" height="25" as="geometry" />
-        </mxCell>
-        
-        <!-- templates bundles -->
-        <mxCell id="b-t-bundles" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="600" y="110" width="430" height="220" as="geometry" />
-        </mxCell>
-        <mxCell id="b-t-bundles-label" value="bundles/core_win/setup-7zip/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11" vertex="1" parent="1">
-          <mxGeometry x="610" y="115" width="200" height="20" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="b-7zip-template" value="&lt;b&gt;set_7zip_settings.reg.j2&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;Jinja2 template for 7-Zip file associations.&lt;br&gt;&lt;br&gt;Uses: &lt;b&gt;{{ template_vars.install_dir }}&lt;/b&gt;&lt;br&gt;&lt;br&gt;Creates registry entries for:&lt;br&gt;• .7z, .zip, .rar, .tar, .gz, etc.&lt;br&gt;• File type associations&lt;br&gt;• Default icons&lt;br&gt;• Shell open commands&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="620" y="145" width="200" height="170" as="geometry" />
-        </mxCell>
-        
-        <!-- Legend -->
-        <mxCell id="b-legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;" vertex="1" parent="1">
-          <mxGeometry x="580" y="380" width="470" height="180" as="geometry" />
-        </mxCell>
-        <mxCell id="b-legend-title" value="Script Categories" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12" vertex="1" parent="1">
-          <mxGeometry x="590" y="385" width="150" height="20" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="b-leg1" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="600" y="420" width="20" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="b-leg1-text" value="&lt;b&gt;Version Switchers&lt;/b&gt; (set_*.ps1) - Interactive scripts for switching between installed versions" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" vertex="1" parent="1">
-          <mxGeometry x="630" y="415" width="400" height="30" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="b-leg2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="600" y="455" width="20" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="b-leg2-text" value="&lt;b&gt;Validators&lt;/b&gt; (check_*.ps1) - Startup scripts that validate environment variables point to valid paths" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" vertex="1" parent="1">
-          <mxGeometry x="630" y="450" width="400" height="30" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="b-leg3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
-          <mxGeometry x="600" y="490" width="20" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="b-leg3-text" value="&lt;b&gt;AWAP.PSModules&lt;/b&gt; - PowerShell module with Update-EnvironmentVariables and helper functions" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" vertex="1" parent="1">
-          <mxGeometry x="630" y="485" width="400" height="30" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="b-leg4" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="600" y="525" width="20" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="b-leg4-text" value="&lt;b&gt;Jinja2 Templates&lt;/b&gt; (.j2) - Rendered with template_vars at runtime" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" vertex="1" parent="1">
-          <mxGeometry x="630" y="520" width="400" height="30" as="geometry" />
-        </mxCell>
-        
-        <!-- Usage Notes -->
-        <mxCell id="b-notes-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
-          <mxGeometry x="580" y="580" width="470" height="170" as="geometry" />
-        </mxCell>
-        <mxCell id="b-notes-title" value="Usage Notes" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12" vertex="1" parent="1">
-          <mxGeometry x="590" y="585" width="100" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="b-notes-content" value="&lt;font size=&quot;2&quot;&gt;• &lt;b&gt;uploads/&lt;/b&gt; files are referenced via &lt;b&gt;upload_file:&lt;/b&gt; parameter&lt;br&gt;&lt;br&gt;• &lt;b&gt;templates/&lt;/b&gt; files are referenced via &lt;b&gt;upload_template:&lt;/b&gt; parameter&lt;br&gt;&lt;br&gt;• AWAP.PSModules must be deployed &lt;b&gt;before&lt;/b&gt; any env_var operations&lt;br&gt;&lt;br&gt;• Version switcher scripts create desktop shortcuts for easy access&lt;br&gt;&lt;br&gt;• Validator scripts are typically added to Windows startup&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;spacingLeft=5;spacingTop=5" vertex="1" parent="1">
-          <mxGeometry x="590" y="610" width="450" height="130" as="geometry" />
-        </mxCell>
-        
-        <!-- Arrow from 7zip note to template -->
-        <mxCell id="b-arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;dashed=1;dashPattern=5 5;strokeColor=#999999;" edge="1" parent="1" source="b-7zip" target="b-7zip-template">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="560" y="555" />
-              <mxPoint x="560" y="230" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        
-      </root>
-    </mxGraphModel>
-  </diagram>
+<mxfile host="65bd71144e" pages="3">
+    <diagram name="Playbook Execution Flow" id="awap-flow">
+        <mxGraphModel dx="958" dy="499" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="100" pageHeight="95" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Ansible Windows Auto-Provisioning (AWAP) - Execution Flow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="200" y="20" width="700" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="controller-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;dashPattern=8 8;arcSize=2;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="70" width="530" height="750" as="geometry"/>
+                </mxCell>
+                <mxCell id="controller-label" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Ansible Control Node (Linux)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12" parent="1" vertex="1">
+                    <mxGeometry x="45" y="80" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="windows-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;dashPattern=8 8;arcSize=2;" parent="1" vertex="1">
+                    <mxGeometry x="622" y="122.5" width="460" height="657.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="windows-label" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Windows Target Host&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12" parent="1" vertex="1">
+                    <mxGeometry x="637" y="130.5" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="playbook" value="&lt;b&gt;Playbook&lt;/b&gt;&lt;br&gt;(&lt;font face=&quot;Consolas&quot;&gt;&lt;b style=&quot;background-color: rgb(231, 231, 231);&quot;&gt;basic_bundle_win.yml&lt;/b&gt;&lt;/font&gt;)&lt;br&gt;&lt;hr&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;• shortname&lt;br&gt;• pre_setup&lt;br&gt;• setup&lt;br&gt;• post_setup&lt;br&gt;• template_vars&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;align=left;spacingLeft=10;arcSize=6;" parent="1" vertex="1">
+                    <mxGeometry x="115" y="114" width="160" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="inventory" value="&lt;b&gt;Inventory&lt;/b&gt;&lt;br&gt;(&lt;b style=&quot;font-family: Consolas; background-color: rgb(231, 231, 231);&quot;&gt;dev.yml&lt;/b&gt;)&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• hosts&lt;br&gt;• credentials&lt;br&gt;• pkgs_repo_base_url&lt;br&gt;• win_temp_dir_path&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;align=left;spacingLeft=10;arcSize=7;" parent="1" vertex="1">
+                    <mxGeometry x="295" y="114" width="160" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="main-yml" value="&lt;b&gt;&lt;font face=&quot;Consolas&quot; style=&quot;background-color: rgb(231, 231, 231);&quot;&gt;main.yml&lt;/font&gt;&lt;/b&gt;&lt;br&gt;(Orchestrator)&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;1. Clear temp/ dir&lt;br&gt;2. Include phase files&lt;br&gt;3. Execute generated tasks&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=10;arcSize=7;" parent="1" vertex="1">
+                    <mxGeometry x="195" y="274" width="180" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="phase-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;dashed=1;arcSize=7;" parent="1" vertex="1">
+                    <mxGeometry x="45" y="395" width="480" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="phase-label" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Phase Task Files&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=10" parent="1" vertex="1">
+                    <mxGeometry x="60" y="401" width="100" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="pre-setup" value="&lt;b&gt;&lt;font face=&quot;Consolas&quot; style=&quot;background-color: rgb(231, 231, 231);&quot;&gt;01_pre-setup.yml&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;label: [PRE-SETUP]&lt;br&gt;setup_phase: pre_setup&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="55" y="425" width="140" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="setup" value="&lt;b&gt;&lt;font face=&quot;Consolas&quot; style=&quot;background-color: rgb(231, 231, 231);&quot;&gt;02_setup.yml&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;label: [SETUP]&lt;br&gt;setup_phase: setup&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="210" y="425" width="140" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="post-setup" value="&lt;b&gt;&lt;font face=&quot;Consolas&quot; style=&quot;background-color: rgb(231, 231, 231);&quot;&gt;03_post-setup.yml&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;label: [POST-SETUP]&lt;br&gt;setup_phase: post_setup&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="365" y="425" width="150" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="template" value="&lt;b&gt;&lt;font face=&quot;Consolas&quot; style=&quot;background-color: rgb(231, 231, 231);&quot;&gt;operations.yml.j2&lt;/font&gt;&lt;/b&gt;&lt;br&gt;(Jinja2 Template Engine)&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• Parses operation types&lt;br&gt;• Generates Ansible tasks&lt;br&gt;• Handles all logic branches&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacingLeft=10;arcSize=5;" parent="1" vertex="1">
+                    <mxGeometry x="180" y="560" width="200" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="temp-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6e6e6;strokeColor=#999999;dashed=1;arcSize=4;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="690" width="510" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="temp-label" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;font face=&quot;Consolas&quot; style=&quot;background-color: rgb(196, 196, 196);&quot;&gt;temp/&lt;/font&gt; (Generated Tasks)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=10" parent="1" vertex="1">
+                    <mxGeometry x="70" y="700" width="150" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="gen-pre" value="&lt;font style=&quot;font-size: 10px; background-color: rgb(231, 231, 231);&quot; face=&quot;Consolas&quot;&gt;01_&lt;b&gt;&amp;lt;shortname&amp;gt;&lt;/b&gt;__pre-setup.yml&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="44" y="730" width="170" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="gen-setup" value="&lt;font style=&quot;font-size: 10px; background-color: rgb(231, 231, 231);&quot; face=&quot;Consolas&quot;&gt;02_&lt;b&gt;&amp;lt;shortname&amp;gt;&lt;/b&gt;__setup.yml&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="222" y="730" width="145" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="gen-post" value="&lt;font style=&quot;font-size: 10px; background-color: rgb(231, 231, 231);&quot; face=&quot;Consolas&quot;&gt;03_&lt;b&gt;&amp;lt;shortname&amp;gt;&lt;/b&gt;__post-setup.yml&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="375" y="730" width="170" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="tasks-desc" value="&lt;font size=&quot;1&quot;&gt;Contains fully rendered Ansible tasks ready for execution&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="135" y="769.5" width="300" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="winrm" value="&lt;b&gt;WinRM&lt;/b&gt;&lt;br&gt;(Port 5985/5986)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="642" y="162.5" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="operations-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6ffcc;strokeColor=#82b366;dashed=1;arcSize=4;" parent="1" vertex="1">
+                    <mxGeometry x="642" y="232.5" width="420" height="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="operations-label" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Operation Types (Executed on Target)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=10" parent="1" vertex="1">
+                    <mxGeometry x="652" y="237.5" width="250" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="checks" value="&lt;b&gt;Checks&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• check_net_flows&lt;br&gt;• check_http_status&lt;br&gt;• check_service_status&lt;br&gt;• check_ports&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=5;arcSize=9;" parent="1" vertex="1">
+                    <mxGeometry x="662" y="272.5" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="installations" value="&lt;b&gt;Installations&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• MSI packages&lt;br&gt;• EXE installers&lt;br&gt;• ZIP archives&lt;br&gt;• Bundles&lt;br&gt;• Manual registration&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;arcSize=5;" parent="1" vertex="1">
+                    <mxGeometry x="792" y="262.5" width="120" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="configurations" value="&lt;b&gt;Configurations&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• env_var (set/append/remove)&lt;br&gt;• registry (CRUD/merge)&lt;br&gt;• file_system ops&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacingLeft=5;arcSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="922" y="267.5" width="130" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="filesystem" value="&lt;b&gt;File System Operations&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• transfer (upload/download)&lt;br&gt;• shortcut (desktop/start menu)&lt;br&gt;• template (Jinja2 rendering)&lt;br&gt;• create (file/directory)&lt;br&gt;• remove / remove_bypattern&lt;br&gt;• move&lt;br&gt;• append / prepend&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=5;arcSize=4;" parent="1" vertex="1">
+                    <mxGeometry x="662" y="377.5" width="180" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="executions" value="&lt;b&gt;Executions&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• run_ps1_script&lt;br&gt;  - script_content (inline)&lt;br&gt;  - upload_file&lt;br&gt;  - file_relative_url&lt;br&gt;• run_executable&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacingLeft=5;arcSize=3;" parent="1" vertex="1">
+                    <mxGeometry x="862" y="387.5" width="180" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="target-dirs" value="&lt;b&gt;Target Directories&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• C:\AWAP_Temp (temporary)&lt;br&gt;• D:\AppServ (installations)&lt;br&gt;• C:\Program Files\...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=5;arcSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="662" y="532.5" width="180" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="registry" value="&lt;b&gt;Registry&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;• HKLM:\SOFTWARE\...&lt;br&gt;• Uninstall entries&lt;br&gt;• App settings&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;arcSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="862" y="532.5" width="180" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="result" value="&lt;b&gt;Configured Windows System&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;✓ Software installed&lt;/font&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0); font-size: x-small;&quot;&gt;✓ Files transfered&lt;/span&gt;&lt;font size=&quot;1&quot;&gt;&lt;br&gt;✓ Registry configured&lt;br&gt;✓ Environment set&lt;br&gt;✓ Shortcuts created&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=10;arcSize=9;" parent="1" vertex="1">
+                    <mxGeometry x="752" y="662.5" width="200" height="97.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="1" source="playbook" target="main-yml" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow1b" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="1" source="inventory" target="main-yml" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="1" source="main-yml" target="phase-box" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow3a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.25;entryY=0;" parent="1" source="pre-setup" target="template" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow3b" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="1" source="setup" target="template" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow3c" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.75;entryY=0;" parent="1" source="post-setup" target="template" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="279.09000000000003" y="649.9999999999999" as="sourcePoint"/>
+                        <mxPoint x="279.09" y="690" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="279" y="670"/>
+                            <mxPoint x="279" y="670"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow5" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;b&gt;WinRM&lt;/b&gt;&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.997;exitY=0.502;entryX=0;entryY=0.5;strokeWidth=2;strokeColor=#0066CC;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="temp-box" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="588" y="745"/>
+                            <mxPoint x="588" y="433"/>
+                        </Array>
+                        <mxPoint x="557.9999999999998" y="745" as="sourcePoint"/>
+                        <mxPoint x="650" y="432.5" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="1" source="operations-box" target="result" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="Role Template Decision Tree" id="template-tree">
+        <mxGraphModel dx="958" dy="499" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="70" pageHeight="105" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="t2-title" value="&lt;font face=&quot;Consolas&quot; style=&quot;background-color: light-dark(rgb(231, 231, 231), rgb(237, 237, 237));&quot;&gt;&amp;nbsp;operations.yml.j2 &lt;/font&gt;&amp;nbsp;- Template Decision Tree" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="200" y="20" width="450" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-start" value="setup_phase_operations&lt;br&gt;(pre_setup / setup / post_setup)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="325" y="70" width="180" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-decision" value="Operation&lt;br&gt;Type?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+                    <mxGeometry x="355" y="160" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-checks" value="checks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="75" y="280" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-checks-sub" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;arcSize=4;" parent="1" vertex="1">
+                    <mxGeometry x="35" y="340" width="180" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-c1" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;check_net_flows&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="50" y="355" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-c2" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;check_http_status&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="50" y="390" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-c3" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;check_service_status&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="50" y="425" width="110" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-c4" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;check_ports&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="50" y="460" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-install" value="installations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="275" y="280" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-install-sub" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;dashed=1;arcSize=3;" parent="1" vertex="1">
+                    <mxGeometry x="235" y="340" width="180" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-i1" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;type: msi&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="243" y="355" width="80" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-i2" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;type: exe&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="243" y="390" width="80" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-i3" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;type: zip&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="243" y="425" width="80" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-i4" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;type: bundle&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="243" y="460" width="80" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-i5" value="+ manual_registration" style="rounded=0;whiteSpace=wrap;html=1;fontSize=8" parent="1" vertex="1">
+                    <mxGeometry x="331" y="401" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-config" value="configurations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="475" y="280" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-config-sub" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;arcSize=4;" parent="1" vertex="1">
+                    <mxGeometry x="435" y="340" width="180" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-cfg1" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;env_var&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="455" y="355" width="70" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-cfg1a" value="&lt;font style=&quot;font-size: 8px;&quot;&gt;set/append/remove&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;fontSize=7" parent="1" vertex="1">
+                    <mxGeometry x="530" y="358" width="70" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-cfg2" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;registry&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="455" y="390" width="70" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-cfg2a" value="&lt;font style=&quot;font-size: 8px;&quot;&gt;set/remove_value/&lt;br&gt;remove_key/merge&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;fontSize=7" parent="1" vertex="1">
+                    <mxGeometry x="530" y="385" width="80" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-cfg3" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;file_system&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="455" y="437" width="70" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-cfg3a" value="&lt;font style=&quot;font-size: 8px;&quot;&gt;transfer/shortcut/&lt;br&gt;template/create/&lt;br&gt;remove/move/&lt;br&gt;append/prepend/&lt;br&gt;remove_bypattern&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;fontSize=7;align=left" parent="1" vertex="1">
+                    <mxGeometry x="530" y="420" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-exec" value="executions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="675" y="280" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-exec-sub" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;arcSize=5;" parent="1" vertex="1">
+                    <mxGeometry x="635" y="340" width="180" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-e1" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;run_ps1_script&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="655" y="360" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-e1a" value="&lt;font style=&quot;font-size: 8px;&quot;&gt;script_content / upload_file / file_url&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;fontSize=7" parent="1" vertex="1">
+                    <mxGeometry x="655" y="385" width="140" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-e2" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;run_executable&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="655" y="415" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-cleanup" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;Temp Cleanup&lt;br&gt;(after each operation)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9" parent="1" vertex="1">
+                    <mxGeometry x="325" y="550" width="180" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-a1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="t2-start" target="t2-decision" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="415" y="100" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="t2-a3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=0;exitY=0.5;entryX=0.5;entryY=0;" parent="1" source="t2-decision" target="t2-checks" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-a4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=0.25;exitY=1;entryX=0.5;entryY=0;" parent="1" source="t2-decision" target="t2-install" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-a5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=0.75;exitY=1;entryX=0.5;entryY=0;" parent="1" source="t2-decision" target="t2-config" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-a6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=1;exitY=0.5;entryX=0.5;entryY=0;" parent="1" source="t2-decision" target="t2-exec" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="t2-a7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;entryX=-0.009;entryY=0.479;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" target="t2-cleanup" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="105" y="570"/>
+                            <mxPoint x="305" y="570"/>
+                        </Array>
+                        <mxPoint x="105" y="500" as="sourcePoint"/>
+                        <mxPoint x="305" y="570" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="t2-a8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;entryX=0.25;entryY=0;" parent="1" source="t2-install-sub" target="t2-cleanup" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="325" y="530"/>
+                            <mxPoint x="370" y="530"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="t2-a9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;entryX=0.75;entryY=0;" parent="1" source="t2-config-sub" target="t2-cleanup" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="525" y="520"/>
+                            <mxPoint x="460" y="520"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="t2-a10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;entryX=1;entryY=0.5;" parent="1" source="t2-exec-sub" target="t2-cleanup" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="725" y="570"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="bw4UBuvoVfSCSr_jTQ7j" name="Bundled Content Structure">
+        <mxGraphModel dx="958" dy="499" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="100" pageHeight="100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-1" value="AWAP - Bundled Content Structure" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="300" y="20" width="500" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;dashPattern=8 8;arcSize=4;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="70" width="500" height="520" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-3" value="resources/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=14" parent="1" vertex="1">
+                    <mxGeometry x="50" y="75" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-6" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;arcSize=4;" parent="1" vertex="1">
+                    <mxGeometry x="310" y="370" width="200" height="205" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-7" value="basic_win/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11" parent="1" vertex="1">
+                    <mxGeometry x="320" y="375" width="80" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-8" value="&lt;b&gt;setup-nodejs/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• set_NODEJS_HOME.ps1&lt;br&gt;&amp;nbsp; (Version switcher)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" parent="1" vertex="1">
+                    <mxGeometry x="325" y="400" width="170" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-9" value="&lt;b&gt;setup-python312/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• set_PYTHON_paths.ps1&lt;br&gt;&amp;nbsp; (Version switcher)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" parent="1" vertex="1">
+                    <mxGeometry x="325" y="486" width="170" height="75" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-10" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;arcSize=3;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="371" width="200" height="205" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-11" value="core_win/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11" parent="1" vertex="1">
+                    <mxGeometry x="80" y="375" width="80" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-13" value="&lt;b&gt;setup-openjdk/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• set_JAVA_HOME.ps1&lt;br&gt;&amp;nbsp; (Version switcher)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" parent="1" vertex="1">
+                    <mxGeometry x="85" y="400" width="170" height="75" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-14" value="&lt;b&gt;setup-msoffice/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• ms-office-kms-activate.ps1&lt;br&gt;&amp;nbsp; (KMS activation)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;" parent="1" vertex="1">
+                    <mxGeometry x="85" y="486" width="170" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-16" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;dashed=1;dashPattern=8 8;arcSize=4;" parent="1" vertex="1">
+                    <mxGeometry x="580" y="70" width="470" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-17" value="templates/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=14" parent="1" vertex="1">
+                    <mxGeometry x="590" y="75" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-18" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;arcSize=7;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="110" width="430" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-19" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: rgb(0, 0, 0);&quot;&gt;core_win/setup-7zip/&lt;/span&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11" parent="1" vertex="1">
+                    <mxGeometry x="610" y="115" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-20" value="&lt;b&gt;set_7zip_settings.reg.j2&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;Jinja2 template for 7-Zip file associations.&lt;br&gt;&lt;br&gt;Uses: &lt;b&gt;{{ template_vars.install_dir }}&lt;/b&gt;&lt;br&gt;&lt;br&gt;Creates registry entries for:&lt;br&gt;• .7z, .zip, .rar, .tar, .gz, etc.&lt;br&gt;• File type associations&lt;br&gt;• Default icons&lt;br&gt;• Shell open commands&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;arcSize=6;" parent="1" vertex="1">
+                    <mxGeometry x="620" y="145" width="200" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-21" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;arcSize=3;" parent="1" vertex="1">
+                    <mxGeometry x="580" y="380" width="470" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-32" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;u style=&quot;&quot;&gt;In playbook files:&lt;/u&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12" parent="1" vertex="1">
+                    <mxGeometry x="590" y="390" width="160" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-33" value="&lt;font size=&quot;2&quot;&gt;• &lt;b&gt;resources/&lt;/b&gt; files are referenced via &lt;i&gt;&quot;&lt;b&gt;upload_file:&lt;/b&gt; value&quot;&lt;/i&gt;&lt;br&gt;&lt;br&gt;• &lt;b&gt;templates/&lt;/b&gt; files are referenced via &lt;i&gt;&quot;&lt;b&gt;upload_template:&lt;/b&gt; value&quot;&lt;/i&gt;&lt;br&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;spacingLeft=5;spacingTop=5" parent="1" vertex="1">
+                    <mxGeometry x="590" y="415" width="400" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="4pBZrq_WvyYrIrFOXF5J-1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;arcSize=4;" vertex="1" parent="1">
+                    <mxGeometry x="190" y="100" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="4pBZrq_WvyYrIrFOXF5J-2" value="init-system/" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11" vertex="1" parent="1">
+                    <mxGeometry x="200" y="105" width="80" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="vK4wd2AkNQS0Jx5Mm9A7-12" value="&lt;b&gt;init-system/&lt;/b&gt;&lt;br&gt;&lt;hr&gt;&lt;font size=&quot;1&quot;&gt;• AWAP.PSModules/&lt;br&gt;&amp;nbsp; └── 0.1.0/&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ├── AWAP.PSModules.psd1&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ├── AWAP.PSModules.psm1&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; └── README.md&lt;br&gt;• starter.ps1&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=5;arcSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="205" y="135" width="170" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="4pBZrq_WvyYrIrFOXF5J-5" value="" style="endArrow=none;dashed=1;html=1;exitX=0.96;exitY=0.502;exitDx=0;exitDy=0;exitPerimeter=0;strokeWidth=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="525" y="328.67" as="sourcePoint"/>
+                        <mxPoint x="55" y="328.85" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="4pBZrq_WvyYrIrFOXF5J-6" value="&lt;span style=&quot;font-style: normal;&quot;&gt;⬆️ Mandatory (pre-requisite)&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=3;fontSize=11" vertex="1" parent="1">
+                    <mxGeometry x="370" y="301" width="154" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="4pBZrq_WvyYrIrFOXF5J-7" value="&lt;span style=&quot;font-style: normal;&quot;&gt;⬇️Custom (user-created)&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=3;fontSize=11" vertex="1" parent="1">
+                    <mxGeometry x="369.5" y="336" width="138.5" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
 </mxfile>
