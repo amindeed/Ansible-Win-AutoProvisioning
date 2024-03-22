@@ -1,5 +1,9 @@
 # Work Log
 
+## 2024-03-22
+
+- Update README and repo with information and scripts to setup testing environment.
+
 ## 2024-03-14
 
 - Started new README layout and content.

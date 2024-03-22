@@ -7,6 +7,20 @@
 **Ansible Windows Auto-Provisioning (AWAP)** is a declarative Windows provisioning framework built on Ansible, designed primarily for enterprise environments, to streamline software installation, system configuration, and feature enablement for Windows systems. 
 AWAP abstracts complex Windows deployment tasks into a simple YAML-based configuration that handles software installations, system configurations, registry management, and more.
 
+**Table of Contents:**
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Requirements](#requirements)
+    - [Ansible Control Node (Linux)](#ansible-control-node-linux)
+    - [Target Windows Systems](#target-windows-systems)
+- [Architecture](#architecture)
+    - [Directory Structure](#directory-structure)
+    - [How It Works: *Execution Flow*](#how-it-works-execution-flow)
+- [Setting Up Test Environment](#setting-up-test-environment)
+    - [Ansible Controller](#ansible-controller)
+    - [Target Windows Host](#target-windows-host)
+    - [\[Optional\] Simulated {KMS + Artifacts Repository} Server](#optional-simulated-kms--artifacts-repository-server)
+
 
 ## Overview
 
@@ -73,7 +87,10 @@ AWAP is a template-driven Ansible role that transforms high-level YAML declarati
 │   └── basic_win/							# Basic bundle resources
 ├── 📂templates/							# Jinja2 templates of files to deploy
 ├── 📂vaults/📂environments/				# Encrypted credentials
-└── 📂tools/								# Utility scripts (not called by playbooks)
+├── 📂tools/								# Utility scripts (not called by playbooks)
+│
+├── 🗂️docs/				                 # Documentation
+└── 🗂️scripts/								 # Scripts for setting up the environment
 ```
 
 ### How It Works: *Execution Flow*
@@ -91,3 +108,38 @@ Playbook Variables ──► Phase Files ──► operations.yml.j2 ──► G
 2. Phase files include `operations.yml.j2` with your operation list
 3. The Jinja2 template generates native Ansible tasks
 4. Generated tasks execute on Windows targets
+
+## Setting Up Test Environment
+### Ansible Controller
+
+> **Check [`./scripts/`](scripts/) directory**
+
+On a **Rocky Linux 8.9 x64** VM:
+
+```bash
+sudo dnf install -y python3.11 python3.11-pip
+pip3 install ansible-core==2.16.1
+pip3 install pywinrm==0.4.3
+ansible-galaxy collection install ansible.windows:==2.2.0 community.windows:==2.1.0 ansible.posix:==1.5.4
+```
+
+### Target Windows Host
+
+On a **Windows Server 2019 Standard** VM, run [`scripts/setup_target-WinSvr2019.ps1`](scripts/setup_target-WinSvr2019.ps1)
+
+Then, to test from the Ansible Controller:
+
+1. [`python3 scripts/ansible_ctrl_test_winrm_http.py`](scripts/ansible_ctrl_test_winrm_http.py)
+2. [`python3 scripts/ansible_ctrl_test_winrm_https.py`](scripts/ansible_ctrl_test_winrm_https.py)
+3. Ansible *ping* test:
+
+    ```bash
+    ansible -v win2019-http -i inventories/environments/dev.yml -m win_ping
+    ansible -v win2019-https -i inventories/environments/dev.yml -m win_ping
+    ```
+
+### [Optional] Simulated {KMS + Artifacts Repository} Server
+
+```bash
+# ...TBA...
+```
