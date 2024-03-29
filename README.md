@@ -110,7 +110,7 @@ Playbook Variables ──► Phase Files ──► operations.yml.j2 ──► G
 4. Generated tasks execute on Windows targets
 
 ## Setting Up Test Environment
-### Ansible Controller
+### 1. Ansible Controller
 
 > **Check [`./scripts/`](scripts/) directory**
 
@@ -123,7 +123,7 @@ pip3 install pywinrm==0.4.3
 ansible-galaxy collection install ansible.windows:==2.2.0 community.windows:==2.1.0 ansible.posix:==1.5.4
 ```
 
-### Target Windows Host
+### 2. Target Windows Host
 
 On a **Windows Server 2019 Standard** VM, run [`scripts/setup_target-WinSvr2019.ps1`](scripts/setup_target-WinSvr2019.ps1)
 
@@ -138,8 +138,8 @@ Then, to test from the Ansible Controller:
     ansible -v win2019-https -i inventories/environments/dev.yml -m win_ping
     ```
 
-### [Optional] Simulated {KMS + Artifacts Repository} Server
+### 3. [Optional] Simulated {KMS + Artifacts Repository} Server
 
-```bash
-# ...TBA...
-```
+You can setup a simulated KMS ([`vlmcsd`](https://github.com/Wind4/vlmcsd)) and Artifacts Repository (NGINX + [Filebrowser](https://github.com/filebrowser/filebrowser)) if you want to test MS Office installation and activation, as well as downloading installer files from a private server (e.g. company's JFrog Artifactory).
+
+For that, you can run [`scripts/setup_kms_artifactory_simul_svr.sh`](scripts/setup_kms_artifactory_simul_svr.sh) on a dedicated third VM.

@@ -1,10 +1,14 @@
 # Work Log
 
-## 2024-03-22
+## 2024-03-29
+
+- Add script/doc to setup a simulated {KMS + Artifacts Repository} server on a single VM.
+
+## 2024-03-22 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/e704cfe49fceb6cb3fbebb0e2b18821b9326d63d)
 
 - Update README and repo with information and scripts to setup testing environment.
 
-## 2024-03-14
+## 2024-03-14 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/a6d60aa158175383a8291260681a9a70e97f110b)
 
 - Started new README layout and content.
 - Uploaded updated version ofr the architecture diagram (Draw.io)
