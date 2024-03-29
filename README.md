@@ -17,9 +17,9 @@ AWAP abstracts complex Windows deployment tasks into a simple YAML-based configu
     - [Directory Structure](#directory-structure)
     - [How It Works: *Execution Flow*](#how-it-works-execution-flow)
 - [Setting Up Test Environment](#setting-up-test-environment)
-    - [Ansible Controller](#ansible-controller)
-    - [Target Windows Host](#target-windows-host)
-    - [\[Optional\] Simulated {KMS + Artifacts Repository} Server](#optional-simulated-kms--artifacts-repository-server)
+    - [1. Ansible Controller](#1-ansible-controller)
+    - [2. Target Windows Host](#2-target-windows-host)
+    - [3. \[Optional\] Simulated {KMS + Artifacts Repository} Server](#3-optional-simulated-kms--artifacts-repository-server)
 
 
 ## Overview
