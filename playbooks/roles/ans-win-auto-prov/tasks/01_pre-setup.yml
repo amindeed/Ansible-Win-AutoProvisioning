@@ -8,7 +8,7 @@
     setup_phase: pre_setup
     short_name: "{{ shortname | default('') }}"
     setup_phase_operations: "{{ pre_setup | default([]) }}"
-  delegate_to: localhost
+  delegate_to: controlnode
   changed_when: false
   check_mode: no
   #register: presetup_template_output

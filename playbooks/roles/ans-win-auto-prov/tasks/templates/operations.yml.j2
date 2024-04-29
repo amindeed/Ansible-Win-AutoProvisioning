@@ -742,7 +742,7 @@
   stat:
     path: '{% raw %}{{ resources_dir }}{% endraw %}/{{ update_item.source.upload_file }}'
   register: item_type
-  delegate_to: localhost
+  delegate_to: controlnode
 
 - name: "{{ label }} # {{ short_name }} # ({{ loop.index }}/{{ loop.length }}) Upload '{{ file_name }}' (directory) to target host <1/2>"
   win_file:

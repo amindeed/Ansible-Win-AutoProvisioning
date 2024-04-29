@@ -2,6 +2,21 @@
 
 all:
   children:
+
+    # Control plane (never targeted by Windows plays)
+    control:
+      hosts:
+        controlnode:
+          ansible_connection: local
+          ansible_python_interpreter: /usr/bin/python3
+          ansible_shell_type: sh
+
+    # Windows target domain (semantic grouping)
+    windows:
+      children:
+        winrm_http:
+        winrm_https:
+
     # WinRM over HTTP (port 5985)
     winrm_http:
       hosts:

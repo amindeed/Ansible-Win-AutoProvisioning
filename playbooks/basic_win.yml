@@ -13,7 +13,7 @@
 ################################################################################
 
 - name: "Initialize the system"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: [initsys, always]
   roles:
@@ -75,7 +75,7 @@
 ################################################################################
 
 - name: Setup Node.JS v14, v16 and v18
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: nodejs
   roles:
@@ -151,7 +151,7 @@
 
 
 - name: "Setup Eclipse IDE for JEE: 2022-12, 2020-06, Oxygen (2017-06) and Neon 3 (2016-06)"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: eclipseide
   roles:
@@ -199,7 +199,7 @@
               
 
 - name: Setup Cygwin x64
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: cygwin
   roles:
@@ -225,7 +225,7 @@
 
 
 - name: "Setup DBeaver"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: dbeaver
   roles:
@@ -243,7 +243,7 @@
 
 
 - name: "Setup Git Extensions"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: gitextensions
   roles:
@@ -277,7 +277,7 @@
 
 
 - name: "Setup UML Designer"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: umldesigner
   roles:
@@ -298,7 +298,7 @@
 
 
 - name: "Setup Apache Maven"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: maven
   roles:
@@ -325,7 +325,7 @@
 
 
 - name: "Setup Python 2"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: [python, python2]
   roles:
@@ -371,7 +371,7 @@
 
 
 - name: "Setup Python 3.12"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: [python, python312]
   roles:

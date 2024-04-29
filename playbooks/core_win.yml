@@ -13,7 +13,7 @@
 ################################################################################
 
 - name: "Initialize the system"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: [initsys, always]
   roles:
@@ -77,7 +77,7 @@
 ################################################################################
 
 - name: "Setup OpenJDK: Eclipse Temurin JDK 8, 11 and 17"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: openjdk
   roles:
@@ -134,7 +134,7 @@
 
 
 - name: "Setup Notepad++"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: notepadpp
   roles:
@@ -239,7 +239,7 @@
               
 
 - name: "Setup 7-Zip"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: 7zip
   roles:
@@ -271,7 +271,7 @@
 
 
 - name: "Setup OpenSSL"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: openssl
   roles:
@@ -302,7 +302,7 @@
 
 
 - name: "Setup KeePass"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: keepass
   roles:
@@ -319,7 +319,7 @@
 
 
 - name: "Setup Firefox"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: firefox
   roles:
@@ -336,7 +336,7 @@
 
 
 - name: "Setup Draw.io"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: drawio
   roles:
@@ -353,7 +353,7 @@
 
 
 - name: "Setup Pandoc"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: pandoc
   roles:
@@ -370,7 +370,7 @@
 
 
 - name: "Setup BeyondCompare"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: beyondcompare
   roles:
@@ -387,7 +387,7 @@
 
 
 - name: "Setup Adobe PDF Reader"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: adobereader
   roles:
@@ -404,7 +404,7 @@
 
 
 - name: "Setup Greenshot"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: greenshot
   roles:
@@ -421,7 +421,7 @@
 
 
 - name: "Setup Keystore Explorer"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: keystoreexplorer
   roles:
@@ -438,7 +438,7 @@
 
 
 - name: "Setup MarkText"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: marktext
   roles:
@@ -461,7 +461,7 @@
 
 
 - name: "Setup VSCode"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: vscode
   roles:
@@ -479,7 +479,7 @@
 
 
 - name: "Setup Microsoft Office Standard 2016 (x64)"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: msoffice
   roles:
@@ -516,7 +516,7 @@
 
 
 - name: "Setup Sysinternals Suite"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: sysinternals
   roles:
@@ -535,7 +535,7 @@
 
 
 - name: "Setup RegShot"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: regshot
   roles:
@@ -553,7 +553,7 @@
 
 
 - name: "Setup Dependency Walker"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: dependencywalker
   roles:
@@ -573,7 +573,7 @@
 
 
 - name: "Setup TreeSize"
-  hosts: all
+  hosts: windows
   gather_facts: no
   tags: treesize
   roles:

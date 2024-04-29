@@ -1,6 +1,12 @@
 # Work Log
 
-## 2024-03-29
+## 2024-04-29
+
+- Explicit control node for delegated tasks
+- Clear separation between control and Windows targets
+- Safer WinRM execution on Windows control hosts *(considering "Cygwin on Windows" as an option for Control Node)*
+
+## 2024-03-29 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/0e9980fb28252bcb2a8aac38ad5de7917d663ae7)
 
 - Add script/doc to setup a simulated {KMS + Artifacts Repository} server on a single VM.
 

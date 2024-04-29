@@ -1,5 +1,6 @@
 # Ansible Windows Auto-Provisioning (AWAP)
 
+![Rocky Linux](https://img.shields.io/badge/Rocky%20Linux-8.9-blue?logo=rockylinux)
 ![Ansible Core](https://img.shields.io/badge/Ansible--Core-2.16.1-blue?logo=ansible)
 [![Python](https://img.shields.io/badge/Python-v3.11.5-yellowgreen?logo=python&logoColor=ffffff)](https://www.python.org/downloads/release/python-3115/)
 ![Windows Server](https://img.shields.io/badge/Windows%20Server-supported-blue?logo=windows)
