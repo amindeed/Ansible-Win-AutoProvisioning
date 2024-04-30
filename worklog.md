@@ -1,6 +1,6 @@
 # Work Log
 
-## 2024-04-29
+## 2024-04-29 [(code)](https://github.com/amindeed/Ansible-Win-AutoProvisioning/tree/187f52d05ff5f871536f657c396144a2a6ad0432)
 
 - Explicit control node for delegated tasks
 - Clear separation between control and Windows targets
