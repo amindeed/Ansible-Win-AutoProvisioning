@@ -1,0 +1,114 @@
+---
+################################################################################
+# SYSTEM INITIALIZATION - REQUIRED
+################################################################################
+# This play sets up the base system framework and must run before any software
+# setups. It creates:
+#   - PowerShell helper modules (AWAP.PSModules)
+#   - Startup script framework (starter.ps1)
+#   - Environment variable management functions
+#
+# Safe to modify:
+#   - Add play-level variables if needed
+################################################################################
+
+- name: "Initialize the system"
+  hosts: windows
+  gather_facts: no
+  tags: [initsys, always]
+  roles:
+    - role: ans-win-auto-prov
+      vars:
+        shortname: initsys
+        pre_setup:
+          - configurations:
+            - update_resource:
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: /init-system/AWAP.PSModules
+                destination: C:\Program Files\WindowsPowerShell\Modules\
+                #force_overwrite_dest: no # By default, Files are only replaced if different, and folders are always forced
+                #skip_if_path_exists: C:\Program Files\WindowsPowerShell\Modules\AWAP.PSModules\
+
+              - resource_type: file_system
+                operation_type: transfer
+                source:
+                  upload_file: /init-system/starter.ps1
+                destination: C:\opt\ScriptPS\Starter\
+              
+              - resource_type: file_system
+                operation_type: shortcut
+                source: '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe'
+                arguments: '-WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\opt\ScriptPS\Starter\starter.ps1"'
+                destination: '%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup\starter.ps1.lnk'
+              
+              - resource_type: file_system
+                operation_type: create
+                destination: C:\opt\ScriptPS\Starter\startup_scripts
+
+              # ---- TODO ------
+              # Optional: Enterprise CA certificates
+              # Uncomment and configure if your organization requires custom CA certs
+              #- resource_type: file_system
+              #  operation_type: transfer
+              #  source:
+              #    file_full_url: URL_to_cert_bundle
+              #  destination: C:\ProgramData\AWAP\Certificates 
+                
+################################################################################
+# SOFTWARE SETUPS
+################################################################################
+# Add your application setup plays below.
+# Each play should have a unique tag for selective execution.
+#
+# Examples:
+#   --tags "openjdk"            # Setup Java (initsys runs automatically)
+#   --tags "openssl,openjdk"     # Setup multiple applications
+#   --tags "all"                # Setup everything
+#
+# Advanced:
+#   --skip-tags "initsys"       # Skip system initialization
+#                               # Use ONLY if initsys already run successfully
+#                               # on the target machine (saves time on re-runs)
+#
+# Note: 'initsys' is tagged with 'always' and runs automatically unless
+#       explicitly skipped. It is idempotent (safe to run multiple times).
+################################################################################
+
+
+- name: "Setup Microsoft Office Standard 2016 (x64)"
+  hosts: windows
+  gather_facts: no
+  tags: msoffice
+  roles:
+    - role: ans-win-auto-prov
+      vars:
+        shortname: msoffice
+        pre_setup:
+          - checks:
+            - check_net_flows:
+              - target_host: kms.server.local
+                target_port: 1688
+                #abort_on_failure: yes # Default: 'no'
+        setup:
+          - installations:
+            - software_components:
+              - software_fullname: "Microsoft Office Standard 2016"
+                #file_relative_url: ms-office-16/MS_Office_2016_32Bit_En_VL.zip
+                file_relative_url: ms-office-16/MS_Office_2016_64Bit_En_VL.zip
+                type: bundle
+                installer_file_path: setup.exe
+                arguments: '/config .\Config.xml' # /!\ Consider escaping special characters with "`" (for PowerShell)
+                success_exit_codes: # Default: "[0]"
+                  - 0
+                  - 3010
+                #clean_downloads: true
+
+        post_setup:
+          - executions:
+            - run_ps1_script:
+              - upload_file: core_win/setup-msoffice/ms-office-kms-activate.ps1
+                arguments: "kms.server.local"
+                #working_directory: C:\temp\my office stuff\misc
+                abort_on_failure: yes # Default: 'no'
