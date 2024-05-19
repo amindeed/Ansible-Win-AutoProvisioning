@@ -88,21 +88,21 @@
           - installations:
             - software_components:
               - software_fullname: Eclipse Temurin JDK with Hotspot 8u382-b05 (x64)
-                file_relative_url: eclipse_temurin_openjdk/OpenJDK8U-jdk_x64_windows_hotspot_8u382b05.msi
+                file_full_url: https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u382-b05/OpenJDK8U-jdk_x64_windows_hotspot_8u382b05.msi
                 type: msi
                 additional_arguments: ADDLOCAL=FeatureMain
                 root_install_dir: '{{ root_install_dir }}\Java'
                 #abort_on_aftercheck_failure: no # Default: yes
 
               - software_fullname: Eclipse Temurin JDK with Hotspot 11.0.20.1+1 (x64)
-                file_relative_url: eclipse_temurin_openjdk/OpenJDK11U-jdk_x64_windows_hotspot_11.0.20.1_1.msi
+                file_full_url: https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.20.1%2B1/OpenJDK11U-jdk_x64_windows_hotspot_11.0.20.1_1.msi
                 type: msi
                 additional_arguments: ADDLOCAL=FeatureMain
                 root_install_dir: '{{ root_install_dir }}\Java'
                 #abort_on_aftercheck_failure: no # Default: yes
 
               - software_fullname: Eclipse Temurin JDK with Hotspot 17.0.8.1+1 (x64)
-                file_relative_url: eclipse_temurin_openjdk/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.msi
+                file_full_url: https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8.1%2B1/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.msi
                 type: msi
                 additional_arguments: ADDLOCAL=FeatureMain
                 root_install_dir: '{{ root_install_dir }}\Java'
@@ -145,8 +145,8 @@
           - installations:
             - software_components:
               - software_fullname: Notepad++ # Provide a relevant name that is both human-readable and recognizable by the system (check: tools/check_software_installed.ps1)
-                file_relative_url: notepadpp/npp.8.5.4.Installer.x64.exe
-                type: exe
+                file_full_url: https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.5.4/npp.8.5.4.Installer.x64.exe
+                type: zip
                 arguments: /S /D={{ root_install_dir }}\Notepad++
         post_setup:
           - configurations:
@@ -160,7 +160,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/AutoSave_dll_2v00_x64.zip
+                  file_full_url: https://github.com/francostellari/NppPlugins/raw/main/AutoSave/AutoSave_dll_2v00_x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\AutoSave\'
                 unzip: yes # Default: 'no'
                 force_overwrite_dest: no # Default: yes
@@ -168,7 +168,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/DSpellCheck_x64.zip
+                  file_full_url: https://github.com/Predelnik/DSpellCheck/releases/download/v1.5.0/DSpellCheck_x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\DSpellCheck\'
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
@@ -176,7 +176,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/LanguageHelp_dll_1v75_x64.zip
+                  file_full_url: https://github.com/francostellari/NppPlugins/raw/main/LanguageHelp/LanguageHelp_dll_1v75_x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\LanguageHelp\'
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
@@ -184,7 +184,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/MenuIcons_dll_2v03_x64.zip
+                  file_full_url: https://github.com/francostellari/NppPlugins/raw/main/MenuIcons/MenuIcons_dll_2v03_x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\MenuIcons\'
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
@@ -192,7 +192,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/OpenSelection_dll_1v13_x64.zip
+                  file_full_url: https://github.com/francostellari/NppPlugins/raw/main/OpenSelection/OpenSelection_dll_1v13_x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\OpenSelection\'
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
@@ -200,7 +200,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/RunMe_dll_1v61_x64.zip
+                  file_full_url: https://github.com/francostellari/NppPlugins/raw/main/RunMe/RunMe_dll_1v61_x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\RunMe\'
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
@@ -208,7 +208,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/TakeNotes_dll_1v26_x64.zip
+                  file_full_url: https://github.com/francostellari/NppPlugins/raw/main/TakeNotes/TakeNotes_dll_1v26_x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\TakeNotes\'
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
@@ -216,7 +216,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/TopMost_dll_1v42_x64.zip
+                  file_full_url: https://github.com/francostellari/NppPlugins/raw/main/TopMost/TopMost_dll_1v42_x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\TopMost\'
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
@@ -224,7 +224,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/ComparePlus_cp_1.1.0_x64.zip
+                  file_full_url: https://github.com/pnedev/comparePlus/releases/download/cp_1.1.0/ComparePlus_cp_1.1.0_x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\ComparePlus\'
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
@@ -232,7 +232,7 @@
               - resource_type: file_system
                 operation_type: transfer
                 source:
-                  file_relative_url: notepadpp/plugins/NppFTP-x64.zip
+                  file_full_url: https://github.com/ashkulz/NppFTP/releases/download/v0.30.1/NppFTP-x64.zip
                 destination: '{{ root_install_dir }}\Notepad++\plugins\NppFTP\'
                 unzip: yes
                 force_overwrite_dest: no # Default: yes
@@ -250,7 +250,7 @@
           - installations:
             - software_components:
               - software_fullname: "7-Zip"
-                file_relative_url: 7zip/7z2301-x64.msi
+                file_full_url: https://www.7-zip.org/a/7z2301-x64.msi
                 type: msi
                 root_install_dir: '{{ root_install_dir }}'
         post_setup:
@@ -282,14 +282,14 @@
           - installations:
             - software_components:
               - software_fullname: "Microsoft Visual C++ 2022 X64"
-                file_relative_url: ms-vc-redist/VC_redist.x64_15-17-19-22.exe
+                file_full_url: https://aka.ms/vs/17/release/VC_redist.x64.exe
                 type: exe
                 arguments: "/q /norestart" 
         setup:
           - installations:
             - software_components:
               - software_fullname: "OpenSSL"
-                file_relative_url: openssl/Win64OpenSSL_Light-3_1_2.exe
+                file_full_url: https://slproweb.com/download/Win64OpenSSL_Light-3_1_2.exe
                 type: exe
                 arguments: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR={{ root_install_dir }}\OpenSSL-Win64
         post_setup:
@@ -313,7 +313,7 @@
           - installations:
             - software_components:
               - software_fullname: "KeePass"
-                file_relative_url: keepass/KeePass-2.54.msi
+                file_full_url: https://phoenixnap.dl.sourceforge.net/project/keepass/KeePass%202.x/2.54/KeePass-2.54.msi?viasf=1
                 type: msi
                 root_install_dir: '{{ root_install_dir }}'
 
@@ -330,7 +330,7 @@
           - installations:
             - software_components:
               - software_fullname: "Firefox"
-                file_relative_url: firefox/FirefoxSetup114.0.2.exe
+                file_full_url: https://ftp.mozilla.org/pub/firefox/releases/114.0.2/win64/en-US/Firefox%20Setup%20114.0.2.exe
                 type: exe
                 arguments: -ms /MaintenanceService=false /InstallDirectoryPath={{ root_install_dir }}\Firefox
 
@@ -347,7 +347,7 @@
           - installations:
             - software_components:
               - software_fullname: "draw.io"
-                file_relative_url: draw-io/draw.io-21.6.8-windows-installer.exe
+                file_full_url: https://github.com/jgraph/drawio-desktop/releases/download/v21.6.8/draw.io-21.6.8-windows-installer.exe
                 type: exe
                 arguments: /allusers /S /D={{ root_install_dir }}\Draw.io
 
@@ -364,7 +364,7 @@
           - installations:
             - software_components:
               - software_fullname: "Pandoc"
-                file_relative_url: pandoc/pandoc-3.1.3-windows-x86_64.msi
+                file_full_url: https://github.com/jgm/pandoc/releases/download/3.1.3/pandoc-3.1.3-windows-x86_64.msi
                 type: msi
                 root_install_dir: '{{ root_install_dir }}'
 
@@ -381,7 +381,7 @@
           - installations:
             - software_components:
               - software_fullname: "Beyond Compare"
-                file_relative_url: beyond-compare/BCompare-4.4.6.27483_x64.msi
+                file_full_url: https://www.scootersoftware.com/files/BCompare-4.4.6.27483_x64.msi
                 type: msi
                 root_install_dir: '{{ root_install_dir }}'
 
@@ -398,7 +398,7 @@
           - installations:
             - software_components:
               - software_fullname: "Adobe Acrobat Reader"
-                file_relative_url: adobe-reader/AcroRdrDC2300320201_en_US.exe
+                file_full_url: https://ardownload2.adobe.com/pub/adobe/reader/win/AcrobatDC/2300320201/AcroRdrDC2300320201_en_US.exe
                 type: exe
                 arguments: /sAll /rs /msi /norestart EULA_ACCEPT=YES INSTALLDIR={{ root_install_dir }}\Adobe DISABLEDESKTOPSHORTCUT=1
 
@@ -415,7 +415,7 @@
           - installations:
             - software_components:
               - software_fullname: "Greenshot"
-                file_relative_url: greenshot/Greenshot-INSTALLER-1.2.10.6-RELEASE.exe
+                file_full_url: https://github.com/greenshot/greenshot/releases/download/Greenshot-RELEASE-1.2.10.6/Greenshot-INSTALLER-1.2.10.6-RELEASE.exe
                 type: exe
                 arguments: /DIR={{ root_install_dir }}\Greenshot /VERYSILENT /NORESTART
 
