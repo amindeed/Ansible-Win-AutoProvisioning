@@ -146,7 +146,7 @@
             - software_components:
               - software_fullname: Notepad++ # Provide a relevant name that is both human-readable and recognizable by the system (check: tools/check_software_installed.ps1)
                 file_full_url: https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.5.4/npp.8.5.4.Installer.x64.exe
-                type: zip
+                type: exe
                 arguments: /S /D={{ root_install_dir }}\Notepad++
         post_setup:
           - configurations:
@@ -432,7 +432,7 @@
           - installations:
             - software_components:
               - software_fullname: "Keystore Explorer"
-                file_relative_url: keystore-explorer/kse-552-setup.exe
+                file_full_url: https://github.com/kaikramer/keystore-explorer/releases/download/v5.5.2/kse-552-setup.exe
                 type: exe
                 arguments: /DIR={{ root_install_dir }}\KeystoreExplorer /VERYSILENT /NORESTART /ALLUSERS
 
@@ -449,7 +449,7 @@
           - installations:
             - software_components:
               - software_fullname: "MarkText"
-                file_relative_url: marktext/marktext-setup_v0_17_1.exe
+                file_full_url: https://github.com/marktext/marktext/releases/download/v0.17.1/marktext-setup.exe
                 type: exe
                 arguments: /allusers /S /D={{ root_install_dir }}\MarkText
         post_setup:
@@ -472,7 +472,7 @@
           - installations:
             - software_components:
               - software_fullname: "Microsoft Visual Studio Code"
-                file_relative_url: vscode/VSCodeSetup-x64-1.80.2.exe
+                file_full_url: https://update.code.visualstudio.com/1.80.2/win32-x64-user/stable
                 type: exe
                 arguments: /DIR={{ root_install_dir }}\VSCode /VERYSILENT /NORESTART /MERGETASKS=!runcode,desktopicon,addcontextmenufiles,addcontextmenufolders
                 #clean_downloads: false
@@ -490,29 +490,11 @@
           - installations:
             - software_components:
               - software_fullname: "Sysinternals Suite" 
-                file_relative_url: sysinternals/SysinternalsSuite.zip
+                file_full_url: https://download.sysinternals.com/files/SysinternalsSuite.zip
                 type: zip
                 root_install_dir: '{{ root_install_dir }}'
                 #desktop_shortcut: yes # Default: no
                 #startmenu_shortcut: no # Default: yes
-
-
-- name: "Setup RegShot"
-  hosts: windows
-  gather_facts: no
-  tags: regshot
-  roles:
-    - role: ans-win-auto-prov
-      vars:
-        shortname: regshot
-        setup:
-          - installations:
-            - software_components:
-              - software_fullname: "RegShot" 
-                file_relative_url: regshot/Regshot-1.9.1-beta_r321.zip
-                type: zip
-                root_install_dir: '{{ root_install_dir }}'
-                main_app_launcher: Regshot-x64-Unicode.exe
 
 
 - name: "Setup Dependency Walker"
@@ -527,29 +509,12 @@
           - installations:
             - software_components:
               - software_fullname: "Dependency Walker" 
-                file_relative_url: dependency-walker/depends22_x64.zip
+                file_full_url: https://www.dependencywalker.com/depends22_x64.zip
                 type: zip
                 root_install_dir: '{{ root_install_dir }}'
                 main_app_launcher: 'depends.exe'
                 desktop_shortcut: no # Default: no
                 startmenu_shortcut: yes # Default: yes
-
-
-- name: "Setup TreeSize"
-  hosts: windows
-  gather_facts: no
-  tags: treesize
-  roles:
-    - role: ans-win-auto-prov
-      vars:
-        shortname: treesize
-        setup:
-          - installations:
-            - software_components:
-              - software_fullname: "TreeSize"
-                file_relative_url: treesize/TreeSize_v4.7.2.exe
-                type: exe
-                arguments: /DIR={{ root_install_dir }}\TreeSize /VERYSILENT /NORESTART /ALLUSERS
 
 
 - name: Setup Node.JS v14, v16 and v18
@@ -564,21 +529,21 @@
           - installations:
             - software_components:
               - software_fullname: "NodeJS v14.17.3" 
-                file_relative_url: nodejs/node-v14.17.3-win-x64.zip
+                file_full_url: https://nodejs.org/download/release/v14.17.3/node-v14.17.3-win-x64.zip
                 type: zip
                 root_install_dir: '{{ root_install_dir }}\nodejs'
                 desktop_shortcut: no # Default: no
                 startmenu_shortcut: no # Default: yes
 
               - software_fullname: "NodeJS v16.16.0" 
-                file_relative_url: nodejs/node-v16.16.0-win-x64.zip
+                file_full_url: https://nodejs.org/download/release/v16.16.0/node-v16.16.0-win-x64.zip
                 type: zip
                 root_install_dir: '{{ root_install_dir }}\nodejs'
                 desktop_shortcut: no # Default: no
                 startmenu_shortcut: no # Default: yes
 
               - software_fullname: "NodeJS v18.18.0" 
-                file_relative_url: nodejs/node-v18.18.0-win-x64.zip
+                file_full_url: https://nodejs.org/download/release/v18.18.0/node-v18.18.0-win-x64.zip
                 type: zip
                 root_install_dir: '{{ root_install_dir }}\nodejs'
                 desktop_shortcut: no # Default: no
@@ -640,7 +605,7 @@
           - installations:
             - software_components:
               - software_fullname: "Eclipse IDE 2020-06" 
-                file_relative_url: eclipse_jee_ide/eclipse-jee-2020-06-R-win32-x86_64.zip
+                file_full_url: https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2020-06/R/eclipse-jee-2020-06-R-win32-x86_64.zip&r=1
                 type: zip
                 root_install_dir: '{{ root_install_dir }}'
                 main_app_launcher: eclipse\eclipse.exe
@@ -649,7 +614,7 @@
                 startmenu_shortcut: yes # Default: yes
                 #
               - software_fullname: "Eclipse IDE 2022-12" 
-                file_relative_url: eclipse_jee_ide/eclipse-jee-2022-12-R-win32-x86_64.zip
+                file_full_url: https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2022-12/R/eclipse-jee-2022-12-R-win32-x86_64.zip&r=1
                 type: zip
                 root_install_dir: '{{ root_install_dir }}'
                 main_app_launcher: eclipse\eclipse.exe
@@ -658,7 +623,7 @@
                 startmenu_shortcut: yes # Default: yes
                 #
               - software_fullname: "Eclipse IDE Neon 3 (2016-06)" 
-                file_relative_url: eclipse_jee_ide/eclipse-jee-neon-3-win32-x86_64.zip
+                file_full_url: https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/3/eclipse-jee-neon-3-win32-x86_64.zip&r=1
                 type: zip
                 root_install_dir: '{{ root_install_dir }}'
                 main_app_launcher: eclipse\eclipse.exe
@@ -667,7 +632,7 @@
                 startmenu_shortcut: yes # Default: yes
                 #
               - software_fullname: "Eclipse IDE Oxygen (2017-06)" 
-                file_relative_url: eclipse_jee_ide/eclipse-jee-oxygen-R-win32-x86_64.zip
+                file_full_url: https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/R/eclipse-jee-oxygen-R-win32-x86_64.zip&r=1
                 type: zip
                 root_install_dir: '{{ root_install_dir }}'
                 main_app_launcher: eclipse\eclipse.exe
@@ -688,9 +653,8 @@
           - installations:
             - software_components:
               - software_fullname: Cygwin
-                file_relative_url: cygwin/cygwin_v3_4_9_setup-x86_64.exe
+                file_full_url: https://www.cygwin.com/setup-x86_64.exe
                 type: exe
-                # /!\ Intall packages from the public internet
                 arguments: --quiet-mode --wait --site https://mirrors.kernel.org/sourceware/cygwin/ --site https://mirrors.filigrane-technologie.fr/cygwin/ --root {{ root_install_dir }}\Cygwin\cygwin64 --no-shortcuts --packages gcc-core,make,binutils,gdb,cygwin-devel,pkg-config,libncurses-devel,gettext-devel
                 manual_registration:
                   root_install_dir: '{{ root_install_dir }}'
@@ -698,7 +662,7 @@
                   desktop_shortcut: yes
                   startmenu_shortcut: yes
                   shortcut_arguments: '-i /Cygwin-Terminal.ico -'
-                  shortcut_icon: '{{ root_install_dir }}\Cygwin\cygwin64\Cygwin.ico'  # Provide full path, optionnally followed with icon index, e.g. 'filpath,12'
+                  shortcut_icon: '{{ root_install_dir }}\Cygwin\cygwin64\Cygwin.ico'  # Provide full path, optionally followed with icon index, e.g. 'filpath,12'
                 #abort_on_aftercheck_failure: no # Default: yes
 
 
